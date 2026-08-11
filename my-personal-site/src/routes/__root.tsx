@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Navbar } from '../components/navbar'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 
 export const Route = createRootRoute({
@@ -7,21 +8,16 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <React.Fragment>
-      <nav>
-        <a href="/">Home</a>
-        {' | '}
-        <a href="/about">About</a>
-        {' | '}
-        <a href="/resume">Resume</a>
-        {' | '}
-        <a href="/boardGames">Board Games</a>
-        {' | '}
-        <a href="/fossilsMinerals">Fossils and Minerals</a>
-        {' | '}
-        <a href="/books">Books</a>
-      </nav>
-      <Outlet />
-    </React.Fragment>
+    <div className="flex flex-col min-h-screen">
+      {/* Navbar sits cleanly at the top */}
+      <header className="w-full border-b bg-background">
+        <Navbar />
+      </header>
+      
+      {/* Outlet content fills everything else */}
+      <main className="flex-1">
+        <Outlet />
+      </main>
+    </div>
   )
 }
