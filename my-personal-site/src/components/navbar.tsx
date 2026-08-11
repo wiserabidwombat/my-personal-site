@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router"
 import {
     NavigationMenu,
     NavigationMenuList,
@@ -10,33 +11,52 @@ export function Navbar() {
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <NavigationMenuLink href="/">
-                        Home
+                    <NavigationMenuLink>
+                        <Link to="/">
+                            Home
+                        </Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <NavigationMenuLink href="/about">
-                        About Me
+                    <NavigationMenuLink>
+                        <Link to="/about">
+                            About Me
+                        </Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <NavigationMenuLink href="/resume">
-                        Resume
+                    <NavigationMenuLink>
+                        <Link to="/resume">
+                            Resume
+                        </Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <NavigationMenuLink href="/boardGames">
-                        Board Games
+                    <NavigationMenuLink>
+                        <Link to="/projects">
+                            Projects
+                        </Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <NavigationMenuLink href="/fossilsMinerals">
-                        Fossils and Minerals
+                    <NavigationMenuLink>
+                        <Link to="/boardGames">
+                            Board Games
+                        </Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <NavigationMenuLink href="/books">
-                        Books
+                    <NavigationMenuLink>
+                        <Link to="/fossilsMinerals">
+                            Fossils and Minerals
+                        </Link>
+                    </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <NavigationMenuLink>
+                        <Link to="/books">
+                            Books
+                        </Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
             </NavigationMenuList>
