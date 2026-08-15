@@ -5,6 +5,28 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>my-personal-site</title>
+    <script>
+      // Apply saved font preference early to avoid layout flash.
+      try {
+        var _f = localStorage.getItem('site-font');
+        if (_f === 'pastor') {
+          document.documentElement.setAttribute('data-font', 'pastor');
+          // add a pending class while the font loads to prevent size flash
+          document.documentElement.classList.add('font-pending');
+          if (document.fonts && document.fonts.ready) {
+            var _removed = false;
+            document.fonts.ready.then(function() {
+              if (!_removed) { document.documentElement.classList.remove('font-pending'); _removed = true }
+            });
+            // fallback: remove the pending class after 3s so site doesn't stay hidden
+            setTimeout(function(){ if (!_removed) { document.documentElement.classList.remove('font-pending'); _removed = true } }, 3000);
+          } else {
+            // if Font Loading API unavailable, remove pending after short timeout
+            setTimeout(function(){ document.documentElement.classList.remove('font-pending'); }, 500);
+          }
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

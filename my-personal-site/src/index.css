@@ -1,115 +1,195 @@
+@font-face {
+  font-family: 'Pastor of Muppets';
+  src: url('/fonts/pastor-of-muppets.woff2') format('woff2'),
+       url('/fonts/pastor-of-muppets.woff') format('woff'),
+       url('/fonts/pastor-of-muppets.ttf') format('truetype');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
 @import "tailwindcss";
 
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --bg-1: #0b0526; /* deep violet */
+  --bg-2: #16072b; /* darker magenta */
+  --neon-pink: #ff2d95;
+  --neon-purple: #7c4dff;
+  --neon-cyan: #00f0ff;
+  --accent: var(--neon-pink);
+  --text: #d7c7ff; /* synthwave-friendly soft lavender */
+  --muted: #b9a7d6;
+  --glass: rgba(255,255,255,0.04);
+  --card: rgba(10, 6, 20, 0.6);
+  --glow: 0 8px 40px rgba(124,77,255,0.18);
+  --glow-strong: 0 16px 80px rgba(255,45,149,0.12);
+  --ui-font-default: 'Orbitron', Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ui-font: var(--ui-font-default);
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
+  font: 16px/1.6 var(--ui-font);
+  color-scheme: dark;
+  background: linear-gradient(120deg, var(--bg-1) 0%, var(--bg-2) 60%);
   color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+/* animated gradient */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(600px 400px at 10% 20%, rgba(124,77,255,0.12), transparent 10%),
+              radial-gradient(500px 300px at 90% 80%, rgba(0,240,255,0.08), transparent 10%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(30px);
+  animation: floatBG 12s linear infinite;
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+@keyframes floatBG {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.03); }
+  100% { transform: translateY(0) scale(1); }
 }
+
+* { box-sizing: border-box; }
+
+html, body { min-height: 100%; }
 
 body {
   margin: 0;
+  background: transparent;
+  font-family: var(--ui-font);
+  color: #f3f2f8;
+  position: relative;
 }
+
+/* data-font toggle: when set to 'pastor' use that font */
+:root { }
+html[data-font='pastor'] {
+  --ui-font: 'Pastor of Muppets', var(--ui-font-default);
+  /* increase base font-size to make Pastor font more readable */
+  font-size: 18px; /* was 16px in :root */
+}
+
+/* while Pastor font is loading, hide the app root to avoid layout flash */
+html.font-pending #root { visibility: hidden; }
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+#root { min-height: 100vh; position: relative; z-index: 1; }
 
 @layer base {
-  h1,
-  h2 {
-    font-family: var(--heading);
-    font-weight: 500;
-    color: var(--text-h);
-  }
+  h1,h2,h3,h4 { color: #fff; }
+  p, li, span { color: var(--muted); }
+  code { font-family: var(--mono); background: rgba(255,255,255,0.03); padding: 0.2rem 0.45rem; border-radius: 6px; }
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+h1 { font-size: clamp(2.5rem, 5vw, 3.6rem); margin: .2rem 0 1rem; }
+h2 { font-size: clamp(1.25rem, 2vw, 1.8rem); }
+
+section { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.04); border-radius: 1.25rem; padding: 1.5rem; box-shadow: var(--glow); }
+
+@media (max-width: 768px) {
+  section { padding: 1rem; }
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+/* utility for neon text */
+.neon { color: var(--neon-pink); text-shadow: 0 0 6px rgba(255,45,149,0.45), 0 0 20px rgba(124,77,255,0.08); }
+
+.neon-underline { position: relative; }
+.neon-underline::after { content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 3px; background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-cyan)); filter: blur(6px); opacity: 0.9; }
+
+/* animated neon link */
+.neon-link {
+  color: var(--neon-cyan);
+  position: relative;
+  overflow: visible;
+  transition: transform 180ms ease, color 180ms ease;
+}
+.neon-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: radial-gradient(circle at center, rgba(0,240,255,0.18), rgba(124,77,255,0.06) 40%, transparent 60%);
+  filter: blur(14px);
+  opacity: 0;
+  transition: opacity 220ms ease, transform 220ms ease;
+  pointer-events: none;
+}
+.neon-link:hover {
+  transform: translateY(-2px);
+  color: #fff8ff;
+}
+.neon-link:hover::after { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+/* subtle flicker animation */
+@keyframes neonFlicker {
+  0% { opacity: 1; }
+  50% { opacity: 0.88; }
+  100% { opacity: 1; }
+}
+.neon-flicker { animation: neonFlicker 3.5s infinite; }
+
+/* ensure link text inherits the neon color (override utility classes if needed) */
+.neon-link > span { color: inherit !important; }
+
+/* hero-specific styles */
+.hero-grid {
+  background-image: linear-gradient(0deg, rgba(255,45,149,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(124,77,255,0.06) 1px, transparent 1px);
+  background-size: 28px 28px, 28px 28px;
+  background-position: 0 0, 14px 14px;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.hero-cta { transition: transform 200ms ease; }
+.hero-cta:hover { transform: translateY(-3px) scale(1.02); box-shadow: var(--glow-strong); }
+
+/* per-link neon colors */
+.neon-pink { color: #ff66b3 !important; }
+.neon-pink::after { background: radial-gradient(circle at center, rgba(255,102,179,0.18), rgba(124,77,255,0.04) 40%, transparent 60%); box-shadow: 0 8px 32px rgba(255,102,179,0.12); }
+
+.neon-purple { color: #b48cff !important; }
+.neon-purple::after { background: radial-gradient(circle at center, rgba(124,77,255,0.18), rgba(0,240,255,0.04) 40%, transparent 60%); box-shadow: 0 8px 32px rgba(124,77,255,0.12); }
+
+.neon-cyan { color: #66fff3 !important; }
+.neon-cyan::after { background: radial-gradient(circle at center, rgba(0,240,255,0.18), rgba(124,77,255,0.04) 40%, transparent 60%); box-shadow: 0 8px 32px rgba(0,240,255,0.12); }
+
+.neon-teal { color: #7fffd4 !important; }
+.neon-teal::after { background: radial-gradient(circle at center, rgba(127,255,212,0.16), rgba(0,240,255,0.04) 40%, transparent 60%); box-shadow: 0 8px 32px rgba(127,255,212,0.10); }
+
+.neon-amber { color: #ffd166 !important; }
+.neon-amber::after { background: radial-gradient(circle at center, rgba(255,209,102,0.14), rgba(255,45,149,0.04) 40%, transparent 60%); box-shadow: 0 8px 32px rgba(255,209,102,0.10); }
+
+.neon-magenta { color: #ff5ca8 !important; }
+.neon-magenta::after { background: radial-gradient(circle at center, rgba(255,92,168,0.18), rgba(124,77,255,0.04) 40%, transparent 60%); box-shadow: 0 8px 32px rgba(255,92,168,0.12); }
+
+/* Site title gradient + glow */
+.site-title {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(90deg, #ff2d95 0%, #7c4dff 50%, #00f0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+  text-shadow: 0 2px 18px rgba(124,77,255,0.06);
+}
+.site-title::after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  bottom: -10px;
+  height: 16px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(255,45,149,0.36), rgba(124,77,255,0.28), rgba(0,240,255,0.28));
+  filter: blur(12px);
+  opacity: 0.95;
+  pointer-events: none;
 }
