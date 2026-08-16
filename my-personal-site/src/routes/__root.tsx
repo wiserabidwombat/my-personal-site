@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { Link, Outlet, createRootRoute } from '@tanstack/react-router'
+import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { Navbar } from '../components/navbar'
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -7,19 +7,10 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <React.Fragment>
-      <nav>
-        <Link to="/">Home</Link>
-        {' | '}
-        <Link to="/about">About</Link>
-        {' | '}
-        <Link to="/games">Games</Link>
-        {' | '}
-        <Link to="/minerals_fossils">Minerals & Fossils</Link>
-        {' | '}
-        <Link to="/resume">Resume</Link>
-      </nav>
+    <div>
+      <h1>Welcome to my personal site!</h1>
+      <Navbar />
       <Outlet />
-    </React.Fragment>
+    </div>
   )
 }
