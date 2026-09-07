@@ -161,3 +161,25 @@ code {
     );
   }
 }
+
+/* Opt-in motion for bg-synth-grid: scrolls the floor grid toward the viewer. */
+@keyframes synth-grid-scroll {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 60px;
+  }
+}
+
+@utility animate-synth-grid {
+  &::before {
+    animation: synth-grid-scroll 1.4s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::before {
+      animation: none;
+    }
+  }
+}

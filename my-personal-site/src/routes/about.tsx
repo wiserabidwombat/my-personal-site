@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { CameraAdd01Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '../../@/components/ui/badge'
+import boardGamePhoto from '../assets/board-game.jpg'
+import flyFishingPhoto from '../assets/fly-fishing.jpg'
+import golfPhoto from '../assets/highest-golf.jpg'
+import beefJerkyPhoto from '../assets/beef-jerky.jpg'
 
 export const Route = createFileRoute('/about')({
   component: AboutRouteComponent,
@@ -30,9 +32,16 @@ const beyondTheCode = [
   { label: 'At the Table', detail: 'Diving into complex strategy board games or PC gaming.' },
   {
     label: 'In the Elements',
-    detail: 'Out on the water fly fishing or playing a fast-paced game of pickleball.',
+    detail: 'Out on the water fly fishing, playing a fast-paced game of pickleball, exploring the great outdoors, covering every corner of the golf course.',
   },
-  { label: 'Unwinding', detail: 'Catching a great movie or getting lost in a good book.' },
+  { label: 'Unwinding', detail: 'Catching a great movie, getting lost in a good book, cooking and smoking good food, collecting minerals and fossils, going out to a great restaurant.' },
+]
+
+const beyondPhotos = [
+  { src: boardGamePhoto, alt: 'Deep into a strategy board game session' },
+  { src: flyFishingPhoto, alt: 'Fly fishing, holding up a rainbow trout catch' },
+  { src: golfPhoto, alt: 'Tee marker at Copper Creek, the highest tee in North America' },
+  { src: beefJerkyPhoto, alt: 'A batch of homemade beef jerky smoking on the grill' },
 ]
 
 const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]'
@@ -127,19 +136,13 @@ function AboutRouteComponent() {
             ))}
           </ul>
           <div className="grid grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((n) => (
-              <div
-                key={n}
-                className="flex aspect-square flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[var(--laser-cyan)]/40 text-[var(--laser-cyan)]/70"
-              >
-                <HugeiconsIcon
-                  icon={CameraAdd01Icon}
-                  strokeWidth={2}
-                  className="size-8"
-                  aria-hidden="true"
-                />
-                <span className="text-xs">Add photo</span>
-              </div>
+            {beyondPhotos.map((photo) => (
+              <img
+                key={photo.alt}
+                src={photo.src}
+                alt={photo.alt}
+                className="aspect-square w-full rounded-2xl border-2 border-[var(--laser-cyan)]/40 object-cover shadow-glow-cyan"
+              />
             ))}
           </div>
         </div>
