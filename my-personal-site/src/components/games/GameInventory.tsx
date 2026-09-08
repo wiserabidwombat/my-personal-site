@@ -11,7 +11,7 @@ import {
   TableHead,
   TableCell,
 } from '../../../@/components/ui/table'
-import boardGamesData from '../../data/board-games.json'
+import { useBoardGames } from '../../hooks/useBoardGames'
 import { pcGames } from '../../data/pc-games'
 import { headingClass } from './shared'
 
@@ -32,30 +32,40 @@ function formatPlayers(min: number | null, max: number | null) {
   return `${min ?? max}`
 }
 
-const inventory: InventoryRow[] = [
-  ...boardGamesData.map((game) => ({
-    id: game.id,
-    name: game.name,
-    category: 'Board Game' as const,
-    players: formatPlayers(game.playersMin, game.playersMax),
-    rating: game.rating != null ? `${game.rating}/10` : '—',
-    status: game.status ?? '—',
-  })),
-  ...pcGames.map((game) => ({
-    id: game.id,
-    name: game.name,
-    category: 'PC Game' as const,
-    players: '—',
-    rating: game.rating != null ? `${game.rating}/10` : '—',
-    status: game.status ?? '—',
-  })),
-]
-
 const categoryFilters: Category[] = ['All', 'Board Game', 'PC Game']
 
+const sourceLabel: Record<ReturnType<typeof useBoardGames>['source'], string> = {
+  loading: 'Loading inventory...',
+  live: 'Live from Notion',
+  cached: 'Showing cached data',
+}
+
 export function GameInventory() {
+  const { games: boardGames, source } = useBoardGames()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<Category>('All')
+
+  const inventory: InventoryRow[] = useMemo(
+    () => [
+      ...boardGames.map((game) => ({
+        id: game.id,
+        name: game.name,
+        category: 'Board Game' as const,
+        players: formatPlayers(game.playersMin, game.playersMax),
+        rating: game.rating != null ? `${game.rating}/10` : '—',
+        status: game.status ?? '—',
+      })),
+      ...pcGames.map((game) => ({
+        id: game.id,
+        name: game.name,
+        category: 'PC Game' as const,
+        players: '—',
+        rating: game.rating != null ? `${game.rating}/10` : '—',
+        status: game.status ?? '—',
+      })),
+    ],
+    [boardGames]
+  )
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -64,11 +74,25 @@ export function GameInventory() {
       const matchesSearch = query === '' || game.name.toLowerCase().includes(query)
       return matchesCategory && matchesSearch
     })
-  }, [search, category])
+  }, [inventory, search, category])
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
-      <h2 className={headingClass}>Game Inventory</h2>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 className={headingClass}>Game Inventory</h2>
+        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+          <span
+            className={`size-1.5 rounded-full ${
+              source === 'live'
+                ? 'bg-[var(--laser-cyan)] shadow-glow-cyan'
+                : source === 'loading'
+                  ? 'animate-pulse bg-slate-500'
+                  : 'bg-slate-500'
+            }`}
+          />
+          {sourceLabel[source]}
+        </span>
+      </div>
       <p className="mt-2 text-slate-300">Everything currently on the shelf (and the hard drive).</p>
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
