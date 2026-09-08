@@ -7,28 +7,28 @@ import {
   FishingRodIcon,
   Brain01Icon,
 } from '@hugeicons/core-free-icons'
-import { Badge } from '../../@/components/ui/badge'
+// import { Badge } from '../../@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
 
-const transmissionLog = [
-  {
-    title: 'Teaching an AI Agent to Respect My Design System',
-    excerpt:
-      'Notes from wiring prompt-driven workflows into a real component library without losing the plot.',
-    tag: '#coding',
-  },
-  {
-    title: 'What Board Games Taught Me About Leading a Team',
-    excerpt:
-      'Turn order, hidden information, and why the best engineering teams play more like co-op games.',
-    tag: '#boardgames',
-  },
-  {
-    title: 'Why I Build People, Not Just Software',
-    excerpt: 'A few thoughts on mentoring, growth, and treating your team like the real architecture.',
-    tag: '#thoughts',
-  },
-]
+// const transmissionLog = [
+//   {
+//     title: 'Teaching an AI Agent to Respect My Design System',
+//     excerpt:
+//       'Notes from wiring prompt-driven workflows into a real component library without losing the plot.',
+//     tag: '#coding',
+//   },
+//   {
+//     title: 'What Board Games Taught Me About Leading a Team',
+//     excerpt:
+//       'Turn order, hidden information, and why the best engineering teams play more like co-op games.',
+//     tag: '#boardgames',
+//   },
+//   {
+//     title: 'Why I Build People, Not Just Software',
+//     excerpt: 'A few thoughts on mentoring, growth, and treating your team like the real architecture.',
+//     tag: '#thoughts',
+//   },
+// ]
 
 const currentStatus = [
   { label: 'Now Playing', value: 'Heroes of Might and Magic: Olden Era', icon: GameController01Icon },
