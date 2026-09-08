@@ -8,13 +8,15 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "fetch:games": "node --env-file=.env.local scripts/fetch-games.mjs"
+    "fetch:games": "node --env-file=.env.local scripts/fetch-games.mjs",
+    "db:migrate": "node --env-file=.env.local scripts/migrate.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
     "@fontsource-variable/figtree": "^5.3.0",
     "@hugeicons/core-free-icons": "^4.2.3",
     "@hugeicons/react": "^1.1.9",
+    "@neondatabase/serverless": "^1.1.0",
     "@notionhq/client": "^5.26.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-router": "^1.170.24",
