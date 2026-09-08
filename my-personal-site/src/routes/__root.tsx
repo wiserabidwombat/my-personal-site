@@ -8,7 +8,6 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <div>
-      <h1>Welcome to my personal site!</h1>
       <Navbar />
       <Outlet />
     </div>
