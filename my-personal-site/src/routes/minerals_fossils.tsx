@@ -1,9 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Fossils } from '../components/Fossils'
 
 export const Route = createFileRoute('/minerals_fossils')({
-  component: RouteComponent,
+  component: Fossils,
 })
-
-function RouteComponent() {
-  return <div>Hello "/minerals_fossils"!</div>
-}
