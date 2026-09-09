@@ -9,7 +9,7 @@ export function Fossils() {
   return (
     <div className="min-h-screen bg-[var(--deep-space-black)] text-slate-200">
       <NeonShowcase specimens={specimens} loading={loading} />
-      <CatalogLedger specimens={specimens} loading={loading} />
+      <CatalogLedger specimens={specimens} loading={loading} status={status} />
       {status === 'error' && (
         <p className="mx-auto max-w-6xl px-6 pb-16 text-center text-sm text-slate-400">
           Unable to load the collection right now. Please try again later.

@@ -13,6 +13,7 @@ import {
   TableCell,
 } from '../../../@/components/ui/table'
 import type { Specimen } from '../../types/specimen'
+import type { SpecimensState } from '../../hooks/useSpecimens'
 import { headingClass } from '../games/shared'
 
 type Filter = 'All' | 'Minerals' | 'Fossils'
@@ -20,9 +21,16 @@ type Filter = 'All' | 'Minerals' | 'Fossils'
 const filters: Filter[] = ['All', 'Minerals', 'Fossils']
 const PAGE_SIZE = 10
 
+const statusLabel: Record<SpecimensState['status'], string> = {
+  loading: 'Connecting to Neon...',
+  ready: 'Live from Neon',
+  error: 'Unable to reach Neon',
+}
+
 type Props = {
   specimens: Specimen[]
   loading: boolean
+  status: SpecimensState['status']
 }
 
 function formatDate(value: string | null) {
@@ -37,7 +45,7 @@ function formatDate(value: string | null) {
   })
 }
 
-export function CatalogLedger({ specimens, loading }: Props) {
+export function CatalogLedger({ specimens, loading, status }: Props) {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('All')
   const [page, setPage] = useState(1)
@@ -73,7 +81,21 @@ export function CatalogLedger({ specimens, loading }: Props) {
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-16">
-      <h2 className={headingClass}>Catalog Ledger</h2>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 className={headingClass}>Catalog Ledger</h2>
+        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+          <span
+            className={`size-1.5 rounded-full ${
+              status === 'ready'
+                ? 'bg-[var(--laser-cyan)] shadow-glow-cyan'
+                : status === 'loading'
+                  ? 'animate-pulse bg-slate-500'
+                  : 'bg-slate-500'
+            }`}
+          />
+          {statusLabel[status]}
+        </span>
+      </div>
       <p className="mt-2 text-slate-300">The full collection, searchable and paginated.</p>
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
