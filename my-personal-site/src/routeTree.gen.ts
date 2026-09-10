@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as GamesRouteImport } from './routes/games'
 import { Route as Minerals_fossilsRouteImport } from './routes/minerals_fossils'
 import { Route as ResumeRouteImport } from './routes/resume'
+import { Route as StackRouteImport } from './routes/stack'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,11 @@ const ResumeRoute = ResumeRouteImport.update({
   path: '/resume',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StackRoute = StackRouteImport.update({
+  id: '/stack',
+  path: '/stack',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/games': typeof GamesRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/resume': typeof ResumeRoute
+  '/stack': typeof StackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/games': typeof GamesRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/resume': typeof ResumeRoute
+  '/stack': typeof StackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,22 @@ export interface FileRoutesById {
   '/games': typeof GamesRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/resume': typeof ResumeRoute
+  '/stack': typeof StackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/games' | '/minerals_fossils' | '/resume'
+  fullPaths:
+    '/' | '/about' | '/games' | '/minerals_fossils' | '/resume' | '/stack'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/games' | '/minerals_fossils' | '/resume'
-  id: '__root__' | '/' | '/about' | '/games' | '/minerals_fossils' | '/resume'
+  to: '/' | '/about' | '/games' | '/minerals_fossils' | '/resume' | '/stack'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/games'
+    | '/minerals_fossils'
+    | '/resume'
+    | '/stack'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +94,7 @@ export interface RootRouteChildren {
   GamesRoute: typeof GamesRoute
   Minerals_fossilsRoute: typeof Minerals_fossilsRoute
   ResumeRoute: typeof ResumeRoute
+  StackRoute: typeof StackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +134,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stack': {
+      id: '/stack'
+      path: '/stack'
+      fullPath: '/stack'
+      preLoaderRoute: typeof StackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +150,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamesRoute: GamesRoute,
   Minerals_fossilsRoute: Minerals_fossilsRoute,
   ResumeRoute: ResumeRoute,
+  StackRoute: StackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
