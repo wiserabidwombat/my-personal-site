@@ -120,6 +120,14 @@ export function Home() {
             </span>
           ))}
         </div>
+        <div className="mt-4 text-center">
+          <Link
+            to="/stack"
+            className="text-xs font-medium tracking-wide text-slate-500 uppercase transition-colors duration-300 hover:text-[var(--laser-cyan)] hover:[text-shadow:var(--glow-cyan)]"
+          >
+            How this site is built &rarr;
+          </Link>
+        </div>
       </footer>
     </div>
   )
