@@ -10,6 +10,7 @@ import {
 const primaryNavItems = [
   { to: '/', label: 'Home' },
   { to: '/about', label: 'About' },
+  { to: '/blog', label: 'Blog' },
   { to: '/resume', label: 'Resume' },
 ]
 
