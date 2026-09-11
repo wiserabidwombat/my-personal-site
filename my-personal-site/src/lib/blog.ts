@@ -49,3 +49,30 @@ export function collectTags(posts: BlogPost[]): string[] {
   }
   return [...tagSet].sort()
 }
+
+const rawModules = import.meta.glob('/content/blog/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+})
+
+let cachedPosts: BlogPost[] | null = null
+
+function loadPosts(): BlogPost[] {
+  if (!cachedPosts) {
+    cachedPosts = buildPostsFromRaw(rawModules)
+  }
+  return cachedPosts
+}
+
+export function getAllPosts(): BlogPost[] {
+  return loadPosts()
+}
+
+export function getPostBySlug(slug: string): BlogPost | undefined {
+  return findPostBySlug(loadPosts(), slug)
+}
+
+export function getAllTags(): string[] {
+  return collectTags(loadPosts())
+}

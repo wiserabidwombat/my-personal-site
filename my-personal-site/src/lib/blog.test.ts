@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { buildPostsFromRaw, collectTags, findPostBySlug } from './blog'
+import {
+  buildPostsFromRaw,
+  collectTags,
+  findPostBySlug,
+  getAllPosts,
+  getAllTags,
+  getPostBySlug,
+} from './blog'
 
 describe('buildPostsFromRaw', () => {
   it('sorts posts by date, newest first', () => {
@@ -119,5 +126,33 @@ Body.
     })
 
     expect(collectTags(posts)).toEqual(['ai', 'boardgames', 'coding'])
+  })
+})
+
+describe('getAllPosts (real seed content)', () => {
+  it('returns both seed posts, newest first', () => {
+    const posts = getAllPosts()
+    expect(posts.map((post) => post.slug)).toEqual([
+      'teaching-an-ai-agent-to-respect-my-design-system',
+      'what-board-games-taught-me-about-leading-a-team',
+    ])
+  })
+})
+
+describe('getPostBySlug (real seed content)', () => {
+  it('finds a seeded post by slug', () => {
+    expect(getPostBySlug('what-board-games-taught-me-about-leading-a-team')?.title).toBe(
+      'What Board Games Taught Me About Leading a Team',
+    )
+  })
+
+  it('returns undefined for an unknown slug', () => {
+    expect(getPostBySlug('does-not-exist')).toBeUndefined()
+  })
+})
+
+describe('getAllTags (real seed content)', () => {
+  it('includes the tags from the tagged seed post', () => {
+    expect(getAllTags()).toEqual(['ai', 'coding'])
   })
 })
