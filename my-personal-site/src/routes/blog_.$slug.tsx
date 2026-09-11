@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
-import { Button } from '../../@/components/ui/button'
+import { buttonVariants } from '../../@/components/ui/button'
 import { getPostBySlug } from '../lib/blog'
 import { BlogPostView } from '../components/blog/BlogPostView'
 
@@ -20,10 +20,10 @@ function BlogSlugRouteComponent() {
           Post not found
         </h1>
         <p className="mt-4 text-slate-300">That transmission never made it through.</p>
-        <Button variant="outline" className="mt-8" render={<Link to="/blog" />}>
+        <Link to="/blog" className={buttonVariants({ variant: 'outline', className: 'mt-8' })}>
           <HugeiconsIcon icon={ArrowLeft02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
           Back to blog
-        </Button>
+        </Link>
       </div>
     )
   }

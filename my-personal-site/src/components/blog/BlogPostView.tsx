@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '../../../@/components/ui/badge'
-import { Button } from '../../../@/components/ui/button'
+import { buttonVariants } from '../../../@/components/ui/button'
 import type { BlogPost } from '../../types/blog-post'
 
 function formatDate(value: string) {
@@ -94,10 +94,10 @@ export function BlogPostView({ post }: Props) {
           </ReactMarkdown>
         </div>
 
-        <Button variant="outline" className="mt-12" render={<Link to="/blog" />}>
+        <Link to="/blog" className={buttonVariants({ variant: 'outline', className: 'mt-12' })}>
           <HugeiconsIcon icon={ArrowLeft02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
           Back to blog
-        </Button>
+        </Link>
       </article>
     </div>
   )
