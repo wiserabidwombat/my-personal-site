@@ -7,9 +7,26 @@ function parsePost(raw: string, filePath: string): BlogPost {
   const { data, content } = matter(raw)
 
   for (const field of REQUIRED_FIELDS) {
-    if (!data[field]) {
+    if (data[field] === undefined || data[field] === null || data[field] === '') {
       throw new Error(`Blog post "${filePath}" is missing required frontmatter field "${field}"`)
     }
+    if (typeof data[field] !== 'string') {
+      if (field === 'date') {
+        throw new Error(
+          `Blog post "${filePath}" has a "date" field that isn't a string — did you forget to quote it in the frontmatter (e.g. date: "2026-01-01")?`,
+        )
+      }
+      throw new Error(
+        `Blog post "${filePath}" has a "${field}" field that isn't a string (got ${typeof data[field]})`,
+      )
+    }
+  }
+
+  if (
+    data.tags !== undefined &&
+    (!Array.isArray(data.tags) || data.tags.some((tag: unknown) => typeof tag !== 'string'))
+  ) {
+    throw new Error(`Blog post "${filePath}" has a "tags" field that isn't an array of strings`)
   }
 
   return {

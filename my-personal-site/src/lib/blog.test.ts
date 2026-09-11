@@ -49,6 +49,39 @@ Missing a blurb.
     expect(() => buildPostsFromRaw(rawModules)).toThrow(/blurb/)
   })
 
+  it('throws when the date field is an unquoted YAML date (parsed as a Date, not a string)', () => {
+    const rawModules = {
+      '/content/blog/unquoted-date.md': `---
+title: Unquoted Date Post
+slug: unquoted-date-post
+image: /blog/unquoted-date.svg
+blurb: A post with an unquoted date.
+date: 2026-08-14
+---
+Body.
+`,
+    }
+
+    expect(() => buildPostsFromRaw(rawModules)).toThrow(/date/i)
+  })
+
+  it('throws when tags is a scalar instead of a list', () => {
+    const rawModules = {
+      '/content/blog/scalar-tags.md': `---
+title: Scalar Tags Post
+slug: scalar-tags-post
+image: /blog/scalar-tags.svg
+blurb: A post with a scalar tags value.
+date: "2026-01-01"
+tags: coding
+---
+Body.
+`,
+    }
+
+    expect(() => buildPostsFromRaw(rawModules)).toThrow(/tags/i)
+  })
+
   it('throws on duplicate slugs', () => {
     const makePost = (title: string) => `---
 title: ${title}
