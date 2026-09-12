@@ -11,12 +11,12 @@ tags: ["coding", "ai"]
 I've spent the last week folding AI-assisted development into my admittely
 slow start to building a new personal website. The hardest problem
 hasn't been getting an agent to write working code.  It's been getting
-it to write that looks like mine, respects token usage, follows
+it to write code that looks like mine, respects token usage, follows
 component conventions and making a coherent design.
 
 ## The problem with "just describe it"
 
-Early on, I ried just prompting the agent with pretty plain English
+Early on, I tried just prompting the agent with pretty plain English
 statements such as "build a component that can display a blog article".
 It produced the component but didn't use Tailwind or shadcn.  And of
 course it looked nothing like what I though it should.
@@ -33,10 +33,8 @@ like what I would have written.
 
 ## The takeaway
 
-Agents are excellent at consistency once you hand them something
-consistent to be consistent *with*. The design system was never the
-constraint — it was the missing context.
-
 Agents are great when you can give them something to work off of.
 It allows them to be consistent with your ideas and design system.
-Context ultimately is what makes the agents great.
+Context ultimately is what makes the agents great.  The next time
+I prompted for a new component, it had the synthwave styling and
+design I was looking for.
