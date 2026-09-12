@@ -1,41 +1,42 @@
 ---
-title: "Teaching an AI Agent to Respect My Design System"
-slug: teaching-an-ai-agent-to-respect-my-design-system
+title: "Introducing AI Agents Into My Design System"
+slug: introducing-ai-agents-into-my-design-system
 image: /blog/ai-design-system.svg
-blurb: "Notes from wiring prompt-driven workflows into a real component library without losing the plot."
+blurb: "Notes on introducing prompt-drive workflows into a real site"
 date: "2026-08-14"
 author: "Aaron Tilley"
 tags: ["coding", "ai"]
 ---
 
-I've spent the last few months folding AI-assisted development into my
-day-to-day workflow, and the hardest problem hasn't been getting an
-agent to write working code. It's been getting it to write code that
-looks like *mine* — that respects the tokens, the component
-conventions, and the fifty small decisions that make a design system
-feel coherent instead of assembled.
+I've spent the last week folding AI-assisted development into my admittely
+slow start to building a new personal website. The hardest problem
+hasn't been getting an agent to write working code.  It's been getting
+it to write that looks like mine, respects token usage, follows
+component conventions and making a coherent design.
 
 ## The problem with "just describe it"
 
-Early on, I tried prompting an agent with plain-English descriptions
-of the aesthetic: "neon, retro-future, dark backgrounds." It produced
-technically correct Tailwind, but every component reinvented its own
-shade of pink and its own idea of what a glow effect should look like.
-The output worked. It just didn't belong.
+Early on, I ried just prompting the agent with pretty plain English
+statements such as "build a component that can display a blog article".
+It produced the component but didn't use Tailwind or shadcn.  And of
+course it looked nothing like what I though it should.
 
 ## What actually worked
 
-The fix wasn't a better prompt — it was giving the agent the same
-thing I'd give a new engineer joining the project: the actual design
-tokens, the existing component patterns to imitate, and explicit
-permission to go read the code before writing any. Once the agent had
-`--neon-pink`, `--laser-cyan`, and the `bg-synth-grid` utility in front
-of it, along with a couple of real examples to pattern-match against,
-the components it produced were indistinguishable from ones I'd
-written by hand.
+The fix wasn't me writing a better prompt.  It was giving the agent
+the same thing I would want when starting a new project.  What
+component patterns should it imitate, what is my design aesthetic,
+what is the purpose of this project, etc.  Once I created a skill
+the agent could use, specifically defining the UI styling being
+synthwave and what colors it should use for example, the component looked
+like what I would have written.
 
 ## The takeaway
 
 Agents are excellent at consistency once you hand them something
 consistent to be consistent *with*. The design system was never the
 constraint — it was the missing context.
+
+Agents are great when you can give them something to work off of.
+It allows them to be consistent with your ideas and design system.
+Context ultimately is what makes the agents great.
