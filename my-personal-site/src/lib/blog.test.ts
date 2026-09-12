@@ -166,7 +166,7 @@ describe('getAllPosts (real seed content)', () => {
   it('returns both seed posts, newest first', () => {
     const posts = getAllPosts()
     expect(posts.map((post) => post.slug)).toEqual([
-      'teaching-an-ai-agent-to-respect-my-design-system',
+      'introducing-ai-agents-into-my-design-system',
       'what-board-games-taught-me-about-leading-a-team',
     ])
   })
