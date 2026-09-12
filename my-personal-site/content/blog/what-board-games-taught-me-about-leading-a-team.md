@@ -25,7 +25,7 @@ like a board game.
 ## Turn order matters more than talent
 
 Turn order matters.  It's important to know who blocks whom, and who
-unblocks whom.  It's also important to understand how does best in
+unblocks whom.  It's also important to understand who does best in
 a discussion and who does best being left alone.  In other words,
 sequencing matters when it comes to the team.
 
