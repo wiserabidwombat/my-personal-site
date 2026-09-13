@@ -16,7 +16,7 @@ const skillGroups = [
   },
   {
     label: 'Frameworks & Libraries',
-    skills: ['React', 'Angular', '.NET 4', 'Tailwind CSS', 'shadcn/ui'],
+    skills: ['React', 'Angular', '.NET 4', 'Tailwind CSS', 'shadcn/ui', 'npm', 'TanStack Router'],
   },
   {
     label: 'Cloud & DevOps',
@@ -24,10 +24,6 @@ const skillGroups = [
       'AWS Lambda',
       'AWS RDS',
       'AWS DynamoDB',
-      'AWS API Gateway',
-      'AWS SQS',
-      'AWS SNS',
-      'AWS CodePipeline',
       'Docker',
       'D365 Power Apps',
       'D365 Cloudflows',
