@@ -11,24 +11,32 @@ const summary =
 
 const skillGroups = [
   {
-    label: 'Programming / Languages',
-    skills: ['C#', 'SQL', 'Angular', 'ASP.NET Core', 'Microservices'],
+    label: 'Languages',
+    skills: ['C#', 'TypeScript', 'JavaScript', 'SQL'],
   },
   {
-    label: 'Tools',
+    label: 'Frameworks & Libraries',
+    skills: ['React', 'Angular', '.NET 4', 'Tailwind CSS', 'shadcn/ui', 'npm', 'TanStack Router'],
+  },
+  {
+    label: 'Cloud & DevOps',
     skills: [
       'AWS Lambda',
       'AWS RDS',
       'AWS DynamoDB',
-      'AWS API Gateway',
-      'AWS SQS',
-      'AWS SNS',
-      'AWS CodePipeline',
+      'Docker',
+      'D365 Power Apps',
+      'D365 Cloudflows',
+      'Terraform',
     ],
   },
   {
-    label: 'Software',
-    skills: ['Docker', 'Git', 'Jira', 'Visual Studio', 'SSMS'],
+    label: 'Enterprise Platforms',
+    skills: ['Microsoft Dynamics (D365)', 'Microservices Architecture'],
+  },
+  {
+    label: 'Tools',
+    skills: ['Git', 'GitHub', 'Jira', 'Visual Studio', 'SSMS', 'VS Code'],
   },
 ]
 
@@ -140,17 +148,6 @@ const credentials: Credential[] = [
     date: 'January 2022',
   },
   {
-    title: 'Microsoft Certified Professional',
-    detail: '70-483 Programming in C#',
-    date: 'December 2018',
-  },
-  {
-    title: 'Brookhaven College',
-    detail: 'Continuing education — Programming Logic & Design, C#, Intro to C++ Programming',
-    date: 'Fall 2015, Spring 2016',
-    location: 'Dallas, TX',
-  },
-  {
     title: 'University of North Texas',
     detail: 'Bachelor of Science in Business Computer Information Systems',
     date: 'December 2004',
@@ -177,7 +174,7 @@ function RouteComponent() {
 
       <section className="mx-auto max-w-4xl px-6 py-12">
         <h2 className={headingClass}>Technology Skills</h2>
-        <div className="mt-6 grid gap-6 sm:grid-cols-3">
+        <div className="mt-6 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {skillGroups.map((group) => (
             <div
               key={group.label}
@@ -234,7 +231,7 @@ function RouteComponent() {
 
       <section className="mx-auto max-w-4xl px-6 py-12">
         <h2 className={headingClass}>Education and Professional Development</h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="mx-auto mt-6 grid max-w-2xl gap-4 sm:grid-cols-2">
           {credentials.map((credential) => (
             <Card key={credential.title} className="ring-[var(--cyber-purple)]/40 shadow-glow-purple">
               <CardHeader>
