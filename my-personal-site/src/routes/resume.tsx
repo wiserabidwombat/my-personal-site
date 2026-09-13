@@ -40,11 +40,16 @@ const skillGroups = [
   },
 ]
 
+type Project = {
+  name: string
+  bullets: string[]
+}
+
 type Role = {
   title: string
   dateRange?: string
-  project?: string
-  bullets: string[]
+  bullets?: string[]
+  projects?: Project[]
 }
 
 type Company = {
@@ -57,49 +62,60 @@ type Company = {
 const experience: Company[] = [
   {
     name: 'Alight Solutions',
+    location: 'Remote',
     dateRange: 'June 2022 – Present',
     roles: [
       {
         title: 'Senior Developer',
-        dateRange: 'July 2026 – Present',
-        project: 'Salesforce-to-Dynamics 365 Migration',
-        bullets: [
-          'Building React-based web resource components embedded within Microsoft Dynamics 365 CRM to support the migration off Salesforce',
-          'Leveraging D365 tables, Power Apps, and Power Automate (Cloud Flows) to support end-to-end workflows for client creation, documentation, tracking, and communication',
-          'Updating existing backend services to source and display client data from Dynamics 365 instead of Salesforce, ensuring continuity across the broader platform ecosystem',
-          'Supporting a platform-wide migration affecting 3,000+ clients',
+        dateRange: 'June 2026 – Present',
+        projects: [
+          {
+            name: 'Salesforce-to-Dynamics 365 Migration',
+            bullets: [
+              'Building React-based web resource components embedded within Microsoft Dynamics 365 CRM to support the migration off Salesforce',
+              'Leveraging D365 tables, Power Apps, and Power Automate (Cloud Flows) to support end-to-end workflows for client creation, documentation, tracking, and communication',
+              'Updating existing backend services to source and display client data from Dynamics 365 instead of Salesforce, ensuring continuity across the broader platform ecosystem',
+              'Supporting a platform-wide migration affecting 3,000+ clients',
+            ],
+          },
         ],
       },
       {
         title: 'Team Lead',
-        dateRange: 'April 2024 – 2025',
-        project: 'Alight Platform Integration',
-        bullets: [
-          'Led the integration of two previously independent client tools (Smart Select MD and Health Pros) into the unified Alight domain, eliminating standalone URLs and consolidating the user experience',
-          "Migrated features and business logic into Alight's Angular front-end architecture, aligning UI and navigation with the broader platform",
-          "Re-engineered backend services to integrate with Alight's existing notification, ticketing, and communication systems",
-          'Led the team through the migration while maintaining continuity of service for 3,000+ clients at 99% uptime',
-        ],
-      },
-      {
-        title: 'Team Lead',
-        dateRange: 'April 2023 – April 2024',
-        project: 'Health Pros Platform',
-        bullets: [
-          'Led development of a live communication platform connecting clients with health advocates ("Health Pros") for support with provider search, appointment scheduling, and insurance guidance',
-          'Architected a real-time chat system using SignalR, enabling live two-way communication between clients and health advocates',
-          'Built a front-end ticketing interface displaying open requests, conversation history, and document/file upload capabilities',
-          'Led a development team delivering the platform to 3,000+ clients with 99% uptime',
+        dateRange: 'April 2023 – June 2026',
+        projects: [
+          {
+            name: 'Health Pros Platform',
+            bullets: [
+              'Led development of a live communication platform connecting clients with health advocates ("Health Pros") for support with provider search, appointment scheduling, and insurance guidance',
+              'Architected a real-time chat system using SignalR, enabling live two-way communication between clients and health advocates',
+              'Built a front-end ticketing interface displaying open requests, conversation history, and document/file upload capabilities',
+              'Led a development team delivering the platform to 3,000+ clients with 99% uptime',
+            ],
+          },
+          {
+            name: 'Alight Platform Integration',
+            bullets: [
+              'Led the integration of two previously independent client tools (Smart Select MD and Health Pros) into the unified Alight domain, eliminating standalone URLs and consolidating the user experience',
+              "Migrated features and business logic into Alight's Angular front-end architecture, aligning UI and navigation with the broader platform",
+              "Re-engineered backend services to integrate with Alight's existing notification, ticketing, and communication systems",
+              'Led the team through the migration while maintaining continuity of service for 3,000+ clients at 99% uptime',
+            ],
+          },
         ],
       },
       {
         title: 'Developer',
         dateRange: 'July 2022 – April 2023',
-        project: 'Smart Select MD',
-        bullets: [
-          'Developed a client-facing healthcare navigation tool using Angular, C# services on AWS ECS, SQL, and Elasticsearch, enabling users to search for doctors and facilities by specialty or condition',
-          'Built search functionality that combined member health insurance data with provider cost, rating, and quality information to support informed care decisions',
-          'Contributed to a platform supporting 3,000+ clients while maintaining 99% uptime',
+        projects: [
+          {
+            name: 'Smart Select MD',
+            bullets: [
+              'Developed a client-facing healthcare navigation tool using Angular, C# services on AWS ECS, SQL, and Elasticsearch, enabling users to search for doctors and facilities by specialty or condition',
+              'Built search functionality that combined member health insurance data with provider cost, rating, and quality information to support informed care decisions',
+              'Contributed to a platform supporting 3,000+ clients while maintaining 99% uptime',
+            ],
+          },
         ],
       },
     ],
@@ -113,18 +129,18 @@ const experience: Company[] = [
         title: 'Software Engineer',
         dateRange: 'April 2019 – May 2022',
         bullets: [
-          'Build and deploy microservices to scale security platform from 10k to 100k agents',
-          'Deploy and troubleshoot AWS SQS, RDS, Dynamo and Lambda infrastructure',
-          'Develop and deploy microservices for interacting with Qualys Cloud Security Assessment (CSPM)',
+          'Built and deployed microservices to scale security platform from 10k to 100k agents',
+          'Deployed and troubleshot AWS SQS, RDS, Dynamo and Lambda infrastructure',
+          'Developed and deployed microservices for interacting with Qualys Cloud Security Assessment (CSPM)',
         ],
       },
       {
         title: 'Quality Engineer',
         dateRange: 'May 2016 – April 2019',
         bullets: [
-          'Perform end to end web application and API testing',
-          'Linux and Windows application testing',
-          'Develop and implement test plans, test cases and document outcomes',
+          'Performed end to end web application and API testing',
+          'Tested Linux and Windows applications',
+          'Developed and implemented test plans and test cases, and documented outcomes',
         ],
       },
     ],
@@ -138,33 +154,26 @@ const experience: Company[] = [
         title: 'Quality Assurance Analyst',
         dateRange: 'October 2014 – May 2016',
         bullets: [
-          'Design, develop, and implement test plans, test cases, and processes to identify issues',
-          "Analyze and document root cause related to software, databases, HL7 interfaces, and API's",
-          'Manage database, including configuration, debugging, modifying, and updating stored procedures',
+          'Designed, developed, and implemented test plans, test cases, and processes to identify issues',
+          "Analyzed and documented root cause related to software, databases, HL7 interfaces, and API's",
+          'Managed database, including configuration, debugging, modifying, and updating stored procedures',
         ],
       },
       {
         title: 'Implementation Technical Engineer',
         dateRange: 'November 2013 – October 2014',
         bullets: [
-          'Subject matter expert for team on all aspects of hardware and software',
+          'Served as subject matter expert for the team on all aspects of hardware and software',
           'Scoped, planned, initiated, and set goals and requirements and implemented new projects to provide positive outcomes for customers',
         ],
       },
       {
         title: 'Support Technical Analyst II',
-        dateRange: 'February 2012 – November 2013',
+        dateRange: 'January 2011 – November 2013',
         bullets: [
-          'Reviewed and resolved escalated issues requiring advanced troubleshooting or knowledge and provided root cause analysis',
-          'Provided leadership, mentoring, training, and instruction to Support Specialists in Customer Support Group',
-        ],
-      },
-      {
-        title: 'Support Technical Analyst',
-        dateRange: 'January 2011 – February 2012',
-        bullets: [
-          'Responsible for 30–35 MEDHOST customers; managed conference calls, existing issues, item tracking and customer relationships, software upgrades, maintenance and repairs',
-          'Resolved hardware, software, network, HL7 interface, and MEDHOST EDIS (Emergency Department Information System) application issues',
+          'Reviewed and resolved escalated issues requiring advanced troubleshooting and provided root cause analysis',
+          'Provided leadership, mentoring, training, and instruction to Support Specialists in the Customer Support Group',
+          'Managed a portfolio of 30–35 MEDHOST customers, including conference calls, item tracking, software upgrades, and ongoing maintenance and repairs',
         ],
       },
     ],
@@ -177,8 +186,8 @@ const experience: Company[] = [
       {
         title: 'Systems Analyst II / Officer',
         bullets: [
-          "Monitored bank's IT infrastructure to prevent downtimes to essential systems such as Online Banking",
-          'Administered mainframe, UNIX/Linux and Windows platforms, trading applications, and e-commerce software',
+          'Monitored bank-wide IT infrastructure to maintain uptime for essential systems, including Online Banking, Bill Pay, and ATM/POS networks',
+          'Administered mainframe, UNIX/Linux, and Windows platforms supporting trading applications and e-commerce software',
         ],
       },
     ],
@@ -262,23 +271,35 @@ function RouteComponent() {
 
               <div className="mt-4 space-y-6 border-l-2 border-[var(--cyber-purple)]/40 pl-6">
                 {company.roles.map((role) => (
-                  <div key={role.project ?? role.title}>
+                  <div key={role.title + (role.dateRange ?? '')}>
                     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                       <h4 className="font-semibold text-[var(--neon-pink)]">{role.title}</h4>
                       {role.dateRange && (
                         <span className="text-xs text-slate-400">{role.dateRange}</span>
                       )}
                     </div>
-                    {role.project && (
-                      <p className="mt-0.5 text-xs font-medium tracking-wide text-[var(--laser-cyan)] uppercase">
-                        Project: {role.project}
-                      </p>
+                    {role.projects ? (
+                      <div className="mt-2 space-y-4">
+                        {role.projects.map((project) => (
+                          <div key={project.name}>
+                            <p className="text-xs font-medium tracking-wide text-[var(--laser-cyan)] uppercase">
+                              Project: {project.name}
+                            </p>
+                            <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-300">
+                              {project.bullets.map((bullet) => (
+                                <li key={bullet}>{bullet}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-300">
+                        {role.bullets?.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
                     )}
-                    <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-300">
-                      {role.bullets.map((bullet) => (
-                        <li key={bullet}>{bullet}</li>
-                      ))}
-                    </ul>
                   </div>
                 ))}
               </div>
