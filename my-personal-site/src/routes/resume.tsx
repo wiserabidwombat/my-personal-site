@@ -11,11 +11,15 @@ const summary =
 
 const skillGroups = [
   {
-    label: 'Programming / Languages',
-    skills: ['C#', 'SQL', 'Angular', 'ASP.NET Core', 'Microservices'],
+    label: 'Languages',
+    skills: ['C#', 'TypeScript', 'JavaScript', 'SQL'],
   },
   {
-    label: 'Tools',
+    label: 'Frameworks & Libraries',
+    skills: ['React', 'Angular', '.NET 4', 'Tailwind CSS', 'shadcn/ui'],
+  },
+  {
+    label: 'Cloud & DevOps',
     skills: [
       'AWS Lambda',
       'AWS RDS',
@@ -24,11 +28,19 @@ const skillGroups = [
       'AWS SQS',
       'AWS SNS',
       'AWS CodePipeline',
+      'Docker',
+      'D365 Power Apps',
+      'D365 Cloudflows',
+      'Terraform',
     ],
   },
   {
-    label: 'Software',
-    skills: ['Docker', 'Git', 'Jira', 'Visual Studio', 'SSMS'],
+    label: 'Enterprise Platforms',
+    skills: ['Microsoft Dynamics (D365)', 'Microservices Architecture'],
+  },
+  {
+    label: 'Tools',
+    skills: ['Git', 'GitHub', 'Jira', 'Visual Studio', 'SSMS', 'VS Code'],
   },
 ]
 
@@ -177,7 +189,7 @@ function RouteComponent() {
 
       <section className="mx-auto max-w-4xl px-6 py-12">
         <h2 className={headingClass}>Technology Skills</h2>
-        <div className="mt-6 grid gap-6 sm:grid-cols-3">
+        <div className="mt-6 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {skillGroups.map((group) => (
             <div
               key={group.label}
