@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Search01Icon, DiceFaces01Icon, ComputerIcon, Cancel01Icon } from '@hugeicons/core-free-icons'
+import { Search01Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
 import { Input } from '../../../@/components/ui/input'
 import { Badge } from '../../../@/components/ui/badge'
 import {
@@ -13,19 +13,15 @@ import {
   PaginationPrevious,
 } from '../../../@/components/ui/pagination'
 import { useBoardGames } from '../../hooks/useBoardGames'
-import { pcGames } from '../../data/pc-games'
 import { headingClass } from './shared'
 import { MultiSelectFilter } from './MultiSelectFilter'
 import { MinPlayersFilter } from './MinPlayersFilter'
 import { MaxPlayersFilter } from './MaxPlayersFilter'
 import { GameCard } from './GameCard'
 
-type Category = 'All' | 'Board Game' | 'PC Game'
-
 type InventoryRow = {
   id: string
   name: string
-  category: Exclude<Category, 'All'>
   players: string
   playersMin: number | null
   playersMax: number | null
@@ -67,8 +63,6 @@ function getPageNumbers(current: number, total: number): (number | 'ellipsis')[]
   return pages
 }
 
-const categoryFilters: Category[] = ['All', 'Board Game', 'PC Game']
-
 const sourceLabel: Record<ReturnType<typeof useBoardGames>['source'], string> = {
   loading: 'Loading inventory...',
   live: 'Live from Notion',
@@ -78,7 +72,6 @@ const sourceLabel: Record<ReturnType<typeof useBoardGames>['source'], string> = 
 export function GameInventory() {
   const { games: boardGames, source } = useBoardGames()
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<Category>('All')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedMechanics, setSelectedMechanics] = useState<string[]>([])
   const [minPlayers, setMinPlayers] = useState<number | null>(null)
@@ -87,11 +80,10 @@ export function GameInventory() {
   const [currentPage, setCurrentPage] = useState(1)
 
   const inventory: InventoryRow[] = useMemo(
-    () => [
-      ...boardGames.map((game) => ({
+    () =>
+      boardGames.map((game) => ({
         id: game.id,
         name: game.name,
-        category: 'Board Game' as const,
         players: formatPlayers(game.playersMin, game.playersMax),
         playersMin: game.playersMin,
         playersMax: game.playersMax,
@@ -101,20 +93,6 @@ export function GameInventory() {
         categories: game.categories ?? [],
         mechanics: game.mechanics ?? [],
       })),
-      ...pcGames.map((game) => ({
-        id: game.id,
-        name: game.name,
-        category: 'PC Game' as const,
-        players: '—',
-        playersMin: null,
-        playersMax: null,
-        rating: game.rating != null ? `${game.rating}/10` : '—',
-        status: game.status ?? '—',
-        bggLink: null,
-        categories: [],
-        mechanics: [],
-      })),
-    ],
     [boardGames]
   )
 
@@ -130,7 +108,6 @@ export function GameInventory() {
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase()
     return inventory.filter((game) => {
-      const matchesCategory = category === 'All' || game.category === category
       const matchesSearch = query === '' || game.name.toLowerCase().includes(query)
       const matchesCategories = selectedCategories.every((c) => game.categories.includes(c))
       const matchesMechanics = selectedMechanics.every((m) => game.mechanics.includes(m))
@@ -139,7 +116,6 @@ export function GameInventory() {
       const matchesMaxPlayers =
         maxPlayers === null || (game.playersMin != null && game.playersMin <= maxPlayers)
       return (
-        matchesCategory &&
         matchesSearch &&
         matchesCategories &&
         matchesMechanics &&
@@ -147,7 +123,7 @@ export function GameInventory() {
         matchesMaxPlayers
       )
     })
-  }, [inventory, search, category, selectedCategories, selectedMechanics, minPlayers, maxPlayers])
+  }, [inventory, search, selectedCategories, selectedMechanics, minPlayers, maxPlayers])
 
   const hasActiveFilters =
     selectedCategories.length > 0 ||
@@ -168,7 +144,6 @@ export function GameInventory() {
   // which would cost an extra render pass.
   const filterSignature = JSON.stringify([
     search,
-    category,
     selectedCategories,
     selectedMechanics,
     minPlayers,
@@ -207,28 +182,9 @@ export function GameInventory() {
           {sourceLabel[source]}
         </span>
       </div>
-      <p className="mt-2 text-slate-300">Everything currently on the shelf (and the hard drive).</p>
+      <p className="mt-2 text-slate-300">Everything currently on the shelf.</p>
 
-      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-2">
-          {categoryFilters.map((filter) => (
-            <Badge
-              key={filter}
-              variant={category === filter ? 'secondary' : 'outline'}
-              onClick={() => setCategory(filter)}
-              className="cursor-pointer gap-1 select-none"
-            >
-              {filter === 'Board Game' && (
-                <HugeiconsIcon icon={DiceFaces01Icon} strokeWidth={2} className="size-3" aria-hidden="true" />
-              )}
-              {filter === 'PC Game' && (
-                <HugeiconsIcon icon={ComputerIcon} strokeWidth={2} className="size-3" aria-hidden="true" />
-              )}
-              {filter}
-            </Badge>
-          ))}
-        </div>
-
+      <div className="mt-6 flex justify-end">
         <div className="relative w-full sm:w-64">
           <HugeiconsIcon
             icon={Search01Icon}
@@ -329,7 +285,6 @@ export function GameInventory() {
           <GameCard
             key={game.id}
             name={game.name}
-            category={game.category}
             players={game.players}
             rating={game.rating}
             status={game.status}
