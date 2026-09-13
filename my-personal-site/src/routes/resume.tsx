@@ -61,7 +61,7 @@ const experience: Company[] = [
     roles: [
       {
         title: 'Senior Developer',
-        dateRange: '[START DATE] – Present',
+        dateRange: 'July 2026 – Present',
         project: 'Salesforce-to-Dynamics 365 Migration',
         bullets: [
           'Building React-based web resource components embedded within Microsoft Dynamics 365 CRM to support the migration off Salesforce',
@@ -72,7 +72,7 @@ const experience: Company[] = [
       },
       {
         title: 'Team Lead',
-        dateRange: '[START DATE] – [END DATE]',
+        dateRange: 'April 2024 – 2025',
         project: 'Alight Platform Integration',
         bullets: [
           'Led the integration of two previously independent client tools (Smart Select MD and Health Pros) into the unified Alight domain, eliminating standalone URLs and consolidating the user experience',
@@ -83,7 +83,7 @@ const experience: Company[] = [
       },
       {
         title: 'Team Lead',
-        dateRange: '[START DATE] – [END DATE]',
+        dateRange: 'April 2023 – April 2024',
         project: 'Health Pros Platform',
         bullets: [
           'Led development of a live communication platform connecting clients with health advocates ("Health Pros") for support with provider search, appointment scheduling, and insurance guidance',
@@ -94,7 +94,7 @@ const experience: Company[] = [
       },
       {
         title: 'Developer',
-        dateRange: '[START DATE] – [END DATE]',
+        dateRange: 'July 2022 – April 2023',
         project: 'Smart Select MD',
         bullets: [
           'Developed a client-facing healthcare navigation tool using Angular, C# services on AWS ECS, SQL, and Elasticsearch, enabling users to search for doctors and facilities by specialty or condition',
