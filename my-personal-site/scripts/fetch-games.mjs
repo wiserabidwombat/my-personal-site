@@ -25,6 +25,8 @@ function mapPage(page) {
     id: page.id,
     name: p.Game?.title?.[0]?.plain_text ?? 'Untitled',
     tags: p.Tags?.multi_select?.map((t) => t.name) ?? [],
+    categories: p.Categories?.multi_select?.map((c) => c.name) ?? [],
+    mechanics: p.Mechanics?.multi_select?.map((m) => m.name) ?? [],
     rating: p['Rating (1–10)']?.number ?? null,
     status: p.Status?.status?.name ?? null,
     owned: p.Owned?.checkbox ?? false,

@@ -2,6 +2,8 @@ export type BoardGame = {
   id: string
   name: string
   tags: string[]
+  categories: string[]
+  mechanics: string[]
   rating: number | null
   status: string | null
   owned: boolean

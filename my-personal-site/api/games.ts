@@ -6,6 +6,8 @@ export type BoardGame = {
   id: string
   name: string
   tags: string[]
+  categories: string[]
+  mechanics: string[]
   rating: number | null
   status: string | null
   owned: boolean
@@ -29,6 +31,8 @@ function mapPage(page: PageObjectResponse): BoardGame {
 
   const title = p.Game?.type === 'title' ? p.Game.title : []
   const tags = p.Tags?.type === 'multi_select' ? p.Tags.multi_select : []
+  const categories = p.Categories?.type === 'multi_select' ? p.Categories.multi_select : []
+  const mechanics = p.Mechanics?.type === 'multi_select' ? p.Mechanics.multi_select : []
   const rating = p['Rating (1–10)']?.type === 'number' ? p['Rating (1–10)'].number : null
   const status = p.Status?.type === 'status' ? p.Status.status : null
   const owned = p.Owned?.type === 'checkbox' ? p.Owned.checkbox : false
@@ -48,6 +52,8 @@ function mapPage(page: PageObjectResponse): BoardGame {
     id: page.id,
     name: plainText(title) ?? 'Untitled',
     tags: tags.map((tag) => tag.name),
+    categories: categories.map((category) => category.name),
+    mechanics: mechanics.map((mechanic) => mechanic.name),
     rating,
     status: status?.name ?? null,
     owned,
