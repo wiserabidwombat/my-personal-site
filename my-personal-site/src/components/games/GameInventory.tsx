@@ -13,10 +13,13 @@ import {
   PaginationPrevious,
 } from '../../../@/components/ui/pagination'
 import { useBoardGames } from '../../hooks/useBoardGames'
-import { headingClass } from './shared'
+import type { BoardGame } from '../../types/board-game'
+import { headingClass, formatRange } from './shared'
 import { MultiSelectFilter } from './MultiSelectFilter'
 import { MinPlayersFilter } from './MinPlayersFilter'
 import { MaxPlayersFilter } from './MaxPlayersFilter'
+import { MinPlaytimeFilter } from './MinPlaytimeFilter'
+import { MaxPlaytimeFilter } from './MaxPlaytimeFilter'
 import { GameCard } from './GameCard'
 
 type InventoryRow = {
@@ -25,11 +28,14 @@ type InventoryRow = {
   players: string
   playersMin: number | null
   playersMax: number | null
+  minPlaytime: number | null
+  maxPlaytime: number | null
   rating: string
   status: string
   bggLink: string | null
   categories: string[]
   mechanics: string[]
+  game: BoardGame
 }
 
 const PAGE_SIZE_OPTIONS = [6, 12, 24]
@@ -40,12 +46,6 @@ function toggleValue(values: string[], value: string) {
 
 function uniqueSorted(values: string[][]) {
   return [...new Set(values.flat())].sort((a, b) => a.localeCompare(b))
-}
-
-function formatPlayers(min: number | null, max: number | null) {
-  if (!min && !max) return '—'
-  if (min && max && min !== max) return `${min}–${max}`
-  return `${min ?? max}`
 }
 
 function getPageNumbers(current: number, total: number): (number | 'ellipsis')[] {
@@ -76,22 +76,27 @@ export function GameInventory() {
   const [selectedMechanics, setSelectedMechanics] = useState<string[]>([])
   const [minPlayers, setMinPlayers] = useState<number | null>(null)
   const [maxPlayers, setMaxPlayers] = useState<number | null>(null)
+  const [minPlaytime, setMinPlaytime] = useState<number | null>(null)
+  const [maxPlaytime, setMaxPlaytime] = useState<number | null>(null)
   const [pageSize, setPageSize] = useState(12)
   const [currentPage, setCurrentPage] = useState(1)
 
   const inventory: InventoryRow[] = useMemo(
     () =>
-      boardGames.map((game) => ({
-        id: game.id,
-        name: game.name,
-        players: formatPlayers(game.playersMin, game.playersMax),
-        playersMin: game.playersMin,
-        playersMax: game.playersMax,
-        rating: game.rating != null ? `${game.rating}/10` : '—',
-        status: game.status ?? '—',
-        bggLink: game.bggLink,
-        categories: game.categories ?? [],
-        mechanics: game.mechanics ?? [],
+      boardGames.map((boardGame) => ({
+        id: boardGame.id,
+        name: boardGame.name,
+        players: formatRange(boardGame.playersMin, boardGame.playersMax),
+        playersMin: boardGame.playersMin,
+        playersMax: boardGame.playersMax,
+        minPlaytime: boardGame.minPlaytime,
+        maxPlaytime: boardGame.maxPlaytime,
+        rating: boardGame.rating != null ? `${boardGame.rating}/10` : '—',
+        status: boardGame.status ?? '—',
+        bggLink: boardGame.bggLink,
+        categories: boardGame.categories ?? [],
+        mechanics: boardGame.mechanics ?? [],
+        game: boardGame,
       })),
     [boardGames]
   )
@@ -115,27 +120,49 @@ export function GameInventory() {
         minPlayers === null || (game.playersMax != null && game.playersMax >= minPlayers)
       const matchesMaxPlayers =
         maxPlayers === null || (game.playersMin != null && game.playersMin <= maxPlayers)
+      // Unlike the player-count filters above (which check for range overlap),
+      // playtime compares the same field directly: Min Playtime checks the
+      // game's own minPlaytime, Max Playtime checks its own maxPlaytime.
+      const matchesMinPlaytime =
+        minPlaytime === null || (game.minPlaytime != null && game.minPlaytime >= minPlaytime)
+      const matchesMaxPlaytime =
+        maxPlaytime === null || (game.maxPlaytime != null && game.maxPlaytime <= maxPlaytime)
       return (
         matchesSearch &&
         matchesCategories &&
         matchesMechanics &&
         matchesMinPlayers &&
-        matchesMaxPlayers
+        matchesMaxPlayers &&
+        matchesMinPlaytime &&
+        matchesMaxPlaytime
       )
     })
-  }, [inventory, search, selectedCategories, selectedMechanics, minPlayers, maxPlayers])
+  }, [
+    inventory,
+    search,
+    selectedCategories,
+    selectedMechanics,
+    minPlayers,
+    maxPlayers,
+    minPlaytime,
+    maxPlaytime,
+  ])
 
   const hasActiveFilters =
     selectedCategories.length > 0 ||
     selectedMechanics.length > 0 ||
     minPlayers !== null ||
-    maxPlayers !== null
+    maxPlayers !== null ||
+    minPlaytime !== null ||
+    maxPlaytime !== null
 
   function clearAllFilters() {
     setSelectedCategories([])
     setSelectedMechanics([])
     setMinPlayers(null)
     setMaxPlayers(null)
+    setMinPlaytime(null)
+    setMaxPlaytime(null)
   }
 
   // Reset to page 1 whenever the result set or page size changes, so a stale
@@ -148,6 +175,8 @@ export function GameInventory() {
     selectedMechanics,
     minPlayers,
     maxPlayers,
+    minPlaytime,
+    maxPlaytime,
     pageSize,
   ])
   const [prevFilterSignature, setPrevFilterSignature] = useState(filterSignature)
@@ -221,6 +250,8 @@ export function GameInventory() {
           )}
           <MinPlayersFilter value={minPlayers} onChange={setMinPlayers} />
           <MaxPlayersFilter value={maxPlayers} onChange={setMaxPlayers} />
+          <MinPlaytimeFilter value={minPlaytime} onChange={setMinPlaytime} />
+          <MaxPlaytimeFilter value={maxPlaytime} onChange={setMaxPlaytime} />
           {hasActiveFilters && (
             <button
               type="button"
@@ -276,6 +307,26 @@ export function GameInventory() {
                 <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
               </Badge>
             )}
+            {minPlaytime !== null && (
+              <Badge
+                variant="secondary"
+                onClick={() => setMinPlaytime(null)}
+                className="cursor-pointer gap-1 text-[10px] select-none"
+              >
+                {minPlaytime}+ min
+                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
+              </Badge>
+            )}
+            {maxPlaytime !== null && (
+              <Badge
+                variant="secondary"
+                onClick={() => setMaxPlaytime(null)}
+                className="cursor-pointer gap-1 text-[10px] select-none"
+              >
+                Up to {maxPlaytime} min
+                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
+              </Badge>
+            )}
           </div>
         )}
       </div>
@@ -284,6 +335,7 @@ export function GameInventory() {
         {paginated.map((game) => (
           <GameCard
             key={game.id}
+            game={game.game}
             name={game.name}
             players={game.players}
             rating={game.rating}
