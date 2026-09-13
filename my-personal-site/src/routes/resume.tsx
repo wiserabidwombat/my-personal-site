@@ -152,17 +152,6 @@ const credentials: Credential[] = [
     date: 'January 2022',
   },
   {
-    title: 'Microsoft Certified Professional',
-    detail: '70-483 Programming in C#',
-    date: 'December 2018',
-  },
-  {
-    title: 'Brookhaven College',
-    detail: 'Continuing education — Programming Logic & Design, C#, Intro to C++ Programming',
-    date: 'Fall 2015, Spring 2016',
-    location: 'Dallas, TX',
-  },
-  {
     title: 'University of North Texas',
     detail: 'Bachelor of Science in Business Computer Information Systems',
     date: 'December 2004',
@@ -246,7 +235,7 @@ function RouteComponent() {
 
       <section className="mx-auto max-w-4xl px-6 py-12">
         <h2 className={headingClass}>Education and Professional Development</h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="mx-auto mt-6 grid max-w-2xl gap-4 sm:grid-cols-2">
           {credentials.map((credential) => (
             <Card key={credential.title} className="ring-[var(--cyber-purple)]/40 shadow-glow-purple">
               <CardHeader>
