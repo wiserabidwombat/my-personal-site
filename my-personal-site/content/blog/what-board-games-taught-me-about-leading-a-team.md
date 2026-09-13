@@ -8,7 +8,7 @@ date: "2026-07-02"
 
 Somewhere between my third and fourth session of a heavy Euro-style
 strategy game, I noticed I was thinking about our sprint planning the
-same way I was thinking about turn order.  (This is a bit of a joke
+same way I was thinking about turn order.  (This is a bit tongue in cheek
 based on many such posts on LinkedIn.)
 
 ## Hidden information isn't a bug
@@ -34,4 +34,4 @@ sequencing matters when it comes to the team.
 The best engineering teams I've been part of play like a co-op board
 game: shared win condition, individual roles, and a default assumption
 that if one person is stuck, the table stops to help. Co-op games
-are my favorit for this reason.
+are my favorite for this reason.
