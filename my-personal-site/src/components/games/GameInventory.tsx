@@ -32,7 +32,7 @@ type InventoryRow = {
   mechanics: string[]
 }
 
-const PAGE_SIZE_OPTIONS = [5, 10, 25]
+const PAGE_SIZE_OPTIONS = [6, 12, 24]
 
 function toggleValue(values: string[], value: string) {
   return values.includes(value) ? values.filter((v) => v !== value) : [...values, value]
@@ -76,7 +76,7 @@ export function GameInventory() {
   const [selectedMechanics, setSelectedMechanics] = useState<string[]>([])
   const [minPlayers, setMinPlayers] = useState<number | null>(null)
   const [maxPlayers, setMaxPlayers] = useState<number | null>(null)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(12)
   const [currentPage, setCurrentPage] = useState(1)
 
   const inventory: InventoryRow[] = useMemo(

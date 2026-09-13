@@ -1,7 +1,12 @@
 import { Card, CardHeader, CardTitle } from '../../../@/components/ui/card'
 import { headingClass } from './shared'
 
-const favorites = ['Eldritch Horror', 'Champions of Midgard', 'Horrified']
+const favorites = [
+  'Eldritch Horror',
+  'Champions of Midgard',
+  'Horrified',
+  'The Quacks of Quedlinburg',
+]
 
 export function FavoritesList() {
   return (
