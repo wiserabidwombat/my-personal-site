@@ -10,15 +10,23 @@ export type BoardGame = {
   mechanics: string[]
   rating: number | null
   status: string | null
+  condition: string | null
   owned: boolean
   playersMin: number | null
   playersMax: number | null
   playtimeMinutes: number | null
+  minPlaytime: number | null
+  maxPlaytime: number | null
+  weight: number | null
   designer: string | null
   publisher: string | null
   yearPublished: number | null
   lastPlayed: string | null
   bggLink: string | null
+  thumbnailUrl: string | null
+  notes: string | null
+  notes2: string | null
+  notes3: string | null
   notionUrl: string
 }
 
@@ -35,11 +43,23 @@ function mapPage(page: PageObjectResponse): BoardGame {
   const mechanics = p.Mechanics?.type === 'multi_select' ? p.Mechanics.multi_select : []
   const rating = p['Rating (1–10)']?.type === 'number' ? p['Rating (1–10)'].number : null
   const status = p.Status?.type === 'status' ? p.Status.status : null
+  const conditionProp = p.Condition
+  const condition =
+    conditionProp?.type === 'select'
+      ? (conditionProp.select?.name ?? null)
+      : conditionProp?.type === 'rich_text'
+        ? plainText(conditionProp.rich_text)
+        : null
   const owned = p.Owned?.type === 'checkbox' ? p.Owned.checkbox : false
   const playersMin = p['Players (Min)']?.type === 'number' ? p['Players (Min)'].number : null
   const playersMax = p['Players (Max)']?.type === 'number' ? p['Players (Max)'].number : null
   const playtimeMinutes =
     p['Playtime (min)']?.type === 'number' ? p['Playtime (min)'].number : null
+  const minPlaytime =
+    p['Playtime (Min)']?.type === 'number' ? p['Playtime (Min)'].number : null
+  const maxPlaytime =
+    p['Playtime (Max)']?.type === 'number' ? p['Playtime (Max)'].number : null
+  const weight = p.Weight?.type === 'number' ? p.Weight.number : null
   const designer = p.Designer?.type === 'rich_text' ? plainText(p.Designer.rich_text) : null
   const publisher = p.Publisher?.type === 'rich_text' ? plainText(p.Publisher.rich_text) : null
   const yearPublished =
@@ -47,6 +67,10 @@ function mapPage(page: PageObjectResponse): BoardGame {
   const lastPlayed =
     p['Last Played']?.type === 'date' ? (p['Last Played'].date?.start ?? null) : null
   const bggLink = p['BGG Link']?.type === 'url' ? p['BGG Link'].url : null
+  const thumbnailUrl = p.Thumbnail?.type === 'url' ? p.Thumbnail.url : null
+  const notes = p.Notes?.type === 'rich_text' ? plainText(p.Notes.rich_text) : null
+  const notes2 = p['Notes 2']?.type === 'rich_text' ? plainText(p['Notes 2'].rich_text) : null
+  const notes3 = p['Notes 3']?.type === 'rich_text' ? plainText(p['Notes 3'].rich_text) : null
 
   return {
     id: page.id,
@@ -56,15 +80,23 @@ function mapPage(page: PageObjectResponse): BoardGame {
     mechanics: mechanics.map((mechanic) => mechanic.name),
     rating,
     status: status?.name ?? null,
+    condition,
     owned,
     playersMin,
     playersMax,
     playtimeMinutes,
+    minPlaytime,
+    maxPlaytime,
+    weight,
     designer,
     publisher,
     yearPublished,
     lastPlayed,
     bggLink,
+    thumbnailUrl,
+    notes,
+    notes2,
+    notes3,
     notionUrl: page.url,
   }
 }
