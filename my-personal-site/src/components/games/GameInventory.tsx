@@ -16,6 +16,7 @@ import { useBoardGames } from '../../hooks/useBoardGames'
 import { pcGames } from '../../data/pc-games'
 import { headingClass } from './shared'
 import { MultiSelectFilter } from './MultiSelectFilter'
+import { MinPlayersFilter } from './MinPlayersFilter'
 import { GameCard } from './GameCard'
 
 type Category = 'All' | 'Board Game' | 'PC Game'
@@ -25,6 +26,7 @@ type InventoryRow = {
   name: string
   category: Exclude<Category, 'All'>
   players: string
+  playersMax: number | null
   rating: string
   status: string
   bggLink: string | null
@@ -77,6 +79,7 @@ export function GameInventory() {
   const [category, setCategory] = useState<Category>('All')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedMechanics, setSelectedMechanics] = useState<string[]>([])
+  const [minPlayers, setMinPlayers] = useState<number | null>(null)
   const [pageSize, setPageSize] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -87,6 +90,7 @@ export function GameInventory() {
         name: game.name,
         category: 'Board Game' as const,
         players: formatPlayers(game.playersMin, game.playersMax),
+        playersMax: game.playersMax,
         rating: game.rating != null ? `${game.rating}/10` : '—',
         status: game.status ?? '—',
         bggLink: game.bggLink,
@@ -98,6 +102,7 @@ export function GameInventory() {
         name: game.name,
         category: 'PC Game' as const,
         players: '—',
+        playersMax: null,
         rating: game.rating != null ? `${game.rating}/10` : '—',
         status: game.status ?? '—',
         bggLink: null,
@@ -124,22 +129,35 @@ export function GameInventory() {
       const matchesSearch = query === '' || game.name.toLowerCase().includes(query)
       const matchesCategories = selectedCategories.every((c) => game.categories.includes(c))
       const matchesMechanics = selectedMechanics.every((m) => game.mechanics.includes(m))
-      return matchesCategory && matchesSearch && matchesCategories && matchesMechanics
+      const matchesMinPlayers =
+        minPlayers === null || (game.playersMax != null && game.playersMax >= minPlayers)
+      return (
+        matchesCategory && matchesSearch && matchesCategories && matchesMechanics && matchesMinPlayers
+      )
     })
-  }, [inventory, search, category, selectedCategories, selectedMechanics])
+  }, [inventory, search, category, selectedCategories, selectedMechanics, minPlayers])
 
-  const hasActiveTagFilters = selectedCategories.length > 0 || selectedMechanics.length > 0
+  const hasActiveFilters =
+    selectedCategories.length > 0 || selectedMechanics.length > 0 || minPlayers !== null
 
-  function clearTagFilters() {
+  function clearAllFilters() {
     setSelectedCategories([])
     setSelectedMechanics([])
+    setMinPlayers(null)
   }
 
   // Reset to page 1 whenever the result set or page size changes, so a stale
   // page number never silently shows unrelated results. Adjusted during
   // render (React's documented pattern for this) rather than in an effect,
   // which would cost an extra render pass.
-  const filterSignature = JSON.stringify([search, category, selectedCategories, selectedMechanics, pageSize])
+  const filterSignature = JSON.stringify([
+    search,
+    category,
+    selectedCategories,
+    selectedMechanics,
+    minPlayers,
+    pageSize,
+  ])
   const [prevFilterSignature, setPrevFilterSignature] = useState(filterSignature)
   if (filterSignature !== prevFilterSignature) {
     setPrevFilterSignature(filterSignature)
@@ -228,10 +246,11 @@ export function GameInventory() {
               onChange={setSelectedMechanics}
             />
           )}
-          {hasActiveTagFilters && (
+          <MinPlayersFilter value={minPlayers} onChange={setMinPlayers} />
+          {hasActiveFilters && (
             <button
               type="button"
-              onClick={clearTagFilters}
+              onClick={clearAllFilters}
               className="text-xs font-medium text-[var(--laser-cyan)] underline-offset-4 hover:underline"
             >
               Clear all
@@ -239,7 +258,7 @@ export function GameInventory() {
           )}
         </div>
 
-        {hasActiveTagFilters && (
+        {hasActiveFilters && (
           <div className="flex flex-wrap gap-1.5">
             {selectedCategories.map((tag) => (
               <Badge
@@ -263,6 +282,16 @@ export function GameInventory() {
                 <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
               </Badge>
             ))}
+            {minPlayers !== null && (
+              <Badge
+                variant="secondary"
+                onClick={() => setMinPlayers(null)}
+                className="cursor-pointer gap-1 text-[10px] select-none"
+              >
+                {minPlayers}+ Players
+                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
+              </Badge>
+            )}
           </div>
         )}
       </div>
