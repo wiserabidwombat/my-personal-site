@@ -17,6 +17,7 @@ import { pcGames } from '../../data/pc-games'
 import { headingClass } from './shared'
 import { MultiSelectFilter } from './MultiSelectFilter'
 import { MinPlayersFilter } from './MinPlayersFilter'
+import { MaxPlayersFilter } from './MaxPlayersFilter'
 import { GameCard } from './GameCard'
 
 type Category = 'All' | 'Board Game' | 'PC Game'
@@ -26,6 +27,7 @@ type InventoryRow = {
   name: string
   category: Exclude<Category, 'All'>
   players: string
+  playersMin: number | null
   playersMax: number | null
   rating: string
   status: string
@@ -80,6 +82,7 @@ export function GameInventory() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedMechanics, setSelectedMechanics] = useState<string[]>([])
   const [minPlayers, setMinPlayers] = useState<number | null>(null)
+  const [maxPlayers, setMaxPlayers] = useState<number | null>(null)
   const [pageSize, setPageSize] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -90,6 +93,7 @@ export function GameInventory() {
         name: game.name,
         category: 'Board Game' as const,
         players: formatPlayers(game.playersMin, game.playersMax),
+        playersMin: game.playersMin,
         playersMax: game.playersMax,
         rating: game.rating != null ? `${game.rating}/10` : '—',
         status: game.status ?? '—',
@@ -102,6 +106,7 @@ export function GameInventory() {
         name: game.name,
         category: 'PC Game' as const,
         players: '—',
+        playersMin: null,
         playersMax: null,
         rating: game.rating != null ? `${game.rating}/10` : '—',
         status: game.status ?? '—',
@@ -131,19 +136,30 @@ export function GameInventory() {
       const matchesMechanics = selectedMechanics.every((m) => game.mechanics.includes(m))
       const matchesMinPlayers =
         minPlayers === null || (game.playersMax != null && game.playersMax >= minPlayers)
+      const matchesMaxPlayers =
+        maxPlayers === null || (game.playersMin != null && game.playersMin <= maxPlayers)
       return (
-        matchesCategory && matchesSearch && matchesCategories && matchesMechanics && matchesMinPlayers
+        matchesCategory &&
+        matchesSearch &&
+        matchesCategories &&
+        matchesMechanics &&
+        matchesMinPlayers &&
+        matchesMaxPlayers
       )
     })
-  }, [inventory, search, category, selectedCategories, selectedMechanics, minPlayers])
+  }, [inventory, search, category, selectedCategories, selectedMechanics, minPlayers, maxPlayers])
 
   const hasActiveFilters =
-    selectedCategories.length > 0 || selectedMechanics.length > 0 || minPlayers !== null
+    selectedCategories.length > 0 ||
+    selectedMechanics.length > 0 ||
+    minPlayers !== null ||
+    maxPlayers !== null
 
   function clearAllFilters() {
     setSelectedCategories([])
     setSelectedMechanics([])
     setMinPlayers(null)
+    setMaxPlayers(null)
   }
 
   // Reset to page 1 whenever the result set or page size changes, so a stale
@@ -156,6 +172,7 @@ export function GameInventory() {
     selectedCategories,
     selectedMechanics,
     minPlayers,
+    maxPlayers,
     pageSize,
   ])
   const [prevFilterSignature, setPrevFilterSignature] = useState(filterSignature)
@@ -247,6 +264,7 @@ export function GameInventory() {
             />
           )}
           <MinPlayersFilter value={minPlayers} onChange={setMinPlayers} />
+          <MaxPlayersFilter value={maxPlayers} onChange={setMaxPlayers} />
           {hasActiveFilters && (
             <button
               type="button"
@@ -289,6 +307,16 @@ export function GameInventory() {
                 className="cursor-pointer gap-1 text-[10px] select-none"
               >
                 {minPlayers}+ Players
+                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
+              </Badge>
+            )}
+            {maxPlayers !== null && (
+              <Badge
+                variant="secondary"
+                onClick={() => setMaxPlayers(null)}
+                className="cursor-pointer gap-1 text-[10px] select-none"
+              >
+                Up to {maxPlayers} Players
                 <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
               </Badge>
             )}

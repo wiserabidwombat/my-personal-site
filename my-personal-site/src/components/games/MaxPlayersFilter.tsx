@@ -11,7 +11,7 @@ type Props = {
   onChange: (value: number | null) => void
 }
 
-export function MinPlayersFilter({ value, onChange }: Props) {
+export function MaxPlayersFilter({ value, onChange }: Props) {
   const [open, setOpen] = useState(false)
 
   function select(next: number | null) {
@@ -22,7 +22,7 @@ export function MinPlayersFilter({ value, onChange }: Props) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger className={`${buttonVariants({ variant: 'outline' })} gap-1.5`}>
-        {value ? `${value}+ Players` : 'Min Players'}
+        {value ? `Up to ${value} Players` : 'Max Players'}
         <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} className="size-3.5" aria-hidden="true" />
       </PopoverTrigger>
       <PopoverContent align="start" className="w-40 p-0">
@@ -38,7 +38,7 @@ export function MinPlayersFilter({ value, onChange }: Props) {
                   data-checked={value === threshold}
                   onSelect={() => select(threshold)}
                 >
-                  {threshold}+ players
+                  Up to {threshold} players
                 </CommandItem>
               ))}
             </CommandGroup>
