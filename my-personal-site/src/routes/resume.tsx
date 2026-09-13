@@ -43,25 +43,75 @@ const skillGroups = [
 type Role = {
   title: string
   dateRange?: string
+  project?: string
   bullets: string[]
 }
 
 type Company = {
   name: string
-  location: string
+  location?: string
   dateRange: string
   roles: Role[]
 }
 
 const experience: Company[] = [
   {
+    name: 'Alight Solutions',
+    dateRange: 'June 2022 – Present',
+    roles: [
+      {
+        title: 'Senior Developer',
+        dateRange: 'July 2026 – Present',
+        project: 'Salesforce-to-Dynamics 365 Migration',
+        bullets: [
+          'Building React-based web resource components embedded within Microsoft Dynamics 365 CRM to support the migration off Salesforce',
+          'Leveraging D365 tables, Power Apps, and Power Automate (Cloud Flows) to support end-to-end workflows for client creation, documentation, tracking, and communication',
+          'Updating existing backend services to source and display client data from Dynamics 365 instead of Salesforce, ensuring continuity across the broader platform ecosystem',
+          'Supporting a platform-wide migration affecting 3,000+ clients',
+        ],
+      },
+      {
+        title: 'Team Lead',
+        dateRange: 'April 2024 – 2025',
+        project: 'Alight Platform Integration',
+        bullets: [
+          'Led the integration of two previously independent client tools (Smart Select MD and Health Pros) into the unified Alight domain, eliminating standalone URLs and consolidating the user experience',
+          "Migrated features and business logic into Alight's Angular front-end architecture, aligning UI and navigation with the broader platform",
+          "Re-engineered backend services to integrate with Alight's existing notification, ticketing, and communication systems",
+          'Led the team through the migration while maintaining continuity of service for 3,000+ clients at 99% uptime',
+        ],
+      },
+      {
+        title: 'Team Lead',
+        dateRange: 'April 2023 – April 2024',
+        project: 'Health Pros Platform',
+        bullets: [
+          'Led development of a live communication platform connecting clients with health advocates ("Health Pros") for support with provider search, appointment scheduling, and insurance guidance',
+          'Architected a real-time chat system using SignalR, enabling live two-way communication between clients and health advocates',
+          'Built a front-end ticketing interface displaying open requests, conversation history, and document/file upload capabilities',
+          'Led a development team delivering the platform to 3,000+ clients with 99% uptime',
+        ],
+      },
+      {
+        title: 'Developer',
+        dateRange: 'July 2022 – April 2023',
+        project: 'Smart Select MD',
+        bullets: [
+          'Developed a client-facing healthcare navigation tool using Angular, C# services on AWS ECS, SQL, and Elasticsearch, enabling users to search for doctors and facilities by specialty or condition',
+          'Built search functionality that combined member health insurance data with provider cost, rating, and quality information to support informed care decisions',
+          'Contributed to a platform supporting 3,000+ clients while maintaining 99% uptime',
+        ],
+      },
+    ],
+  },
+  {
     name: 'Armor Defense Inc.',
     location: 'Richardson, TX',
-    dateRange: 'May 2016 – Present',
+    dateRange: 'May 2016 – May 2022',
     roles: [
       {
         title: 'Software Engineer',
-        dateRange: 'April 2019 – Present',
+        dateRange: 'April 2019 – May 2022',
         bullets: [
           'Build and deploy microservices to scale security platform from 10k to 100k agents',
           'Deploy and troubleshoot AWS SQS, RDS, Dynamo and Lambda infrastructure',
@@ -202,20 +252,28 @@ function RouteComponent() {
             <div key={company.name}>
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                 <h3 className="text-xl font-bold text-slate-50">
-                  {company.name} <span className="font-normal text-slate-400">— {company.location}</span>
+                  {company.name}
+                  {company.location && (
+                    <span className="font-normal text-slate-400"> — {company.location}</span>
+                  )}
                 </h3>
                 <span className="text-sm font-medium text-[var(--laser-cyan)]">{company.dateRange}</span>
               </div>
 
               <div className="mt-4 space-y-6 border-l-2 border-[var(--cyber-purple)]/40 pl-6">
                 {company.roles.map((role) => (
-                  <div key={role.title}>
+                  <div key={role.project ?? role.title}>
                     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                       <h4 className="font-semibold text-[var(--neon-pink)]">{role.title}</h4>
                       {role.dateRange && (
                         <span className="text-xs text-slate-400">{role.dateRange}</span>
                       )}
                     </div>
+                    {role.project && (
+                      <p className="mt-0.5 text-xs font-medium tracking-wide text-[var(--laser-cyan)] uppercase">
+                        Project: {role.project}
+                      </p>
+                    )}
                     <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-300">
                       {role.bullets.map((bullet) => (
                         <li key={bullet}>{bullet}</li>
