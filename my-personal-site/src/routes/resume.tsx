@@ -186,8 +186,8 @@ const experience: Company[] = [
       {
         title: 'Systems Analyst II / Officer',
         bullets: [
-          "Monitored bank's IT infrastructure to prevent downtimes to essential systems such as Online Banking",
-          'Administered mainframe, UNIX/Linux and Windows platforms, trading applications, and e-commerce software',
+          'Monitored bank-wide IT infrastructure to maintain uptime for essential systems, including Online Banking, Bill Pay, and ATM/POS networks',
+          'Administered mainframe, UNIX/Linux, and Windows platforms supporting trading applications and e-commerce software',
         ],
       },
     ],
