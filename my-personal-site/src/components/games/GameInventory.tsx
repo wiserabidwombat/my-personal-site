@@ -1,24 +1,22 @@
 import { useMemo, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import {
-  Search01Icon,
-  DiceFaces01Icon,
-  ComputerIcon,
-  ExternalLinkIcon,
-} from '@hugeicons/core-free-icons'
+import { Search01Icon, DiceFaces01Icon, ComputerIcon, Cancel01Icon } from '@hugeicons/core-free-icons'
 import { Input } from '../../../@/components/ui/input'
 import { Badge } from '../../../@/components/ui/badge'
 import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '../../../@/components/ui/table'
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '../../../@/components/ui/pagination'
 import { useBoardGames } from '../../hooks/useBoardGames'
 import { pcGames } from '../../data/pc-games'
 import { headingClass } from './shared'
+import { MultiSelectFilter } from './MultiSelectFilter'
+import { GameCard } from './GameCard'
 
 type Category = 'All' | 'Board Game' | 'PC Game'
 
@@ -34,6 +32,8 @@ type InventoryRow = {
   mechanics: string[]
 }
 
+const PAGE_SIZE_OPTIONS = [5, 10, 25]
+
 function toggleValue(values: string[], value: string) {
   return values.includes(value) ? values.filter((v) => v !== value) : [...values, value]
 }
@@ -46,6 +46,21 @@ function formatPlayers(min: number | null, max: number | null) {
   if (!min && !max) return '—'
   if (min && max && min !== max) return `${min}–${max}`
   return `${min ?? max}`
+}
+
+function getPageNumbers(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+
+  const pages: (number | 'ellipsis')[] = [1]
+  if (current > 3) pages.push('ellipsis')
+
+  for (let page = Math.max(2, current - 1); page <= Math.min(total - 1, current + 1); page++) {
+    pages.push(page)
+  }
+
+  if (current < total - 2) pages.push('ellipsis')
+  pages.push(total)
+  return pages
 }
 
 const categoryFilters: Category[] = ['All', 'Board Game', 'PC Game']
@@ -62,6 +77,8 @@ export function GameInventory() {
   const [category, setCategory] = useState<Category>('All')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedMechanics, setSelectedMechanics] = useState<string[]>([])
+  const [pageSize, setPageSize] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const inventory: InventoryRow[] = useMemo(
     () => [
@@ -118,6 +135,26 @@ export function GameInventory() {
     setSelectedMechanics([])
   }
 
+  // Reset to page 1 whenever the result set or page size changes, so a stale
+  // page number never silently shows unrelated results. Adjusted during
+  // render (React's documented pattern for this) rather than in an effect,
+  // which would cost an extra render pass.
+  const filterSignature = JSON.stringify([search, category, selectedCategories, selectedMechanics, pageSize])
+  const [prevFilterSignature, setPrevFilterSignature] = useState(filterSignature)
+  if (filterSignature !== prevFilterSignature) {
+    setPrevFilterSignature(filterSignature)
+    setCurrentPage(1)
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const safePage = Math.min(currentPage, totalPages)
+  const pageNumbers = useMemo(() => getPageNumbers(safePage, totalPages), [safePage, totalPages])
+
+  const paginated = useMemo(
+    () => filtered.slice((safePage - 1) * pageSize, safePage * pageSize),
+    [filtered, safePage, pageSize]
+  )
+
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -173,147 +210,146 @@ export function GameInventory() {
         </div>
       </div>
 
-      {(allCategories.length > 0 || allMechanics.length > 0) && (
-        <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-[var(--cyber-purple)]/30 bg-[var(--deep-space-purple)]/20 p-4">
+      <div className="mt-4 flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {allCategories.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold tracking-wide text-slate-400 uppercase">
-                Categories
-              </span>
-              {allCategories.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant={selectedCategories.includes(tag) ? 'secondary' : 'outline'}
-                  onClick={() => setSelectedCategories((prev) => toggleValue(prev, tag))}
-                  className="cursor-pointer text-[10px] select-none"
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
+            <MultiSelectFilter
+              label="Categories"
+              options={allCategories}
+              selected={selectedCategories}
+              onChange={setSelectedCategories}
+            />
           )}
           {allMechanics.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold tracking-wide text-slate-400 uppercase">
-                Mechanics
-              </span>
-              {allMechanics.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant={selectedMechanics.includes(tag) ? 'secondary' : 'outline'}
-                  onClick={() => setSelectedMechanics((prev) => toggleValue(prev, tag))}
-                  className="cursor-pointer text-[10px] select-none"
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
+            <MultiSelectFilter
+              label="Mechanics"
+              options={allMechanics}
+              selected={selectedMechanics}
+              onChange={setSelectedMechanics}
+            />
           )}
           {hasActiveTagFilters && (
             <button
               type="button"
               onClick={clearTagFilters}
-              className="w-fit text-xs font-medium text-[var(--laser-cyan)] underline-offset-4 hover:underline"
+              className="text-xs font-medium text-[var(--laser-cyan)] underline-offset-4 hover:underline"
             >
-              Clear filters
+              Clear all
             </button>
           )}
         </div>
-      )}
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-[var(--cyber-purple)]/40">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-[var(--cyber-purple)]/40 hover:bg-transparent">
-              <TableHead className="text-[var(--laser-cyan)]">Game</TableHead>
-              <TableHead className="text-[var(--laser-cyan)]">Category</TableHead>
-              <TableHead className="text-[var(--laser-cyan)]">Players</TableHead>
-              <TableHead className="text-[var(--laser-cyan)]">Rating</TableHead>
-              <TableHead className="text-[var(--laser-cyan)]">Status</TableHead>
-              <TableHead className="text-[var(--laser-cyan)]">BGG Link</TableHead>
-              <TableHead className="text-[var(--laser-cyan)]">Categories</TableHead>
-              <TableHead className="text-[var(--laser-cyan)]">Mechanics</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((game) => (
-              <TableRow key={game.id} className="border-[var(--cyber-purple)]/20">
-                <TableCell className="font-medium text-slate-100">{game.name}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="text-[10px]">
-                    {game.category}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-slate-300">{game.players}</TableCell>
-                <TableCell className="text-slate-300">{game.rating}</TableCell>
-                <TableCell className="text-slate-300">{game.status}</TableCell>
-                <TableCell>
-                  {game.bggLink ? (
-                    <a
-                      href={game.bggLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${game.name} on BoardGameGeek`}
-                      className="inline-flex text-slate-400 transition-colors duration-300 hover:text-[var(--laser-cyan)]"
-                    >
-                      <HugeiconsIcon
-                        icon={ExternalLinkIcon}
-                        strokeWidth={2}
-                        className="size-4"
-                        aria-hidden="true"
-                      />
-                    </a>
-                  ) : (
-                    <span className="text-slate-500">—</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {game.categories.length > 0 ? (
-                    <div className="flex max-w-48 flex-wrap gap-1">
-                      {game.categories.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="outline"
-                          onClick={() => setSelectedCategories((prev) => toggleValue(prev, tag))}
-                          className="cursor-pointer text-[10px] select-none"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="text-slate-500">—</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {game.mechanics.length > 0 ? (
-                    <div className="flex max-w-48 flex-wrap gap-1">
-                      {game.mechanics.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="outline"
-                          onClick={() => setSelectedMechanics((prev) => toggleValue(prev, tag))}
-                          className="cursor-pointer text-[10px] select-none"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="text-slate-500">—</span>
-                  )}
-                </TableCell>
-              </TableRow>
+        {hasActiveTagFilters && (
+          <div className="flex flex-wrap gap-1.5">
+            {selectedCategories.map((tag) => (
+              <Badge
+                key={`cat-${tag}`}
+                variant="secondary"
+                onClick={() => setSelectedCategories((prev) => toggleValue(prev, tag))}
+                className="cursor-pointer gap-1 text-[10px] select-none"
+              >
+                {tag}
+                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
+              </Badge>
             ))}
-            {filtered.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center text-slate-400">
-                  No games match your search.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            {selectedMechanics.map((tag) => (
+              <Badge
+                key={`mech-${tag}`}
+                variant="secondary"
+                onClick={() => setSelectedMechanics((prev) => toggleValue(prev, tag))}
+                className="cursor-pointer gap-1 text-[10px] select-none"
+              >
+                {tag}
+                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {paginated.map((game) => (
+          <GameCard
+            key={game.id}
+            name={game.name}
+            category={game.category}
+            players={game.players}
+            rating={game.rating}
+            status={game.status}
+            bggLink={game.bggLink}
+            categories={game.categories}
+            mechanics={game.mechanics}
+            onCategoryTagClick={(tag) => setSelectedCategories((prev) => toggleValue(prev, tag))}
+            onMechanicTagClick={(tag) => setSelectedMechanics((prev) => toggleValue(prev, tag))}
+          />
+        ))}
+        {filtered.length === 0 && (
+          <p className="col-span-full text-center text-slate-400">No games match your search.</p>
+        )}
+      </div>
+
+      <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <span>Show</span>
+          {PAGE_SIZE_OPTIONS.map((size) => (
+            <Badge
+              key={size}
+              variant={pageSize === size ? 'secondary' : 'outline'}
+              onClick={() => setPageSize(size)}
+              className="cursor-pointer select-none"
+            >
+              {size}
+            </Badge>
+          ))}
+          <span>per page</span>
+        </div>
+
+        {totalPages > 1 && (
+          <Pagination className="mx-0 w-auto">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setCurrentPage((page) => Math.max(1, page - 1))
+                  }}
+                  className={safePage === 1 ? 'pointer-events-none opacity-50' : ''}
+                />
+              </PaginationItem>
+              {pageNumbers.map((page, index) =>
+                page === 'ellipsis' ? (
+                  <PaginationItem key={`ellipsis-${index}`}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                ) : (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      href="#"
+                      isActive={page === safePage}
+                      onClick={(event) => {
+                        event.preventDefault()
+                        setCurrentPage(page)
+                      }}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                )
+              )}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setCurrentPage((page) => Math.min(totalPages, page + 1))
+                  }}
+                  className={safePage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
     </section>
   )
