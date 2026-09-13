@@ -4,8 +4,12 @@ import boardGamePhoto from '../assets/board-game.jpg'
 import flyFishingPhoto from '../assets/fly-fishing.jpg'
 import golfPhoto from '../assets/highest-golf.jpg'
 import beefJerkyPhoto from '../assets/beef-jerky.jpg'
+import { pageTitle } from '../lib/title'
 
 export const Route = createFileRoute('/about')({
+  head: () => ({
+    meta: [{ title: pageTitle('About') }],
+  }),
   component: AboutRouteComponent,
 })
 

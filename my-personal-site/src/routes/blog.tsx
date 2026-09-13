@@ -3,8 +3,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { getAllPosts, getAllTags } from '../lib/blog'
 import { BlogGrid } from '../components/blog/BlogGrid'
 import { TagFilter } from '../components/blog/TagFilter'
+import { pageTitle } from '../lib/title'
 
 export const Route = createFileRoute('/blog')({
+  head: () => ({
+    meta: [{ title: pageTitle('Blog') }],
+  }),
   component: BlogRouteComponent,
 })
 
