@@ -30,7 +30,7 @@ export function GameCard({
   onMechanicTagClick,
 }: Props) {
   return (
-    <Card className="ring-white/10 transition-all duration-300 hover:ring-[var(--laser-cyan)]/60 hover:shadow-glow-cyan">
+    <Card className="text-left ring-white/10 transition-all duration-300 hover:ring-[var(--laser-cyan)]/60 hover:shadow-glow-cyan">
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <div>
