@@ -3,6 +3,7 @@ import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
+  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '../../@/components/ui/navigation-menu'
@@ -53,9 +54,13 @@ export function Navbar() {
                 <ul className="flex min-w-40 flex-col gap-1">
                   {hobbyItems.map((item) => (
                     <li key={item.to}>
-                      <Link to={item.to} className={`${navLinkClass} block rounded-xl px-3 py-2`}>
+                      <NavigationMenuLink
+                        closeOnClick
+                        render={<Link to={item.to} />}
+                        className={`${navLinkClass} block rounded-xl px-3 py-2`}
+                      >
                         {item.label}
-                      </Link>
+                      </NavigationMenuLink>
                     </li>
                   ))}
                 </ul>
