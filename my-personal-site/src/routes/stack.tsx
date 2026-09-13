@@ -10,8 +10,12 @@ import {
   DatabaseLightningIcon,
 } from '@hugeicons/core-free-icons'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
+import { pageTitle } from '../lib/title'
 
 export const Route = createFileRoute('/stack')({
+  head: () => ({
+    meta: [{ title: pageTitle('About This Site') }],
+  }),
   component: StackRouteComponent,
 })
 

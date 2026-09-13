@@ -4,14 +4,18 @@ import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
 import { buttonVariants } from '../../@/components/ui/button'
 import { getPostBySlug } from '../lib/blog'
 import { BlogPostView } from '../components/blog/BlogPostView'
+import { pageTitle } from '../lib/title'
 
 export const Route = createFileRoute('/blog_/$slug')({
+  loader: ({ params }) => getPostBySlug(params.slug),
+  head: ({ loaderData }) => ({
+    meta: [{ title: pageTitle(loaderData?.title ?? 'Post not found') }],
+  }),
   component: BlogSlugRouteComponent,
 })
 
 function BlogSlugRouteComponent() {
-  const { slug } = Route.useParams()
-  const post = getPostBySlug(slug)
+  const post = Route.useLoaderData()
 
   if (!post) {
     return (
