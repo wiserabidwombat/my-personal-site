@@ -1,12 +1,10 @@
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ExternalLinkIcon } from '@hugeicons/core-free-icons'
-import { Badge } from '../../../@/components/ui/badge'
 import { Card, CardHeader, CardTitle } from '../../../@/components/ui/card'
 import { TagList } from './TagList'
 
 type Props = {
   name: string
-  category: 'Board Game' | 'PC Game'
   players: string
   rating: string
   status: string
@@ -19,7 +17,6 @@ type Props = {
 
 export function GameCard({
   name,
-  category,
   players,
   rating,
   status,
@@ -33,12 +30,7 @@ export function GameCard({
     <Card className="text-left ring-white/10 transition-all duration-300 hover:ring-[var(--laser-cyan)]/60 hover:shadow-glow-cyan">
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
-          <div>
-            <Badge variant="outline" className="text-[10px]">
-              {category}
-            </Badge>
-            <CardTitle className="mt-2 text-base font-semibold text-slate-100">{name}</CardTitle>
-          </div>
+          <CardTitle className="text-base font-semibold text-slate-100">{name}</CardTitle>
           {bggLink && (
             <a
               href={bggLink}

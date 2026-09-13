@@ -1,6 +1,6 @@
 import { headingClass } from './shared'
 
-const wantToPlay = ['Frosthaven', 'Ark Nova', 'Cyberpunk 2077: Phantom Liberty']
+const wantToPlay = ['Frosthaven', 'Ark Nova']
 
 export function WantToPlay() {
   return (
