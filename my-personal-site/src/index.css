@@ -82,6 +82,39 @@ body {
   margin: 0;
 }
 
+/*
+ * Synthwave scrollbar, applied globally so it covers the main page scroll,
+ * modals (e.g. the game detail dialog), nav dropdowns, and any other
+ * scrollable container without per-component styling. Browsers that support
+ * neither the standard nor WebKit properties (e.g. very old browsers) simply
+ * ignore these rules and fall back to their native scrollbar -- no extra
+ * fallback CSS is needed for that case.
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--laser-cyan) var(--deep-space-purple);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--deep-space-purple);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--laser-cyan);
+  border-radius: 9999px;
+  border: 2px solid var(--deep-space-purple);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--laser-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
 @layer base {
   h1,
   h2 {
