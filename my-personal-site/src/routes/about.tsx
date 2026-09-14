@@ -127,7 +127,7 @@ function AboutRouteComponent() {
       <section className="mx-auto max-w-4xl px-6 py-12">
         <h2 className={headingClass}>🕹️ Beyond the Code</h2>
         <p className="mt-3 text-slate-300">
-          When I'm not staring at a terminal or architectural diagrams, I like to unplug and stay
+          When I'm not playing with code or AIs, I like to unplug and stay
           active. You can usually find me:
         </p>
         <div className="mt-6 grid gap-8 md:grid-cols-2">
