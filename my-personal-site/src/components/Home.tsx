@@ -32,14 +32,14 @@ import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components
 
 const currentStatus = [
   { label: 'Now Playing', value: 'Heroes of Might and Magic: Olden Era', icon: GameController01Icon },
-  { label: 'Now Reading', value: 'Star Trek Lower Decks', icon: BookOpen01Icon },
-  { label: 'Now Casting', value: 'Too hot to handle in Texas', icon: FishingRodIcon },
+  { label: 'Now Reading', value: 'Do Aliens Speak Physics by Daniel Whiteson and Andy Warner', icon: BookOpen01Icon },
+  { label: 'Now Casting', value: 'Too hot for fishing in Texas', icon: FishingRodIcon },
   { label: 'Now Learning', value: 'AI agent workflows', icon: Brain01Icon },
 ]
 
 const systemMetrics = [
   { label: 'Role', value: 'Lead Dev' },
-  { label: 'Focus', value: 'React / Node' },
+  { label: 'Focus', value: 'AI Agent Workflows' },
   { label: 'Roots', value: 'UNT 🦅' },
 ]
 
