@@ -57,140 +57,153 @@ export function GameDetailModal({ game, open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] w-full overflow-y-auto border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)] shadow-glow-purple sm:max-w-lg">
-        <DialogHeader>
-          <div className="flex items-center gap-4">
-            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[var(--deep-space-black)] ring-1 ring-[var(--cyber-purple)]/40">
-              {showThumbnail ? (
-                <img
-                  src={game.thumbnailUrl ?? undefined}
-                  alt={`${game.name} thumbnail`}
-                  className="size-full object-cover"
-                  onError={() => setImgError(true)}
-                />
-              ) : (
-                <HugeiconsIcon
-                  icon={ImageNotFound01Icon}
-                  strokeWidth={1.5}
-                  className="size-8 text-slate-500"
-                  aria-hidden="true"
-                />
-              )}
-            </div>
-            <DialogTitle className="text-xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]">
-              {game.name}
-            </DialogTitle>
-          </div>
-        </DialogHeader>
-
-        <div>
-          <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
-            Search BGG Forums
-          </p>
-          <div className="relative mt-1.5">
-            <Input
-              value={forumQuery}
-              onChange={(event) => setForumQuery(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault()
-                  searchBggForums()
-                }
-              }}
-              disabled={!bggId}
-              placeholder={bggId ? 'Search the forums…' : 'No BGG link for this game'}
-              className="bg-[var(--deep-space-black)] pr-10 focus-visible:border-[var(--laser-cyan)] focus-visible:shadow-glow-cyan focus-visible:ring-[var(--laser-cyan)]/50"
-            />
-            <button
-              type="button"
-              onClick={searchBggForums}
-              disabled={!bggId}
-              aria-label="Search BGG forums"
-              className="absolute top-1/2 right-1 -translate-y-1/2 rounded-full p-1.5 text-slate-400 transition-colors duration-300 hover:text-[var(--laser-cyan)] disabled:pointer-events-none disabled:opacity-50"
-            >
-              <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          <Stat label="Status" value={game.status ?? '—'} />
-          <Stat label="Condition" value={game.condition ?? '—'} />
-          <Stat
-            label="BGG Link"
-            value={
-              game.bggLink ? (
-                <a
-                  href={game.bggLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[var(--laser-cyan)] hover:underline"
-                >
-                  View on BGG
+      <DialogContent className="w-full overflow-visible border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)] p-0 shadow-glow-purple sm:max-w-lg">
+        {/*
+          The scrolling region is a separate, un-rounded element from the
+          outer card so its native scrollbar isn't clipped by rounded-4xl
+          (browsers clip a scrolling element's own scrollbar to its own
+          border-radius). At sm+ it also shifts right via a negative margin
+          so the scrollbar sits in the gap between the card's border and the
+          dimmed overlay, rather than inset against the curve. On narrow
+          viewports there isn't enough clearance for that gap to read
+          cleanly, so it falls back to the inset behavior (rounded to match
+          the card, scrollbar clipped to the curve like before).
+        */}
+        <div className="grid max-h-[85vh] gap-6 overflow-y-auto rounded-4xl p-6 sm:-mr-3 sm:rounded-none sm:pr-9">
+          <DialogHeader>
+            <div className="flex items-center gap-4">
+              <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[var(--deep-space-black)] ring-1 ring-[var(--cyber-purple)]/40">
+                {showThumbnail ? (
+                  <img
+                    src={game.thumbnailUrl ?? undefined}
+                    alt={`${game.name} thumbnail`}
+                    className="size-full object-cover"
+                    onError={() => setImgError(true)}
+                  />
+                ) : (
                   <HugeiconsIcon
-                    icon={ExternalLinkIcon}
-                    strokeWidth={2}
-                    className="size-3"
+                    icon={ImageNotFound01Icon}
+                    strokeWidth={1.5}
+                    className="size-8 text-slate-500"
                     aria-hidden="true"
                   />
-                </a>
-              ) : (
-                '—'
-              )
-            }
-          />
-          <Stat label="Players" value={formatRange(game.playersMin, game.playersMax)} />
-          <Stat label="Playtime" value={formatRange(game.minPlaytime, game.maxPlaytime, 'min')} />
-          <Stat label="Weight" value={game.weight != null ? game.weight.toFixed(2) : '—'} />
-          <Stat label="Year Published" value={game.yearPublished ?? '—'} />
-          <Stat label="Rating" value={game.rating != null ? `${game.rating.toFixed(2)}/10` : '—'} />
-          <Stat label="Last Played" value={formatDate(game.lastPlayed) ?? '—'} />
-          <Stat label="Designer" value={game.designer ?? '—'} />
-          <Stat label="Publisher" value={formatCommaList(game.publisher)} />
+                )}
+              </div>
+              <DialogTitle className="text-xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]">
+                {game.name}
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+
+          <div>
+            <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
+              Search BGG Forums
+            </p>
+            <div className="relative mt-1.5">
+              <Input
+                value={forumQuery}
+                onChange={(event) => setForumQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault()
+                    searchBggForums()
+                  }
+                }}
+                disabled={!bggId}
+                placeholder={bggId ? 'Search the forums…' : 'No BGG link for this game'}
+                className="bg-[var(--deep-space-black)] pr-10 focus-visible:border-[var(--laser-cyan)] focus-visible:shadow-glow-cyan focus-visible:ring-[var(--laser-cyan)]/50"
+              />
+              <button
+                type="button"
+                onClick={searchBggForums}
+                disabled={!bggId}
+                aria-label="Search BGG forums"
+                className="absolute top-1/2 right-1 -translate-y-1/2 rounded-full p-1.5 text-slate-400 transition-colors duration-300 hover:text-[var(--laser-cyan)] disabled:pointer-events-none disabled:opacity-50"
+              >
+                <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <Stat label="Status" value={game.status ?? '—'} />
+            <Stat label="Condition" value={game.condition ?? '—'} />
+            <Stat
+              label="BGG Link"
+              value={
+                game.bggLink ? (
+                  <a
+                    href={game.bggLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[var(--laser-cyan)] hover:underline"
+                  >
+                    View on BGG
+                    <HugeiconsIcon
+                      icon={ExternalLinkIcon}
+                      strokeWidth={2}
+                      className="size-3"
+                      aria-hidden="true"
+                    />
+                  </a>
+                ) : (
+                  '—'
+                )
+              }
+            />
+            <Stat label="Players" value={formatRange(game.playersMin, game.playersMax)} />
+            <Stat label="Playtime" value={formatRange(game.minPlaytime, game.maxPlaytime, 'min')} />
+            <Stat label="Weight" value={game.weight != null ? game.weight.toFixed(2) : '—'} />
+            <Stat label="Year Published" value={game.yearPublished ?? '—'} />
+            <Stat label="Rating" value={game.rating != null ? `${game.rating.toFixed(2)}/10` : '—'} />
+            <Stat label="Last Played" value={formatDate(game.lastPlayed) ?? '—'} />
+            <Stat label="Designer" value={game.designer ?? '—'} />
+            <Stat label="Publisher" value={formatCommaList(game.publisher)} />
+          </div>
+
+          {game.categories.length > 0 && (
+            <div>
+              <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
+                Categories
+              </p>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {game.categories.map((category) => (
+                  <Badge key={category} variant="outline" className="text-[10px]">
+                    {category}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {game.mechanics.length > 0 && (
+            <div>
+              <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
+                Mechanics
+              </p>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {game.mechanics.map((mechanic) => (
+                  <Badge key={mechanic} variant="outline" className="text-[10px]">
+                    {mechanic}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {notes.length > 0 && (
+            <div>
+              <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
+                Notes
+              </p>
+              <div className="mt-1.5 space-y-2 text-sm leading-relaxed text-slate-300">
+                {notes.map((note, index) => (
+                  <p key={index}>{note}</p>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-
-        {game.categories.length > 0 && (
-          <div>
-            <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
-              Categories
-            </p>
-            <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {game.categories.map((category) => (
-                <Badge key={category} variant="outline" className="text-[10px]">
-                  {category}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {game.mechanics.length > 0 && (
-          <div>
-            <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
-              Mechanics
-            </p>
-            <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {game.mechanics.map((mechanic) => (
-                <Badge key={mechanic} variant="outline" className="text-[10px]">
-                  {mechanic}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {notes.length > 0 && (
-          <div>
-            <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
-              Notes
-            </p>
-            <div className="mt-1.5 space-y-2 text-sm leading-relaxed text-slate-300">
-              {notes.map((note, index) => (
-                <p key={index}>{note}</p>
-              ))}
-            </div>
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   )
