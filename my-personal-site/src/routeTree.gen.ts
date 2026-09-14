@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as BlogRouteImport } from './routes/blog'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as GamesRouteImport } from './routes/games'
 import { Route as Minerals_fossilsRouteImport } from './routes/minerals_fossils'
 import { Route as ResumeRouteImport } from './routes/resume'
@@ -31,6 +32,11 @@ const AboutRoute = AboutRouteImport.update({
 const BlogRoute = BlogRouteImport.update({
   id: '/blog',
   path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamesRoute = GamesRouteImport.update({
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
   '/games': typeof GamesRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/resume': typeof ResumeRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
   '/games': typeof GamesRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/resume': typeof ResumeRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
   '/games': typeof GamesRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/resume': typeof ResumeRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/blog'
+    | '/contact'
     | '/games'
     | '/minerals_fossils'
     | '/resume'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/blog'
+    | '/contact'
     | '/games'
     | '/minerals_fossils'
     | '/resume'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/blog'
+    | '/contact'
     | '/games'
     | '/minerals_fossils'
     | '/resume'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   BlogRoute: typeof BlogRoute
+  ContactRoute: typeof ContactRoute
   GamesRoute: typeof GamesRoute
   Minerals_fossilsRoute: typeof Minerals_fossilsRoute
   ResumeRoute: typeof ResumeRoute
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog'
       preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/games': {
@@ -199,6 +219,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BlogRoute: BlogRoute,
+  ContactRoute: ContactRoute,
   GamesRoute: GamesRoute,
   Minerals_fossilsRoute: Minerals_fossilsRoute,
   ResumeRoute: ResumeRoute,
