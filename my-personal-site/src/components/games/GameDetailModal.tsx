@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ExternalLinkIcon, ImageNotFound01Icon } from '@hugeicons/core-free-icons'
+import { ExternalLinkIcon, ImageNotFound01Icon, Search01Icon } from '@hugeicons/core-free-icons'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../@/components/ui/dialog'
 import { Badge } from '../../../@/components/ui/badge'
+import { Input } from '../../../@/components/ui/input'
 import type { BoardGame } from '../../types/board-game'
-import { formatRange, formatCommaList } from './shared'
+import { formatRange, formatCommaList, extractBggId } from './shared'
 
 type Props = {
   game: BoardGame
@@ -38,11 +39,21 @@ function Stat({ label, value }: { label: string; value: ReactNode }) {
 
 export function GameDetailModal({ game, open, onOpenChange }: Props) {
   const [imgError, setImgError] = useState(false)
+  const [forumQuery, setForumQuery] = useState('')
   const showThumbnail = Boolean(game.thumbnailUrl) && !imgError
+  const bggId = extractBggId(game.bggLink)
 
   const notes = [game.notes, game.notes2, game.notes3].filter((note): note is string =>
     Boolean(note && note.trim())
   )
+
+  function searchBggForums() {
+    const term = forumQuery.trim()
+    if (!term || !bggId) return
+    const url = `https://boardgamegeek.com/forums/search?objectid=${bggId}&objecttype=thing&searchTerm=${encodeURIComponent(term)}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+    setForumQuery('')
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -71,6 +82,36 @@ export function GameDetailModal({ game, open, onOpenChange }: Props) {
             </DialogTitle>
           </div>
         </DialogHeader>
+
+        <div>
+          <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
+            Search BGG Forums
+          </p>
+          <div className="relative mt-1.5">
+            <Input
+              value={forumQuery}
+              onChange={(event) => setForumQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault()
+                  searchBggForums()
+                }
+              }}
+              disabled={!bggId}
+              placeholder={bggId ? 'Search the forums…' : 'No BGG link for this game'}
+              className="bg-[var(--deep-space-black)] pr-10 focus-visible:border-[var(--laser-cyan)] focus-visible:shadow-glow-cyan focus-visible:ring-[var(--laser-cyan)]/50"
+            />
+            <button
+              type="button"
+              onClick={searchBggForums}
+              disabled={!bggId}
+              aria-label="Search BGG forums"
+              className="absolute top-1/2 right-1 -translate-y-1/2 rounded-full p-1.5 text-slate-400 transition-colors duration-300 hover:text-[var(--laser-cyan)] disabled:pointer-events-none disabled:opacity-50"
+            >
+              <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <Stat label="Status" value={game.status ?? '—'} />

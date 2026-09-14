@@ -21,3 +21,12 @@ export function formatCommaList(value: string | null, max = 3) {
     .filter(Boolean)
   return items.slice(0, max).join(', ')
 }
+
+// There's no separate numeric-ID field synced from Notion -- bggLink is a
+// full URL (e.g. https://boardgamegeek.com/boardgame/174430/gloomhaven), so
+// pull the ID out of it rather than adding a new Notion property.
+export function extractBggId(bggLink: string | null): string | null {
+  if (!bggLink) return null
+  const match = bggLink.match(/\/boardgame\/(\d+)/)
+  return match ? match[1] : null
+}
