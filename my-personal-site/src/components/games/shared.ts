@@ -9,3 +9,15 @@ export function formatRange(min: number | null, max: number | null, unit = '') {
   if (min != null && max != null && min !== max) return `${min}–${max}${suffix}`
   return `${min ?? max}${suffix}`
 }
+
+// Some Notion fields (e.g. Publisher) store multiple values as a single
+// comma-separated string. Cap the displayed list so a long value doesn't
+// overwhelm the modal.
+export function formatCommaList(value: string | null, max = 3) {
+  if (!value) return '—'
+  const items = value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+  return items.slice(0, max).join(', ')
+}

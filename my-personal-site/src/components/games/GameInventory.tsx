@@ -91,7 +91,7 @@ export function GameInventory() {
         playersMax: boardGame.playersMax,
         minPlaytime: boardGame.minPlaytime,
         maxPlaytime: boardGame.maxPlaytime,
-        rating: boardGame.rating != null ? `${boardGame.rating}/10` : '—',
+        rating: boardGame.rating != null ? `${boardGame.rating.toFixed(2)}/10` : '—',
         status: boardGame.status ?? '—',
         bggLink: boardGame.bggLink,
         categories: boardGame.categories ?? [],

@@ -5,7 +5,7 @@ import { ExternalLinkIcon, ImageNotFound01Icon } from '@hugeicons/core-free-icon
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../@/components/ui/dialog'
 import { Badge } from '../../../@/components/ui/badge'
 import type { BoardGame } from '../../types/board-game'
-import { formatRange } from './shared'
+import { formatRange, formatCommaList } from './shared'
 
 type Props = {
   game: BoardGame
@@ -105,7 +105,7 @@ export function GameDetailModal({ game, open, onOpenChange }: Props) {
           <Stat label="Rating" value={game.rating != null ? `${game.rating.toFixed(2)}/10` : '—'} />
           <Stat label="Last Played" value={formatDate(game.lastPlayed) ?? '—'} />
           <Stat label="Designer" value={game.designer ?? '—'} />
-          <Stat label="Publisher" value={game.publisher ?? '—'} />
+          <Stat label="Publisher" value={formatCommaList(game.publisher)} />
         </div>
 
         {game.categories.length > 0 && (
