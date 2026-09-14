@@ -67,7 +67,7 @@ function mapPage(page: PageObjectResponse): BoardGame {
   const lastPlayed =
     p['Last Played']?.type === 'date' ? (p['Last Played'].date?.start ?? null) : null
   const bggLink = p['BGG Link']?.type === 'url' ? p['BGG Link'].url : null
-  const thumbnailUrl = p.Thumbnail?.type === 'url' ? p.Thumbnail.url : null
+  const thumbnailUrl = p['Thumbnail URL']?.type === 'url' ? p['Thumbnail URL'].url : null
   const notes = p.Notes?.type === 'rich_text' ? plainText(p.Notes.rich_text) : null
   const notes2 = p['Notes 2']?.type === 'rich_text' ? plainText(p['Notes 2'].rich_text) : null
   const notes3 = p['Notes 3']?.type === 'rich_text' ? plainText(p['Notes 3'].rich_text) : null

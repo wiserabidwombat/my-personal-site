@@ -42,7 +42,7 @@ function mapPage(page) {
     yearPublished: p['Year Published']?.number ?? null,
     lastPlayed: p['Last Played']?.date?.start ?? null,
     bggLink: p['BGG Link']?.url ?? null,
-    thumbnailUrl: p.Thumbnail?.url ?? null,
+    thumbnailUrl: p['Thumbnail URL']?.url ?? null,
     notes: plainText(p.Notes?.rich_text),
     notes2: plainText(p['Notes 2']?.rich_text),
     notes3: plainText(p['Notes 3']?.rich_text),
