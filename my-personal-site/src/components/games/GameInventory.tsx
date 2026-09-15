@@ -14,22 +14,20 @@ import {
 } from '../../../@/components/ui/pagination'
 import { useBoardGames } from '../../hooks/useBoardGames'
 import type { BoardGame } from '../../types/board-game'
-import { headingClass, formatRange } from './shared'
+import { headingClass, formatRange, toggleValue } from './shared'
+import { useGameFilterState } from './useGameFilterState'
 import { MultiSelectFilter } from './MultiSelectFilter'
 import { MinPlayersFilter } from './MinPlayersFilter'
 import { MaxPlayersFilter } from './MaxPlayersFilter'
 import { MinPlaytimeFilter } from './MinPlaytimeFilter'
 import { MaxPlaytimeFilter } from './MaxPlaytimeFilter'
 import { GameCard } from './GameCard'
+import { RandomGamePicker } from './RandomGamePicker'
 
 type InventoryRow = {
   id: string
   name: string
   players: string
-  playersMin: number | null
-  playersMax: number | null
-  minPlaytime: number | null
-  maxPlaytime: number | null
   rating: string
   status: string
   bggLink: string | null
@@ -40,12 +38,18 @@ type InventoryRow = {
 
 const PAGE_SIZE_OPTIONS = [6, 12, 24]
 
-function toggleValue(values: string[], value: string) {
-  return values.includes(value) ? values.filter((v) => v !== value) : [...values, value]
-}
-
-function uniqueSorted(values: string[][]) {
-  return [...new Set(values.flat())].sort((a, b) => a.localeCompare(b))
+function toInventoryRow(boardGame: BoardGame): InventoryRow {
+  return {
+    id: boardGame.id,
+    name: boardGame.name,
+    players: formatRange(boardGame.playersMin, boardGame.playersMax),
+    rating: boardGame.rating != null ? `${boardGame.rating.toFixed(2)}/10` : '—',
+    status: boardGame.status ?? '—',
+    bggLink: boardGame.bggLink,
+    categories: boardGame.categories ?? [],
+    mechanics: boardGame.mechanics ?? [],
+    game: boardGame,
+  }
 }
 
 function getPageNumbers(current: number, total: number): (number | 'ellipsis')[] {
@@ -72,98 +76,34 @@ const sourceLabel: Record<ReturnType<typeof useBoardGames>['source'], string> = 
 export function GameInventory() {
   const { games: boardGames, source } = useBoardGames()
   const [search, setSearch] = useState('')
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [selectedMechanics, setSelectedMechanics] = useState<string[]>([])
-  const [minPlayers, setMinPlayers] = useState<number | null>(null)
-  const [maxPlayers, setMaxPlayers] = useState<number | null>(null)
-  const [minPlaytime, setMinPlaytime] = useState<number | null>(null)
-  const [maxPlaytime, setMaxPlaytime] = useState<number | null>(null)
+  const {
+    allCategories,
+    allMechanics,
+    selectedCategories,
+    setSelectedCategories,
+    selectedMechanics,
+    setSelectedMechanics,
+    minPlayers,
+    setMinPlayers,
+    maxPlayers,
+    setMaxPlayers,
+    minPlaytime,
+    setMinPlaytime,
+    maxPlaytime,
+    setMaxPlaytime,
+    filteredGames,
+    hasActiveFilters,
+    clearAllFilters,
+  } = useGameFilterState(boardGames)
   const [pageSize, setPageSize] = useState(12)
   const [currentPage, setCurrentPage] = useState(1)
 
-  const inventory: InventoryRow[] = useMemo(
-    () =>
-      boardGames.map((boardGame) => ({
-        id: boardGame.id,
-        name: boardGame.name,
-        players: formatRange(boardGame.playersMin, boardGame.playersMax),
-        playersMin: boardGame.playersMin,
-        playersMax: boardGame.playersMax,
-        minPlaytime: boardGame.minPlaytime,
-        maxPlaytime: boardGame.maxPlaytime,
-        rating: boardGame.rating != null ? `${boardGame.rating.toFixed(2)}/10` : '—',
-        status: boardGame.status ?? '—',
-        bggLink: boardGame.bggLink,
-        categories: boardGame.categories ?? [],
-        mechanics: boardGame.mechanics ?? [],
-        game: boardGame,
-      })),
-    [boardGames]
-  )
-
-  const allCategories = useMemo(
-    () => uniqueSorted(boardGames.map((game) => game.categories ?? [])),
-    [boardGames]
-  )
-  const allMechanics = useMemo(
-    () => uniqueSorted(boardGames.map((game) => game.mechanics ?? [])),
-    [boardGames]
-  )
-
-  const filtered = useMemo(() => {
+  const filtered: InventoryRow[] = useMemo(() => {
     const query = search.trim().toLowerCase()
-    return inventory.filter((game) => {
-      const matchesSearch = query === '' || game.name.toLowerCase().includes(query)
-      const matchesCategories = selectedCategories.every((c) => game.categories.includes(c))
-      const matchesMechanics = selectedMechanics.every((m) => game.mechanics.includes(m))
-      const matchesMinPlayers =
-        minPlayers === null || (game.playersMax != null && game.playersMax >= minPlayers)
-      const matchesMaxPlayers =
-        maxPlayers === null || (game.playersMin != null && game.playersMin <= maxPlayers)
-      // Unlike the player-count filters above (which check for range overlap),
-      // playtime compares the same field directly: Min Playtime checks the
-      // game's own minPlaytime, Max Playtime checks its own maxPlaytime.
-      const matchesMinPlaytime =
-        minPlaytime === null || (game.minPlaytime != null && game.minPlaytime >= minPlaytime)
-      const matchesMaxPlaytime =
-        maxPlaytime === null || (game.maxPlaytime != null && game.maxPlaytime <= maxPlaytime)
-      return (
-        matchesSearch &&
-        matchesCategories &&
-        matchesMechanics &&
-        matchesMinPlayers &&
-        matchesMaxPlayers &&
-        matchesMinPlaytime &&
-        matchesMaxPlaytime
-      )
-    })
-  }, [
-    inventory,
-    search,
-    selectedCategories,
-    selectedMechanics,
-    minPlayers,
-    maxPlayers,
-    minPlaytime,
-    maxPlaytime,
-  ])
-
-  const hasActiveFilters =
-    selectedCategories.length > 0 ||
-    selectedMechanics.length > 0 ||
-    minPlayers !== null ||
-    maxPlayers !== null ||
-    minPlaytime !== null ||
-    maxPlaytime !== null
-
-  function clearAllFilters() {
-    setSelectedCategories([])
-    setSelectedMechanics([])
-    setMinPlayers(null)
-    setMaxPlayers(null)
-    setMinPlaytime(null)
-    setMaxPlaytime(null)
-  }
+    return filteredGames
+      .filter((game) => query === '' || game.name.toLowerCase().includes(query))
+      .map(toInventoryRow)
+  }, [filteredGames, search])
 
   // Reset to page 1 whenever the result set or page size changes, so a stale
   // page number never silently shows unrelated results. Adjusted during
@@ -213,7 +153,8 @@ export function GameInventory() {
       </div>
       <p className="mt-2 text-slate-300">Everything currently on the shelf.</p>
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
+        <RandomGamePicker games={boardGames} />
         <div className="relative w-full sm:w-64">
           <HugeiconsIcon
             icon={Search01Icon}

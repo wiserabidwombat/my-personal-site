@@ -3,6 +3,14 @@ export const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-sh
 export const PLAYER_COUNT_THRESHOLDS = [1, 2, 3, 4, 5, 6, 8]
 export const PLAYTIME_THRESHOLDS = [15, 30, 45, 60, 90, 120, 180]
 
+export function toggleValue(values: string[], value: string) {
+  return values.includes(value) ? values.filter((v) => v !== value) : [...values, value]
+}
+
+export function uniqueSorted(values: string[][]) {
+  return [...new Set(values.flat())].sort((a, b) => a.localeCompare(b))
+}
+
 export function formatRange(min: number | null, max: number | null, unit = '') {
   if (min == null && max == null) return '—'
   const suffix = unit ? ` ${unit}` : ''
