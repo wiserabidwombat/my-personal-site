@@ -1,5 +1,6 @@
-import { Outlet, createRootRoute, HeadContent } from '@tanstack/react-router'
+import { createRootRoute, HeadContent } from '@tanstack/react-router'
 import { Navbar } from '../components/navbar'
+import { PageTransition } from '../components/PageTransition'
 import { pageTitle } from '../lib/title'
 
 export const Route = createRootRoute({
@@ -22,7 +23,7 @@ function RootComponent() {
     <div>
       <HeadContent />
       <Navbar />
-      <Outlet />
+      <PageTransition />
     </div>
   )
 }

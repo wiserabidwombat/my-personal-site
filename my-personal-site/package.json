@@ -29,6 +29,7 @@
     "cn": "^0.2.6",
     "gray-matter": "^4.0.3",
     "jspdf": "^4.2.1",
+    "motion": "^13.3.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-markdown": "^10.1.0",
