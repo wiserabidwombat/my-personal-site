@@ -238,19 +238,17 @@
   --color-laser-cyan: var(--laser-cyan);
   --color-deep-space-black: var(--deep-space-black);
 
-  /* Neon glow utilities: shadow-glow-pink, shadow-glow-purple, shadow-glow-cyan */
-  --shadow-glow-pink: 0 0 10px rgba(255, 43, 214, 0.7), 0 0 30px rgba(255, 43, 214, 0.4);
-  --shadow-glow-purple: 0 0 10px rgba(139, 47, 224, 0.7), 0 0 30px rgba(139, 47, 224, 0.4);
-  --shadow-glow-cyan: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 30px rgba(0, 240, 255, 0.4);
+  /* shadow-glow-pink/purple/cyan are defined as @utility rules in
+     index.css instead of here -- see the comment there for why. */
 }
 
 :root {
-  /* Synthwave brand constants */
-  --neon-pink: #ff2bd6;
-  --cyber-purple: #8b2fe0;
-  --laser-cyan: #00f0ff;
-  --deep-space-black: #0a0612;
-
+  /* Synthwave brand constants (--neon-pink, --cyber-purple, --laser-cyan,
+     --deep-space-black) are defined once in index.css, not duplicated here:
+     a second unconditional `:root` declaration in this file would load
+     after index.css's [data-theme="light"] override and win the cascade
+     (equal 0,1,0 specificity, later source order beats it) regardless of
+     the active theme, permanently clobbering the light-theme values. */
   --background: var(--deep-space-black);
   --foreground: #f5f3ff;
   --card: #150a24;
@@ -316,6 +314,43 @@
   --sidebar-accent: var(--cyber-purple);
   --sidebar-accent-foreground: #f5f3ff;
   --sidebar-border: #2d1b4e;
+  --sidebar-ring: var(--laser-cyan);
+}
+
+/* Light-theme values for the shadcn/ui primitives (Badge, Card, Popover,
+   Command, Dialog, Input, Table, Textarea) -- see index.css for the
+   corresponding synthwave token + body-text overrides. */
+[data-theme='light'] {
+  --background: var(--deep-space-black);
+  --foreground: #1f1730;
+  --card: var(--deep-space-purple);
+  --card-foreground: #1f1730;
+  --popover: var(--deep-space-purple);
+  --popover-foreground: #1f1730;
+  --primary: var(--neon-pink);
+  --primary-foreground: #ffffff;
+  --secondary: var(--laser-cyan);
+  --secondary-foreground: #ffffff;
+  --muted: #ece7f5;
+  --muted-foreground: #6b6280;
+  --accent: var(--cyber-purple);
+  --accent-foreground: #ffffff;
+  --destructive: #c81e3a;
+  --border: #d9d2ea;
+  --input: #d9d2ea;
+  --ring: var(--laser-cyan);
+  --chart-1: var(--neon-pink);
+  --chart-2: var(--laser-cyan);
+  --chart-3: var(--cyber-purple);
+  --chart-4: #9333ea;
+  --chart-5: #db2777;
+  --sidebar: var(--deep-space-purple);
+  --sidebar-foreground: #1f1730;
+  --sidebar-primary: var(--neon-pink);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--cyber-purple);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #d9d2ea;
   --sidebar-ring: var(--laser-cyan);
 }
 
