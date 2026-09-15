@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Menu01Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
+import { Menu01Icon, Cancel01Icon, Sun02Icon, Moon02Icon } from '@hugeicons/core-free-icons'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -10,6 +10,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '../../@/components/ui/navigation-menu'
+import { useTheme } from '../hooks/useTheme'
 
 const primaryNavItems = [
   { to: '/', label: 'Home' },
@@ -29,6 +30,7 @@ const navLinkClass =
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--neon-pink)] bg-[var(--deep-space-black)]/80 shadow-[0_2px_16px_-4px_var(--neon-pink)] backdrop-blur-md">
@@ -75,15 +77,26 @@ export function Navbar() {
           </NavigationMenuList>
         </NavigationMenu>
 
-        <button
-          type="button"
-          onClick={() => setMobileOpen((open) => !open)}
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileOpen}
-          className="text-[var(--laser-cyan)] md:hidden"
-        >
-          <HugeiconsIcon icon={mobileOpen ? Cancel01Icon : Menu01Icon} size={26} />
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            className="text-[var(--laser-cyan)] transition-colors duration-300 hover:text-[var(--neon-pink)]"
+          >
+            <HugeiconsIcon icon={theme === 'dark' ? Sun02Icon : Moon02Icon} size={22} strokeWidth={2} />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMobileOpen((open) => !open)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+            className="text-[var(--laser-cyan)] md:hidden"
+          >
+            <HugeiconsIcon icon={mobileOpen ? Cancel01Icon : Menu01Icon} size={26} />
+          </button>
+        </div>
       </div>
 
       {mobileOpen && (

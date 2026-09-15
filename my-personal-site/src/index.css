@@ -22,10 +22,20 @@
   --cyber-purple: #8b2fe0;
   --laser-cyan: #00f0ff;
 
-  /* Neon glow shadows */
+  /* Neon glow shadows (text-shadow) */
   --glow-pink: 0 0 10px rgba(255, 43, 214, 0.7), 0 0 30px rgba(255, 43, 214, 0.4);
   --glow-purple: 0 0 10px rgba(139, 47, 224, 0.7), 0 0 30px rgba(139, 47, 224, 0.4);
   --glow-cyan: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 30px rgba(0, 240, 255, 0.4);
+
+  /* Neon glow shadows (box-shadow, e.g. hover:shadow-glow-cyan). Defined as
+     plain runtime custom properties -- rather than inside App.css's
+     `@theme inline` block -- so [data-theme="light"] can override them; a
+     `@theme`-registered shadow value gets its rgba() baked directly into
+     the compiled utility class with no var() indirection, which would make
+     it impossible to re-theme. See the shadow-glow-* @utility rules below. */
+  --shadow-glow-pink: 0 0 10px rgba(255, 43, 214, 0.7), 0 0 30px rgba(255, 43, 214, 0.4);
+  --shadow-glow-purple: 0 0 10px rgba(139, 47, 224, 0.7), 0 0 30px rgba(139, 47, 224, 0.4);
+  --shadow-glow-cyan: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 30px rgba(0, 240, 255, 0.4);
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -44,6 +54,68 @@
   @media (max-width: 1024px) {
     font-size: 16px;
   }
+}
+
+/*
+ * Light theme. Overrides the synthwave tokens above (plus the scrollbar and
+ * shadow-glow-* utilities built on them) with a toned-down, high-contrast
+ * light palette -- deep berry/violet/teal accents rather than full
+ * neon-on-white, which reads as harsh rather than "light mode." Applied via
+ * data-theme="light" on <html>, toggled from the navbar (see
+ * src/hooks/useTheme.ts) and set synchronously before first paint by the
+ * inline script in index.html so switching -- or reloading with a saved
+ * preference -- never flashes the wrong theme.
+ */
+[data-theme='light'] {
+  --deep-space-black: #f7f5fb;
+  --deep-space-purple: #e9e3f5;
+
+  --neon-pink: #9d174d;
+  --cyber-purple: #6d28d9;
+  --laser-cyan: #155e75;
+
+  --glow-pink: 0 1px 3px rgba(157, 23, 77, 0.25);
+  --glow-purple: 0 1px 3px rgba(109, 40, 217, 0.25);
+  --glow-cyan: 0 1px 3px rgba(21, 94, 117, 0.25);
+
+  --shadow-glow-pink: 0 4px 14px rgba(157, 23, 77, 0.22);
+  --shadow-glow-purple: 0 4px 14px rgba(109, 40, 217, 0.22);
+  --shadow-glow-cyan: 0 4px 14px rgba(21, 94, 117, 0.22);
+}
+
+/* Body-text overrides: Tailwind's slate-* palette is used directly across
+   the app for text color (e.g. `text-slate-200`) rather than a text-color
+   theme token, so it's re-themed here by targeting Tailwind's own generated
+   class names instead of editing every component. Ordering mirrors each
+   shade's role on the dark theme -- slate-50/100 (most prominent) become
+   the darkest text here, slate-400/500 (most muted) the lightest -- so
+   relative text hierarchy stays intact. All pass WCAG AA (4.5:1+) against
+   both the page background and the --deep-space-purple card background. */
+[data-theme='light'] .text-slate-50,
+[data-theme='light'] .text-slate-100 {
+  color: #18122b;
+}
+[data-theme='light'] .text-slate-200 {
+  color: #332b47;
+}
+[data-theme='light'] .text-slate-300 {
+  color: #463c5c;
+}
+[data-theme='light'] .text-slate-400 {
+  color: #6b6280;
+}
+[data-theme='light'] .text-slate-500 {
+  color: #5f5775;
+}
+
+/* Subtle white-on-dark borders/rings (used for card edges against the dark
+   background) are invisible on a light background -- swap to an equally
+   subtle dark tint. */
+[data-theme='light'] .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+[data-theme='light'] .ring-white\/10 {
+  --tw-ring-color: rgba(0, 0, 0, 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -199,6 +271,20 @@ code {
       transparent 70%
     );
   }
+}
+
+/* Neon glow box-shadows. Defined as @utility rules (like bg-synth-grid)
+   rather than left to App.css's `@theme inline` block, which would bake the
+   rgba() values directly into the compiled class with no var() indirection
+   -- making them impossible to re-theme under [data-theme="light"] above. */
+@utility shadow-glow-pink {
+  box-shadow: var(--shadow-glow-pink);
+}
+@utility shadow-glow-purple {
+  box-shadow: var(--shadow-glow-purple);
+}
+@utility shadow-glow-cyan {
+  box-shadow: var(--shadow-glow-cyan);
 }
 
 /* Opt-in motion for bg-synth-grid: scrolls the floor grid toward the viewer. */
