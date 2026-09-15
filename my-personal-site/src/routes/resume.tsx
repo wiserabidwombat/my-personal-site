@@ -1,6 +1,4 @@
-import { useRef } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useReactToPrint } from 'react-to-print'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Download04Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '../../@/components/ui/badge'
@@ -8,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components
 import { Button } from '../../@/components/ui/button'
 import { pageTitle } from '../lib/title'
 import { summary, skillGroups, experience, credentials } from '../lib/resume-data'
-import { PrintResume } from '../components/resume/PrintResume'
+import { generateResumePdf } from '../lib/generate-resume-pdf'
 
 export const Route = createFileRoute('/resume')({
   head: () => ({
@@ -20,16 +18,6 @@ export const Route = createFileRoute('/resume')({
 const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]'
 
 function RouteComponent() {
-  const printRef = useRef<HTMLDivElement>(null)
-  const printResume = useReactToPrint({
-    contentRef: printRef,
-    documentTitle: 'Aaron_Tilley_Resume',
-    pageStyle: `
-      @page { size: letter; margin: 0.5in; }
-      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    `,
-  })
-
   return (
     <div className="min-h-screen bg-[var(--deep-space-black)] text-left text-slate-200">
       <section className="bg-synth-grid px-6 py-20 text-center">
@@ -42,7 +30,7 @@ function RouteComponent() {
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">{summary}</p>
           <Button
-            onClick={() => printResume()}
+            onClick={generateResumePdf}
             variant="outline"
             className="mt-8 gap-2 border-[var(--laser-cyan)] text-[var(--laser-cyan)] hover:bg-[var(--laser-cyan)]/10 hover:shadow-glow-cyan"
           >
@@ -51,16 +39,6 @@ function RouteComponent() {
           </Button>
         </div>
       </section>
-
-      {/*
-        Kept in the DOM (not display:none) so react-to-print's clone of this
-        node carries no hiding styles into the print output; the height-0
-        overflow-hidden wrapper (not the printed node itself) is what keeps
-        it invisible and out of layout on the live page.
-      */}
-      <div style={{ height: 0, overflow: 'hidden' }} aria-hidden="true">
-        <PrintResume ref={printRef} />
-      </div>
 
       <section className="mx-auto max-w-4xl px-6 py-12">
         <h2 className={headingClass}>Technology Skills</h2>
