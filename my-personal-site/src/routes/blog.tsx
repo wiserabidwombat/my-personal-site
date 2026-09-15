@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { RssIcon } from '@hugeicons/core-free-icons'
 import { getAllPosts, getAllTags } from '../lib/blog'
 import { BlogGrid } from '../components/blog/BlogGrid'
 import { TagFilter } from '../components/blog/TagFilter'
@@ -29,9 +31,19 @@ function BlogRouteComponent() {
           <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
             Transmission Log
           </p>
-          <h1 className="mx-auto mt-4 max-w-3xl text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
-            Blog
-          </h1>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <h1 className="max-w-3xl text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
+              Blog
+            </h1>
+            <a
+              href="/rss.xml"
+              aria-label="RSS feed"
+              title="RSS feed"
+              className="text-slate-400 transition-colors duration-300 hover:text-[var(--laser-cyan)] hover:[filter:drop-shadow(0_0_6px_var(--laser-cyan))]"
+            >
+              <HugeiconsIcon icon={RssIcon} strokeWidth={2} className="size-6" aria-hidden="true" />
+            </a>
+          </div>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300">
             Notes on code, teams, and everything in between.
           </p>
