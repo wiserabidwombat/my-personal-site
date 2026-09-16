@@ -16,7 +16,10 @@ export type Specimen = {
 type SpecimenRow = {
   id: number
   name: string
-  type: SpecimenType
+  // Stored capitalized ('Mineral' / 'Fossil') in fossils_and_minerals;
+  // normalized to lowercase in mapRow to match the SpecimenType contract
+  // the frontend's type filter (CatalogLedger) actually compares against.
+  type: string
   date_collected: string | null
   location_found: string | null
   description: string | null
@@ -27,11 +30,14 @@ function mapRow(row: SpecimenRow): Specimen {
   return {
     id: row.id,
     name: row.name,
-    type: row.type,
+    type: row.type.toLowerCase() as SpecimenType,
     dateCollected: row.date_collected,
     locationFound: row.location_found,
     description: row.description,
-    imageUrl: row.image_url,
+    // A handful of rows store an empty string rather than NULL for "no
+    // image yet" -- normalize so callers only ever have to check for a
+    // single falsy shape.
+    imageUrl: row.image_url || null,
   }
 }
 
@@ -50,9 +56,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const sql = neon(DATABASE_URL)
+    // NOTE: fossils_and_minerals, not the legacy `specimens` table left
+    // over from initial scaffolding (a single stray "Rose Quartz" row --
+    // see db/migrations/001_create_specimens.sql). This is the table the
+    // real collection has actually been added to.
     const rows = (await sql.query(
       `SELECT id, name, type, date_collected, location_found, description, image_url
-       FROM specimens
+       FROM fossils_and_minerals
        ORDER BY date_collected DESC NULLS LAST, id DESC`
     )) as SpecimenRow[]
 

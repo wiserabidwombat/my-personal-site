@@ -41,18 +41,24 @@ export function NeonShowcase({ specimens, loading }: Props) {
 
         {!loading &&
           featured.map((specimen) => (
+            // No fixed aspect ratio on the card itself -- only the image is
+            // locked to a ratio. The content block below sizes to whatever
+            // the type/title/location actually need (grid's default
+            // items-stretch still keeps every card in a row matched to the
+            // tallest one), so a wrapping title or long location is never
+            // clipped by a height the card refuses to grow past.
             <div
               key={specimen.id}
-              className="flex aspect-[3/4] flex-col overflow-hidden rounded-2xl border-2 border-[var(--neon-pink)] bg-[var(--deep-space-purple)]/40 shadow-glow-pink backdrop-blur-md"
+              className="flex flex-col overflow-hidden rounded-2xl border-2 border-[var(--neon-pink)] bg-[var(--deep-space-purple)]/40 shadow-glow-pink backdrop-blur-md"
             >
               {specimen.imageUrl ? (
                 <img
                   src={getResizedImageUrl(specimen.imageUrl, 'thumbnail')}
                   alt={specimen.name}
-                  className="h-1/2 w-full object-cover"
+                  className="aspect-square w-full object-cover"
                 />
               ) : (
-                <div className="flex h-1/2 w-full items-center justify-center bg-[var(--deep-space-black)]/60 text-xs text-slate-500">
+                <div className="flex aspect-square w-full items-center justify-center bg-[var(--deep-space-black)]/60 text-xs text-slate-500">
                   No image
                 </div>
               )}
