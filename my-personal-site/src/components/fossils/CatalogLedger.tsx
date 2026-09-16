@@ -4,22 +4,17 @@ import { Search01Icon } from '@hugeicons/core-free-icons'
 import { Input } from '../../../@/components/ui/input'
 import { Badge } from '../../../@/components/ui/badge'
 import { Button } from '../../../@/components/ui/button'
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '../../../@/components/ui/table'
 import type { Specimen } from '../../types/specimen'
 import type { SpecimensState } from '../../hooks/useSpecimens'
 import { headingClass } from '../games/shared'
+import { SpecimenCard } from './SpecimenCard'
 
 type Filter = 'All' | 'Minerals' | 'Fossils'
 
 const filters: Filter[] = ['All', 'Minerals', 'Fossils']
-const PAGE_SIZE = 10
+// 12 (not the board games grid's default) divides evenly into full rows at
+// this grid's 3-column desktop breakpoint.
+const PAGE_SIZE = 12
 
 const statusLabel: Record<SpecimensState['status'], string> = {
   loading: 'Connecting to Neon...',
@@ -31,18 +26,6 @@ type Props = {
   specimens: Specimen[]
   loading: boolean
   status: SpecimensState['status']
-}
-
-function formatDate(value: string | null) {
-  if (!value) return '—'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return date.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    timeZone: 'UTC',
-  })
 }
 
 export function CatalogLedger({ specimens, loading, status }: Props) {
@@ -128,55 +111,27 @@ export function CatalogLedger({ specimens, loading, status }: Props) {
         </div>
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-[var(--cyber-purple)]/40">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-[var(--cyber-purple)]/40 hover:bg-transparent">
-              <TableHead className="text-[var(--laser-cyan)]">Name</TableHead>
-              <TableHead className="text-[var(--laser-cyan)]">Type</TableHead>
-              <TableHead className="text-[var(--laser-cyan)]">Found</TableHead>
-              <TableHead className="text-[var(--laser-cyan)]">Location</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading &&
-              Array.from({ length: 5 }).map((_, index) => (
-                <TableRow key={index} className="border-[var(--cyber-purple)]/20">
-                  <TableCell colSpan={4}>
-                    <div className="h-4 w-full animate-pulse rounded bg-[var(--deep-space-purple)]/50" />
-                  </TableCell>
-                </TableRow>
-              ))}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {loading &&
+          Array.from({ length: PAGE_SIZE }).map((_, index) => (
+            <div
+              key={index}
+              className="aspect-[4/5] animate-pulse rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/40"
+            />
+          ))}
 
-            {!loading &&
-              pageItems.map((specimen) => (
-                <TableRow key={specimen.id} className="border-[var(--cyber-purple)]/20">
-                  <TableCell className="font-medium text-slate-100">{specimen.name}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-[10px] capitalize">
-                      {specimen.type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-slate-300">
-                    {formatDate(specimen.dateCollected)}
-                  </TableCell>
-                  <TableCell className="text-slate-300">{specimen.locationFound ?? '—'}</TableCell>
-                </TableRow>
-              ))}
+        {!loading &&
+          pageItems.map((specimen) => <SpecimenCard key={specimen.id} specimen={specimen} />)}
 
-            {!loading && pageItems.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center text-slate-400">
-                  No specimens match your search.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        {!loading && pageItems.length === 0 && (
+          <p className="col-span-full text-center text-slate-400">
+            No specimens match your search.
+          </p>
+        )}
       </div>
 
       {!loading && filtered.length > 0 && (
-        <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
+        <div className="mt-6 flex items-center justify-between text-sm text-slate-400">
           <span>
             Page {currentPage} of {totalPages}
           </span>

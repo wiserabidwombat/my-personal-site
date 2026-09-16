@@ -7,7 +7,6 @@ export type Specimen = {
   id: number
   name: string
   type: SpecimenType
-  dateCollected: string | null
   locationFound: string | null
   description: string | null
   imageUrl: string | null
@@ -20,7 +19,6 @@ type SpecimenRow = {
   // normalized to lowercase in mapRow to match the SpecimenType contract
   // the frontend's type filter (CatalogLedger) actually compares against.
   type: string
-  date_collected: string | null
   location_found: string | null
   description: string | null
   image_url: string | null
@@ -31,7 +29,6 @@ function mapRow(row: SpecimenRow): Specimen {
     id: row.id,
     name: row.name,
     type: row.type.toLowerCase() as SpecimenType,
-    dateCollected: row.date_collected,
     locationFound: row.location_found,
     description: row.description,
     // A handful of rows store an empty string rather than NULL for "no
@@ -60,10 +57,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // over from initial scaffolding (a single stray "Rose Quartz" row --
     // see db/migrations/001_create_specimens.sql). This is the table the
     // real collection has actually been added to.
+    //
+    // date_collected is intentionally not selected: this collection is
+    // primarily purchased, not found, so a "found date" isn't meaningful
+    // and the field has been dropped from the app entirely. Newest
+    // additions (highest id) surface first instead.
     const rows = (await sql.query(
-      `SELECT id, name, type, date_collected, location_found, description, image_url
+      `SELECT id, name, type, location_found, description, image_url
        FROM fossils_and_minerals
-       ORDER BY date_collected DESC NULLS LAST, id DESC`
+       ORDER BY id DESC`
     )) as SpecimenRow[]
 
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300')
