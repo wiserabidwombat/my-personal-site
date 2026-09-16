@@ -28,7 +28,12 @@ const triggerClass =
 // lands on the actual winner.
 function SpinFrameCard({ game }: { game: BoardGame }) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-[var(--cyber-purple)]/30 bg-[var(--deep-space-black)]/40 p-4">
+    // h-24 keeps this a fixed size regardless of title length, so the modal
+    // never resizes/jumps as different games flash through. min-w-0 on the
+    // title is load-bearing: flex items default to min-width:auto, so
+    // without it a long, unbroken (nowrap, from `truncate`) title refuses
+    // to shrink and blows out the row's width instead of eliding with "…".
+    <div className="flex h-24 items-center gap-4 overflow-hidden rounded-2xl border border-[var(--cyber-purple)]/30 bg-[var(--deep-space-black)]/40 p-4">
       <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[var(--deep-space-black)] ring-1 ring-[var(--cyber-purple)]/40">
         {game.thumbnailUrl ? (
           <img src={game.thumbnailUrl} alt="" className="size-full object-cover" />
@@ -41,7 +46,7 @@ function SpinFrameCard({ game }: { game: BoardGame }) {
           />
         )}
       </div>
-      <p className="truncate text-lg font-bold text-[var(--laser-cyan)]">{game.name}</p>
+      <p className="min-w-0 flex-1 truncate text-lg font-bold text-[var(--laser-cyan)]">{game.name}</p>
     </div>
   )
 }
@@ -148,7 +153,18 @@ export function RandomGamePicker({ games }: Props) {
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="w-full overflow-visible border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)] p-0 shadow-glow-purple sm:max-w-lg">
-          <div className="grid max-h-[85vh] gap-6 overflow-y-auto rounded-4xl p-6 sm:-mr-3 sm:rounded-none sm:pr-9">
+          <div
+            className={`grid max-h-[85vh] gap-6 rounded-4xl p-6 sm:-mr-3 sm:rounded-none sm:pr-9 ${
+              // Forced hidden (not auto/scroll) specifically while spinning,
+              // so no scrollbar can appear even transiently as cards cycle
+              // through -- the fixed-height SpinFrameCard above means there's
+              // nothing that should need to scroll during the spin anyway.
+              // Reverts to normal auto-scrolling once the spin lands, so the
+              // final detail view (categories, notes, etc.) scrolls exactly
+              // like the standalone game detail modal.
+              spinning ? 'overflow-hidden' : 'overflow-y-auto'
+            }`}
+          >
             <DialogHeader>
               <DialogTitle className="text-xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]">
                 🎲 Random Game Picker
