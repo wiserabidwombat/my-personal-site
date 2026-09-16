@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Badge } from '../../../@/components/ui/badge'
 import type { Specimen } from '../../types/specimen'
 import { headingClass } from '../games/shared'
+import { getResizedImageUrl } from '../../lib/image'
 
 function shuffle<T>(items: T[]): T[] {
   const copy = [...items]
@@ -46,7 +47,7 @@ export function NeonShowcase({ specimens, loading }: Props) {
             >
               {specimen.imageUrl ? (
                 <img
-                  src={specimen.imageUrl}
+                  src={getResizedImageUrl(specimen.imageUrl, 'thumbnail')}
                   alt={specimen.name}
                   className="h-1/2 w-full object-cover"
                 />
