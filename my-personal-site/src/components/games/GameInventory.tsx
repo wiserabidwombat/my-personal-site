@@ -22,6 +22,7 @@ import { MaxPlayersFilter } from './MaxPlayersFilter'
 import { MinPlaytimeFilter } from './MinPlaytimeFilter'
 import { MaxPlaytimeFilter } from './MaxPlaytimeFilter'
 import { GameCard } from './GameCard'
+import { GameCardSkeleton } from './GameCardSkeleton'
 import { RandomGamePicker } from './RandomGamePicker'
 
 type InventoryRow = {
@@ -37,6 +38,10 @@ type InventoryRow = {
 }
 
 const PAGE_SIZE_OPTIONS = [6, 12, 24]
+// Fills out a realistic 3-row grid at the lg breakpoint (sm:grid-cols-2
+// lg:grid-cols-3) -- roughly what would show above the fold -- rather than
+// a sparse handful of skeletons.
+const SKELETON_CARD_COUNT = 9
 
 function toInventoryRow(boardGame: BoardGame): InventoryRow {
   return {
@@ -273,23 +278,29 @@ export function GameInventory() {
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {paginated.map((game) => (
-          <GameCard
-            key={game.id}
-            game={game.game}
-            name={game.name}
-            players={game.players}
-            rating={game.rating}
-            status={game.status}
-            bggLink={game.bggLink}
-            categories={game.categories}
-            mechanics={game.mechanics}
-            onCategoryTagClick={(tag) => setSelectedCategories((prev) => toggleValue(prev, tag))}
-            onMechanicTagClick={(tag) => setSelectedMechanics((prev) => toggleValue(prev, tag))}
-          />
-        ))}
-        {filtered.length === 0 && (
-          <p className="col-span-full text-center text-slate-400">No games match your search.</p>
+        {source === 'loading' ? (
+          Array.from({ length: SKELETON_CARD_COUNT }, (_, i) => <GameCardSkeleton key={i} />)
+        ) : (
+          <>
+            {paginated.map((game) => (
+              <GameCard
+                key={game.id}
+                game={game.game}
+                name={game.name}
+                players={game.players}
+                rating={game.rating}
+                status={game.status}
+                bggLink={game.bggLink}
+                categories={game.categories}
+                mechanics={game.mechanics}
+                onCategoryTagClick={(tag) => setSelectedCategories((prev) => toggleValue(prev, tag))}
+                onMechanicTagClick={(tag) => setSelectedMechanics((prev) => toggleValue(prev, tag))}
+              />
+            ))}
+            {filtered.length === 0 && (
+              <p className="col-span-full text-center text-slate-400">No games match your search.</p>
+            )}
+          </>
         )}
       </div>
 

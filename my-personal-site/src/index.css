@@ -308,3 +308,32 @@ code {
     }
   }
 }
+
+/* Skeleton loading placeholder: a pink/cyan shimmer sweeps across a dark
+   bar rather than a generic gray pulse, to fit the synthwave aesthetic. */
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -150% 0;
+  }
+}
+
+@utility skeleton-shimmer {
+  background-color: color-mix(in oklab, var(--cyber-purple) 20%, var(--deep-space-black));
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--neon-pink) 45%, transparent) 40%,
+    color-mix(in oklab, var(--laser-cyan) 55%, transparent) 50%,
+    color-mix(in oklab, var(--neon-pink) 45%, transparent) 60%,
+    transparent 100%
+  );
+  background-size: 250% 100%;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
