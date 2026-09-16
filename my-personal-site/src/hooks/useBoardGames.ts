@@ -28,7 +28,11 @@ const fallback: BoardGame[] = (boardGamesFallback as Partial<BoardGame>[]).map((
 })) as BoardGame[]
 
 export function useBoardGames(): BoardGamesState {
-  const [state, setState] = useState<BoardGamesState>({ games: fallback, source: 'loading' })
+  // Starts empty (not the fallback snapshot) so consumers can render a real
+  // loading state -- e.g. skeleton cards -- while source is 'loading',
+  // rather than a handful of sparse, mostly-empty fallback cards. The
+  // fallback only comes into play if the live fetch actually fails.
+  const [state, setState] = useState<BoardGamesState>({ games: [], source: 'loading' })
 
   useEffect(() => {
     let cancelled = false
