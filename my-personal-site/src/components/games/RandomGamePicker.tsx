@@ -4,11 +4,11 @@ import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../@/components/ui/dialog'
 import { Button } from '../../../@/components/ui/button'
 import { Badge } from '../../../@/components/ui/badge'
-import { Input } from '../../../@/components/ui/input'
 import type { BoardGame } from '../../types/board-game'
 import { usePickerFilterState } from './usePickerFilterState'
 import { pickRandomGame } from './gameFilters'
 import { SingleSelectFilter } from './SingleSelectFilter'
+import { PlayerCountFilter } from './PlayerCountFilter'
 import { MinPlaytimeFilter } from './MinPlaytimeFilter'
 import { MaxPlaytimeFilter } from './MaxPlaytimeFilter'
 import { GameDetailContent } from './GameDetailContent'
@@ -19,12 +19,6 @@ type Props = {
 
 const triggerClass =
   'gap-2 border-[var(--laser-cyan)] text-[var(--laser-cyan)] hover:bg-[var(--laser-cyan)]/10 hover:shadow-glow-cyan'
-
-function parsePlayerCount(raw: string): number | null {
-  if (raw === '') return null
-  const value = Number(raw)
-  return Number.isNaN(value) ? null : Math.max(1, Math.trunc(value))
-}
 
 export function RandomGamePicker({ games }: Props) {
   const [open, setOpen] = useState(false)
@@ -107,15 +101,7 @@ export function RandomGamePicker({ games }: Props) {
                     onChange={setMechanic}
                   />
                 )}
-                <Input
-                  type="number"
-                  min={1}
-                  inputMode="numeric"
-                  value={players ?? ''}
-                  onChange={(event) => setPlayers(parsePlayerCount(event.target.value))}
-                  placeholder="Number of Players"
-                  className="w-40"
-                />
+                <PlayerCountFilter value={players} onChange={setPlayers} />
                 <MinPlaytimeFilter value={minPlaytime} onChange={setMinPlaytime} />
                 <MaxPlaytimeFilter value={maxPlaytime} onChange={setMaxPlaytime} />
                 <button
