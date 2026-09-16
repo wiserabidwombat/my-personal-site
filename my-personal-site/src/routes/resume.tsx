@@ -4,13 +4,17 @@ import { Download04Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '../../@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
 import { Button } from '../../@/components/ui/button'
-import { pageTitle } from '../lib/title'
+import { seoMeta } from '../lib/meta'
 import { summary, skillGroups, experience, credentials } from '../lib/resume-data'
 import { generateResumePdf } from '../lib/generate-resume-pdf'
 
 export const Route = createFileRoute('/resume')({
   head: () => ({
-    meta: [{ title: pageTitle('Resume') }],
+    meta: seoMeta({
+      title: 'Resume',
+      description: "View Aaron Tilley's professional experience and technical skills.",
+      path: '/resume',
+    }),
   }),
   component: RouteComponent,
 })

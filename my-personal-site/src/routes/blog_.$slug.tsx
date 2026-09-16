@@ -4,12 +4,18 @@ import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
 import { buttonVariants } from '../../@/components/ui/button'
 import { getPostBySlug } from '../lib/blog'
 import { BlogPostView } from '../components/blog/BlogPostView'
-import { pageTitle } from '../lib/title'
+import { seoMeta, SITE_URL } from '../lib/meta'
 
 export const Route = createFileRoute('/blog_/$slug')({
   loader: ({ params }) => getPostBySlug(params.slug),
-  head: ({ loaderData }) => ({
-    meta: [{ title: pageTitle(loaderData?.title ?? 'Post not found') }],
+  head: ({ loaderData, params }) => ({
+    meta: seoMeta({
+      title: loaderData?.title ?? 'Post not found',
+      description: loaderData?.blurb ?? 'That transmission never made it through.',
+      path: `/blog/${params.slug}`,
+      image: loaderData ? `${SITE_URL}${loaderData.image}` : undefined,
+      type: 'article',
+    }),
   }),
   component: BlogSlugRouteComponent,
 })

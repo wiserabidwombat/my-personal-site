@@ -5,11 +5,16 @@ import { RssIcon } from '@hugeicons/core-free-icons'
 import { getAllPosts, getAllTags } from '../lib/blog'
 import { BlogGrid } from '../components/blog/BlogGrid'
 import { TagFilter } from '../components/blog/TagFilter'
-import { pageTitle } from '../lib/title'
+import { seoMeta } from '../lib/meta'
 
 export const Route = createFileRoute('/blog')({
   head: () => ({
-    meta: [{ title: pageTitle('Blog') }],
+    meta: seoMeta({
+      title: 'Blog',
+      description:
+        'Notes on code, engineering leadership, and everything in between -- Aaron Tilley writes about software development, teams, and AI-assisted workflows.',
+      path: '/blog',
+    }),
   }),
   component: BlogRouteComponent,
 })
