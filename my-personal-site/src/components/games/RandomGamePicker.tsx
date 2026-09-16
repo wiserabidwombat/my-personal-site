@@ -26,6 +26,19 @@ const triggerClass =
 // to swap every 80-360ms without jank. The full GameDetailContent (stats,
 // categories, mechanics, forum search, etc.) only renders once the spin
 // lands on the actual winner.
+//
+// A long title truncating correctly here isn't enough on its own: the
+// outer wrapper below is `display: grid`, and CSS Grid sizes an auto
+// column using the *min-content* contribution of every grid item -- for
+// `white-space: nowrap` text (what `truncate` sets) that's the full
+// unbroken text width, not the shrunk/truncated width. Left unchecked,
+// that single long title silently widens the whole modal (every sibling
+// grid item, including the Pick button, stretches to match), even though
+// this card's own internal layout looks fine in isolation. Every
+// `min-w-0` in this file below the grid wrapper is there specifically to
+// stop that contribution from bubbling up -- removing any one of them
+// reintroduces the overflow whenever the currently-cycling card happens
+// to have a long name.
 function SpinFrameCard({ game }: { game: BoardGame }) {
   return (
     // h-24 keeps this a fixed size regardless of title length, so the modal
@@ -154,7 +167,7 @@ export function RandomGamePicker({ games }: Props) {
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="w-full overflow-visible border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)] p-0 shadow-glow-purple sm:max-w-lg">
           <div
-            className={`grid max-h-[85vh] gap-6 rounded-4xl p-6 sm:-mr-3 sm:rounded-none sm:pr-9 ${
+            className={`grid min-w-0 max-h-[85vh] gap-6 rounded-4xl p-6 sm:-mr-3 sm:rounded-none sm:pr-9 ${
               // Forced hidden (not auto/scroll) specifically while spinning,
               // so no scrollbar can appear even transiently as cards cycle
               // through -- the fixed-height SpinFrameCard above means there's
@@ -171,7 +184,7 @@ export function RandomGamePicker({ games }: Props) {
               </DialogTitle>
             </DialogHeader>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex min-w-0 flex-col gap-3">
               <div className="flex flex-wrap items-center gap-2">
                 {allCategories.length > 0 && (
                   <SingleSelectFilter
@@ -275,7 +288,7 @@ export function RandomGamePicker({ games }: Props) {
             </Button>
 
             {displayedGame && spinning && (
-              <div className="border-t border-[var(--cyber-purple)]/30 pt-6">
+              <div className="min-w-0 border-t border-[var(--cyber-purple)]/30 pt-6">
                 <SpinFrameCard game={displayedGame} />
               </div>
             )}
@@ -293,7 +306,7 @@ export function RandomGamePicker({ games }: Props) {
                   ],
                 }}
                 transition={{ duration: 0.7, ease: 'easeOut' }}
-                className="rounded-3xl border-t border-[var(--cyber-purple)]/30 pt-6"
+                className="min-w-0 rounded-3xl border-t border-[var(--cyber-purple)]/30 pt-6"
               >
                 <GameDetailContent game={displayedGame} />
               </motion.div>
