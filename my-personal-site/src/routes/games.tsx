@@ -1,10 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Games } from '../components/Games'
-import { pageTitle } from '../lib/title'
+import { seoMeta } from '../lib/meta'
 
 export const Route = createFileRoute('/games')({
   head: () => ({
-    meta: [{ title: pageTitle('Game Inventory') }],
+    meta: seoMeta({
+      title: 'Game Inventory',
+      description: "Browse Aaron's board game collection.",
+      path: '/games',
+    }),
   }),
   component: Games,
 })

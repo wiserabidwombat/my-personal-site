@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vitest run && tsc -b && node scripts/generate-rss.mjs && vite build",
+    "build": "vitest run && tsc -b && node scripts/generate-rss.mjs && vite build && node scripts/prerender-meta.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "fetch:games": "node --env-file=.env.local scripts/fetch-games.mjs",
