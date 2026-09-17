@@ -85,6 +85,33 @@ function ShowcaseCard({
   )
 }
 
+function Bar({ className }: { className: string }) {
+  return <div className={`skeleton-shimmer rounded-md ${className}`} aria-hidden="true" />
+}
+
+// Mirrors ShowcaseCard's exact structure and spacing (including the
+// spotlight-vs-grid size difference) so neither the desktop grid nor the
+// mobile carousel shifts once real specimens swap in. Border is dimmed
+// (no glow) rather than matching the real card's full neon-pink treatment,
+// so a still-loading card doesn't read as "loaded but broken."
+//
+// Bar heights below match each real text element's actual line-height
+// (text-xl/text-base -> 28px/24px, text-sm/text-xs -> 20px/16px), not just
+// a close-looking size -- a few px short per line is enough to shift the
+// whole grid row once real text (at its real line-height) swaps in.
+function ShowcaseCardSkeleton({ spotlight }: { spotlight?: boolean }) {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-2xl border-2 border-[var(--neon-pink)]/30 bg-[var(--deep-space-purple)]/40 backdrop-blur-md">
+      <div className="skeleton-shimmer aspect-square w-full" aria-hidden="true" />
+      <div className={`flex flex-1 flex-col gap-2 ${spotlight ? 'p-6' : 'p-4'}`}>
+        <Bar className="h-5 w-16 rounded-full" />
+        <Bar className={spotlight ? 'h-7 w-3/4' : 'h-6 w-2/3'} />
+        <Bar className={spotlight ? 'h-5 w-1/2' : 'h-4 w-1/2'} />
+      </div>
+    </div>
+  )
+}
+
 export function NeonShowcase({ specimens, loading }: Props) {
   const featured = useMemo(() => shuffle(specimens).slice(0, 5), [specimens])
   const isMobile = useMediaQuery(MOBILE_QUERY)
@@ -120,14 +147,13 @@ export function NeonShowcase({ specimens, loading }: Props) {
 
       {loading &&
         (isMobile ? (
-          <div className="mx-auto mt-8 aspect-[4/5] max-w-sm animate-pulse rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/40" />
+          <div className="mx-auto mt-8 max-w-sm">
+            <ShowcaseCardSkeleton spotlight />
+          </div>
         ) : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div
-                key={index}
-                className="aspect-[3/4] animate-pulse rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/40"
-              />
+            {Array.from({ length: 5 }, (_, index) => (
+              <ShowcaseCardSkeleton key={index} />
             ))}
           </div>
         ))}

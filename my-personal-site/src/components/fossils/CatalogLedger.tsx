@@ -8,6 +8,7 @@ import type { Specimen } from '../../types/specimen'
 import type { SpecimensState } from '../../hooks/useSpecimens'
 import { headingClass } from '../games/shared'
 import { SpecimenCard } from './SpecimenCard'
+import { SpecimenCardSkeleton } from './SpecimenCardSkeleton'
 
 type Filter = 'All' | 'Minerals' | 'Fossils'
 
@@ -113,12 +114,7 @@ export function CatalogLedger({ specimens, loading, status }: Props) {
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {loading &&
-          Array.from({ length: PAGE_SIZE }).map((_, index) => (
-            <div
-              key={index}
-              className="aspect-[4/5] animate-pulse rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/40"
-            />
-          ))}
+          Array.from({ length: PAGE_SIZE }, (_, index) => <SpecimenCardSkeleton key={index} />)}
 
         {!loading &&
           pageItems.map((specimen) => <SpecimenCard key={specimen.id} specimen={specimen} />)}
