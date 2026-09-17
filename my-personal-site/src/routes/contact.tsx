@@ -58,7 +58,7 @@ const contactLinks: {
 
 function ContactRouteComponent() {
   return (
-    <div className="min-h-screen bg-[var(--deep-space-black)] text-left text-slate-200">
+    <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
       <section className="bg-synth-grid px-6 py-20 text-center">
         <div className="relative z-10">
           <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">

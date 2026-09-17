@@ -7,7 +7,7 @@ export function Fossils() {
   const loading = status === 'loading'
 
   return (
-    <div className="min-h-screen bg-[var(--deep-space-black)] text-slate-200">
+    <div className="bg-[var(--deep-space-black)] text-slate-200">
       <NeonShowcase specimens={specimens} loading={loading} />
       <CatalogLedger specimens={specimens} loading={loading} status={status} />
       {status === 'error' && (

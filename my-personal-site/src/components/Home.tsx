@@ -111,7 +111,10 @@ export function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-[var(--cyber-purple)]/30 px-6 py-6">
+      {/* Not a <footer> -- that element belongs to the single site-wide
+          Footer rendered by the root layout, right after this section. This
+          is just this page's own themed closing content block. */}
+      <div className="border-t border-[var(--cyber-purple)]/30 px-6 py-6">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-8 gap-y-2 text-xs font-medium tracking-wide text-slate-400 uppercase">
           {systemMetrics.map((metric, i) => (
             <span key={metric.label} className="flex items-center gap-2">
@@ -128,7 +131,7 @@ export function Home() {
             How this site is built &rarr;
           </Link>
         </div>
-      </footer>
+      </div>
     </div>
   )
 }
