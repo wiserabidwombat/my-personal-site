@@ -36,7 +36,7 @@ function parsePost(raw: string, filePath: string): BlogPost {
     blurb: data.blurb,
     date: data.date,
     author: data.author,
-    tags: data.tags,
+    tags: data.tags ?? [],
     body: content.trim(),
   }
 }
@@ -62,7 +62,7 @@ export function findPostBySlug(posts: BlogPost[], slug: string): BlogPost | unde
 export function collectTags(posts: BlogPost[]): string[] {
   const tagSet = new Set<string>()
   for (const post of posts) {
-    post.tags?.forEach((tag) => tagSet.add(tag))
+    post.tags.forEach((tag) => tagSet.add(tag))
   }
   return [...tagSet].sort()
 }

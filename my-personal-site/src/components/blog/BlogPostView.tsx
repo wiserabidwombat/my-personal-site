@@ -26,10 +26,15 @@ export function BlogPostView({ post }: Props) {
     <div className="bg-[var(--deep-space-black)] text-slate-200">
       <section className="bg-synth-grid px-6 py-20 text-center">
         <div className="relative z-10 mx-auto max-w-3xl">
-          {post.tags && post.tags.length > 0 && (
+          {post.tags.length > 0 && (
             <div className="flex flex-wrap justify-center gap-2">
               {post.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="capitalize">
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  render={<Link to="/blog" search={{ tag }} />}
+                  className="cursor-pointer capitalize"
+                >
                   {tag}
                 </Badge>
               ))}

@@ -46,7 +46,7 @@ export function BlogCard({ post, glow = 'cyan' }: Props) {
           className="aspect-video w-full object-cover transition-[filter] duration-300 group-hover:brightness-110"
         />
         <CardHeader>
-          {post.tags && post.tags.length > 0 && (
+          {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {post.tags.map((tag) => (
                 <Badge key={tag} variant="secondary" className="text-[10px] capitalize">

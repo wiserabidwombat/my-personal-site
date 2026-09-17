@@ -5,6 +5,6 @@ export type BlogPost = {
   blurb: string
   date: string
   author?: string
-  tags?: string[]
+  tags: string[]
   body: string
 }
