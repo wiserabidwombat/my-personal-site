@@ -25,7 +25,7 @@ function BlogSlugRouteComponent() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-[var(--deep-space-black)] px-6 py-24 text-center text-slate-200">
+      <div className="bg-[var(--deep-space-black)] px-6 py-24 text-center text-slate-200">
         <h1 className="text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]">
           Post not found
         </h1>

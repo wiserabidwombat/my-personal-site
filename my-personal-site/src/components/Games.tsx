@@ -5,7 +5,7 @@ import { GameInventory } from './games/GameInventory'
 
 export function Games() {
   return (
-    <div className="min-h-screen bg-[var(--deep-space-black)] text-slate-200">
+    <div className="bg-[var(--deep-space-black)] text-slate-200">
       <CurrentlyLoving />
       <FavoritesList />
       <WantToPlay />
