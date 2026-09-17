@@ -15,6 +15,7 @@ import { useTheme } from '../hooks/useTheme'
 const primaryNavItems = [
   { to: '/', label: 'Home' },
   { to: '/about', label: 'About' },
+  { to: '/how-it-works', label: 'How It Works' },
   { to: '/blog', label: 'Blog' },
   { to: '/resume', label: 'Resume' },
   { to: '/contact', label: 'Contact' },
