@@ -12,7 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '../../../@/components/ui/pagination'
-import { useBoardGames } from '../../hooks/useBoardGames'
+import type { BoardGamesSource } from '../../hooks/useBoardGames'
 import type { BoardGame } from '../../types/board-game'
 import { headingClass, formatRange, toggleValue } from './shared'
 import { useGameFilterState } from './useGameFilterState'
@@ -72,14 +72,18 @@ function getPageNumbers(current: number, total: number): (number | 'ellipsis')[]
   return pages
 }
 
-const sourceLabel: Record<ReturnType<typeof useBoardGames>['source'], string> = {
+const sourceLabel: Record<BoardGamesSource, string> = {
   loading: 'Loading inventory...',
   live: 'Live from Notion',
   cached: 'Showing cached data',
 }
 
-export function GameInventory() {
-  const { games: boardGames, source } = useBoardGames()
+type Props = {
+  games: BoardGame[]
+  source: BoardGamesSource
+}
+
+export function GameInventory({ games: boardGames, source }: Props) {
   const [search, setSearch] = useState('')
   const {
     allCategories,
