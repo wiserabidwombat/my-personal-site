@@ -185,7 +185,7 @@ describe('getPostBySlug (real seed content)', () => {
 })
 
 describe('getAllTags (real seed content)', () => {
-  it('includes the tags from the tagged seed post', () => {
-    expect(getAllTags()).toEqual(['ai', 'coding'])
+  it('includes the tags from both seed posts, deduped and sorted', () => {
+    expect(getAllTags()).toEqual(['ai', 'boardgames', 'coding', 'leadership', 'teams'])
   })
 })

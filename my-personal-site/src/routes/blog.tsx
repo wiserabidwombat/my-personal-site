@@ -1,13 +1,23 @@
-import { useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { RssIcon } from '@hugeicons/core-free-icons'
-import { getAllPosts, getAllTags } from '../lib/blog'
+import { RssIcon, Search01Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
+import { Input } from '../../@/components/ui/input'
+import { Badge } from '../../@/components/ui/badge'
+import { getAllPosts } from '../lib/blog'
 import { BlogGrid } from '../components/blog/BlogGrid'
-import { TagFilter } from '../components/blog/TagFilter'
+import { MultiSelectFilter } from '../components/games/MultiSelectFilter'
+import { useBlogFilterState } from '../components/blog/useBlogFilterState'
+import { toggleValue } from '../components/blog/shared'
 import { seoMeta } from '../lib/meta'
 
+type BlogSearch = {
+  tag?: string
+}
+
 export const Route = createFileRoute('/blog')({
+  validateSearch: (search: Record<string, unknown>): BlogSearch => ({
+    tag: typeof search.tag === 'string' ? search.tag : undefined,
+  }),
   head: () => ({
     meta: seoMeta({
       title: 'Blog',
@@ -20,14 +30,22 @@ export const Route = createFileRoute('/blog')({
 })
 
 function BlogRouteComponent() {
-  const posts = useMemo(() => getAllPosts(), [])
-  const tags = useMemo(() => getAllTags(), [])
-  const [activeTag, setActiveTag] = useState<string | null>(null)
-
-  const filteredPosts = useMemo(() => {
-    if (!activeTag) return posts
-    return posts.filter((post) => post.tags?.includes(activeTag))
-  }, [posts, activeTag])
+  const posts = getAllPosts()
+  // The tag search param is only ever read on mount (as the filter's
+  // initial state, seeded by a post page's clickable tag badge) -- once
+  // the user is on this page, the filter UI itself is the single source of
+  // truth, not the URL, matching how the rest of the filter state works.
+  const { tag } = Route.useSearch()
+  const {
+    search,
+    setSearch,
+    allTags,
+    selectedTags,
+    setSelectedTags,
+    filteredPosts,
+    hasActiveFilters,
+    clearAllFilters,
+  } = useBlogFilterState(posts, tag ? [tag] : [])
 
   return (
     <div className="bg-[var(--deep-space-black)] text-slate-200">
@@ -56,7 +74,56 @@ function BlogRouteComponent() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-16">
-        <TagFilter tags={tags} active={activeTag} onChange={setActiveTag} />
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          <div className="relative w-full sm:w-64">
+            <HugeiconsIcon
+              icon={Search01Icon}
+              strokeWidth={2}
+              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
+              aria-hidden="true"
+            />
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search posts..."
+              className="pl-9"
+            />
+          </div>
+        </div>
+
+        {allTags.length > 0 && (
+          <div className="mt-4 flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <MultiSelectFilter label="Tags" options={allTags} selected={selectedTags} onChange={setSelectedTags} />
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={clearAllFilters}
+                  className="text-xs font-medium text-[var(--laser-cyan)] underline-offset-4 hover:underline"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
+
+            {hasActiveFilters && (
+              <div className="flex flex-wrap gap-1.5">
+                {selectedTags.map((selectedTag) => (
+                  <Badge
+                    key={selectedTag}
+                    variant="secondary"
+                    onClick={() => setSelectedTags((prev) => toggleValue(prev, selectedTag))}
+                    className="cursor-pointer gap-1 text-[10px] capitalize select-none"
+                  >
+                    {selectedTag}
+                    <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         <BlogGrid posts={filteredPosts} />
       </section>
     </div>

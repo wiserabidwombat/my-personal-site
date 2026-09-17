@@ -9,7 +9,7 @@ type Props = {
 
 export function BlogGrid({ posts }: Props) {
   if (posts.length === 0) {
-    return <p className="mt-8 text-center text-slate-400">No posts match this tag yet.</p>
+    return <p className="mt-8 text-center text-slate-400">No posts match your search or filters.</p>
   }
 
   return (
