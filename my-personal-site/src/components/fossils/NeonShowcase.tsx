@@ -27,8 +27,7 @@ type Props = {
 }
 
 // Shared card markup for both the desktop/tablet grid and the mobile
-// carousel. onClick is only ever passed on the mobile side -- the desktop
-// grid stays exactly as non-interactive as it was before this change.
+// carousel. Both pass onClick to open the same detail modal.
 function ShowcaseCard({
   specimen,
   spotlight,
@@ -196,7 +195,7 @@ export function NeonShowcase({ specimens, loading }: Props) {
         ) : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {featured.map((specimen) => (
-              <ShowcaseCard key={specimen.id} specimen={specimen} />
+              <ShowcaseCard key={specimen.id} specimen={specimen} onClick={() => openDetail(specimen)} />
             ))}
           </div>
         ))}
