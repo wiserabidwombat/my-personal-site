@@ -2,6 +2,12 @@ import { useEffect, useId, useRef, useState } from 'react'
 
 type Props = {
   chart: string
+  // Mermaid's own default (true) scales the SVG down to fit its container --
+  // right for a narrow, single-flow diagram that should never need to
+  // scroll. A wide diagram with side-by-side subgraphs should instead pass
+  // false to keep its natural size and rely on a scrollable wrapper, since
+  // shrinking it to fit would make its text illegibly small.
+  useMaxWidth?: boolean
 }
 
 // Mermaid renders to SVG at runtime (it walks the DOM and needs a real
@@ -9,7 +15,7 @@ type Props = {
 // (code-split out of the main bundle) and rendered imperatively into a ref
 // on mount, rather than through React state/JSX, since the output is a
 // pre-built SVG string, not something React needs to reconcile.
-export function MermaidDiagram({ chart }: Props) {
+export function MermaidDiagram({ chart, useMaxWidth = true }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const diagramId = `mermaid-${useId().replace(/:/g, '')}`
   const [error, setError] = useState<string | null>(null)
@@ -23,12 +29,7 @@ export function MermaidDiagram({ chart }: Props) {
           startOnLoad: false,
           theme: 'dark',
           fontFamily: 'inherit',
-          // Render at natural size rather than mermaid's default
-          // shrink-to-fit-container behavior, so a wide flowchart with
-          // subgraphs stays legible on narrow viewports and scrolls
-          // horizontally (via the wrapping overflow-x-auto container)
-          // instead of shrinking its text down to fit.
-          flowchart: { useMaxWidth: false },
+          flowchart: { useMaxWidth },
         })
         return mermaid.render(diagramId, chart)
       })
@@ -46,7 +47,7 @@ export function MermaidDiagram({ chart }: Props) {
     return () => {
       cancelled = true
     }
-  }, [chart, diagramId])
+  }, [chart, diagramId, useMaxWidth])
 
   if (error) {
     return <p className="text-sm text-red-400">Unable to render diagram: {error}</p>

@@ -94,7 +94,7 @@ function HowItWorksRouteComponent() {
         </p>
 
         <div className="mt-8 overflow-x-auto rounded-2xl border border-[#ff2fd0]/40 bg-[#0a0612] p-4 shadow-glow-pink [&_svg]:mx-auto">
-          <MermaidDiagram chart={architectureDiagram} />
+          <MermaidDiagram chart={architectureDiagram} useMaxWidth={false} />
         </div>
       </section>
     </div>

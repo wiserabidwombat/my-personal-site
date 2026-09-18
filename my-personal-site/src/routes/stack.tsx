@@ -10,6 +10,7 @@ import {
   DatabaseLightningIcon,
 } from '@hugeicons/core-free-icons'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
+import { MermaidDiagram } from '../components/MermaidDiagram'
 import { seoMeta } from '../lib/meta'
 
 export const Route = createFileRoute('/stack')({
@@ -90,6 +91,35 @@ const stack: { name: string; role: string; icon: typeof Atom01Icon; glow: Glow }
 
 const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]'
 
+// Deliberately flat (no subgraphs) and kept narrow -- unlike the wider,
+// multi-subgraph diagram on /how-it-works, this one relies on Mermaid's
+// default shrink-to-fit sizing (MermaidDiagram's useMaxWidth default) so it
+// never needs horizontal scrolling, on desktop or mobile.
+const dataFlowDiagram = `
+flowchart TD
+    Browser["🖥️ Browser"]
+    ReactRouter["React + TanStack Router<br/>(File-based routing)"]
+    Tailwind["Tailwind CSS + shadcn/ui<br/>(Styling &amp; Components)"]
+    Vercel["▲ Vercel<br/>(Hosting + Serverless API Routes)"]
+    Notion["Notion<br/>Board Game Collection"]
+    Neon["Neon Postgres<br/>Minerals &amp; Fossils Catalog"]
+    Blob["Vercel Blob<br/>(Image Storage)"]
+    Wsrv["wsrv.nl<br/>(Image Resizing)"]
+
+    Browser --> ReactRouter
+    ReactRouter --> Tailwind
+    ReactRouter --> Vercel
+    Vercel --> Notion
+    Vercel --> Neon
+    Blob --> Wsrv
+
+    classDef pinkNode fill:#1a0f2e,stroke:#ff2fd0,color:#ffffff,stroke-width:2px
+    classDef cyanNode fill:#0d1b2a,stroke:#00e5ff,color:#ffffff,stroke-width:2px
+
+    class Browser,ReactRouter,Tailwind,Notion,Neon pinkNode
+    class Vercel,Blob,Wsrv cyanNode
+`.trim()
+
 function StackRouteComponent() {
   return (
     <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
@@ -133,6 +163,13 @@ function StackRouteComponent() {
               </Card>
             )
           })}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-3xl px-6 py-16">
+        <h2 className={headingClass}>Data Flow</h2>
+        <div className="mt-8 flex justify-center overflow-x-auto rounded-2xl border border-[#ff2fd0]/40 bg-[#0a0612] p-4 shadow-glow-pink">
+          <MermaidDiagram chart={dataFlowDiagram} />
         </div>
       </section>
     </div>
