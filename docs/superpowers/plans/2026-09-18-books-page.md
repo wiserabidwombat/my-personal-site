@@ -745,11 +745,19 @@ describe('computeBookStats', () => {
     expect(computeBookStats(books).averageRating).toBe(4)
   })
 
-  it('finds the most-read author, breaking ties by first occurrence', () => {
+  it('finds the most-read author when one has strictly more books', () => {
     const books = [
       makeBook({ hardcoverBookId: 1, author: 'Author A' }),
       makeBook({ hardcoverBookId: 2, author: 'Author B' }),
       makeBook({ hardcoverBookId: 3, author: 'Author A' }),
+    ]
+    expect(computeBookStats(books).mostReadAuthor).toBe('Author A')
+  })
+
+  it('breaks a tied count by first occurrence', () => {
+    const books = [
+      makeBook({ hardcoverBookId: 1, author: 'Author A' }),
+      makeBook({ hardcoverBookId: 2, author: 'Author B' }),
     ]
     expect(computeBookStats(books).mostReadAuthor).toBe('Author A')
   })
@@ -808,7 +816,7 @@ export function computeBookStats(books: Book[], now: Date = new Date()): BookSta
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `npm test -- src/components/books/bookStats.test.ts`
-Expected: PASS (4 tests)
+Expected: PASS (5 tests)
 
 - [ ] **Step 5: Implement `StatsSummary.tsx`**
 
@@ -1293,7 +1301,7 @@ const hobbyItems = [
 - [ ] **Step 4: Run the full test suite**
 
 Run: `npm test`
-Expected: PASS — all prior tests plus the new ones from Tasks 1, 2, 5, 7 (22 new tests: 6 + 3 + 4 + 9)
+Expected: PASS — all prior tests plus the new ones from Tasks 1, 2, 5, 7 (23 new tests: 6 + 3 + 5 + 9)
 
 - [ ] **Step 5: Typecheck everything**
 
