@@ -5,13 +5,11 @@ Status: Approved for implementation planning
 
 ## Summary
 
-Add a `/books` hobbies page tracking books read, backed by a new Neon
-Postgres table seeded and kept current via a manually-run Goodreads
-CSV import script, plus a live "currently reading" strip sourced from
-Goodreads' public shelf RSS feed. The page shows a full searchable
-library, a favorites showcase, a stats summary, and the live
-currently-reading strip. Favorite flag and re-read count are
-site-owned fields that survive repeated re-imports.
+Add a `/books` hobbies page tracking books read, backed entirely by
+live queries to the Hardcover GraphQL API — no local database, no
+import scripts, no manually-maintained fields. The page shows a full
+searchable library, a favorites showcase (sourced from a Hardcover
+list), a stats summary, and a live "currently reading" strip.
 
 ## Context
 
@@ -27,24 +25,29 @@ The site has two existing patterns for hobby-collection data:
   on every request (edge-cached via `Cache-Control`); no local
   snapshot.
 
-The Goodreads official API closed to new developers in 2020 — Amazon
-stopped issuing API keys and retired existing ones. Two unofficial
-data sources remain:
+An earlier version of this design targeted Goodreads, whose official
+API closed to new developers in 2020, forcing an awkward
+manual-CSV-import-plus-site-owned-fields architecture around it. The
+user has an active Hardcover account and API key instead, which
+changes the shape of the problem entirely:
 
-- **CSV export** — manual download from the Goodreads UI (My Books →
-  Import and Export → Export Library). Contains the full library, no
-  item cap, but is not automatable — Goodreads doesn't expose an
-  endpoint to trigger it.
-- **Shelf RSS feed** — `goodreads.com/review/list_rss/<user_id>?shelf=<name>`,
-  no auth required, but **capped at the 100 most recently added items
-  per shelf**.
+- Hardcover's GraphQL API (`https://api.hardcover.app/v1/graphql`,
+  `Authorization: Bearer <token>`) is actively maintained, requires no
+  CSV export, and has no equivalent to the Goodreads RSS feed's
+  100-item cap. Rate limit is 60 requests/min, 30s timeout, max query
+  depth 3.
+- `user_books` can be queried by `status_id` (2 = currently reading, 3
+  = read) directly — the full library, live, in one query.
+- Rereads are tracked natively: each reread opens a new entry in
+  `user_book_reads`, so a re-read count is derivable from the API
+  response rather than being a field the site owns and maintains.
+- Hardcover has a native "Lists" feature, so a "Favorites" list
+  maintained on Hardcover itself is a cleaner source of truth than a
+  site-side flag.
 
-The user has hundreds of books read historically but has only entered
-a handful into Goodreads so far, with the rest being added over the
-next few weeks — meaning the `read` shelf will exceed the RSS cap
-almost immediately. The RSS feed is therefore unsuitable as the
-library's source of truth, but is a good fit for `currently-reading`,
-which by nature never holds more than a few items.
+Because of this, **the data pipeline follows the `games`/live-fetch
+shape, not the `minerals_fossils`/Postgres shape** — there is nothing
+here that needs local persistence, since nothing is site-owned.
 
 ## Goals
 
@@ -52,183 +55,105 @@ which by nature never holds more than a few items.
   favorites showcase, stats summary (total read, read this year,
   average rating, most-read author), and a live currently-reading
   strip.
-- Favorite flag and re-read count are added and edited by the site
-  owner directly (via a script), independent of what Goodreads reports.
-- Library data is refreshed by re-running an import script against a
-  freshly exported Goodreads CSV — no scraping, no unofficial API
-  client, nothing that depends on Goodreads' API (which doesn't exist
-  for this purpose).
-- Currently-reading reflects Goodreads within roughly 30 minutes of
-  being updated there, without requiring a redeploy.
+- Favorites are sourced from a "Favorites" list the user maintains
+  directly in their Hardcover account — no site-side favorite storage.
+- Re-read count is computed from Hardcover's own read-session data,
+  not tracked separately.
+- Library and currently-reading data reflect Hardcover directly on
+  each page load (subject to edge caching) — no manual sync step, no
+  script to remember to run.
 - `Books` added to the `hobbyItems` nav dropdown.
-- README documents both scripts and the new env var.
+- README documents the new env var and the (lack of a) data pipeline
+  step.
 
 ## Non-goals (v1)
 
-- No admin UI / authenticated upload flow for the CSV — a locally-run
-  script is sufficient for an occasional personal task, and avoids
-  building an auth surface for something used a few times a month at
-  most.
-- No automatic/scheduled re-import — the RSS cap makes a fully
-  automated full-library sync impossible without scraping (out of
-  scope), so import stays a manual, deliberate action.
-- No review-text rendering beyond what Goodreads exports as plain
-  text — no rich text/markdown handling for reviews in v1.
-- No write-back to Goodreads (favorites/re-read counts are local-only,
-  one-directional).
+- No local database, no scripts, no manual import/export step of any
+  kind — this was the central complexity of the Goodreads-based
+  version and Hardcover's live API removes the need for it entirely.
+- No write-back to Hardcover (read-only integration; favoriting/rating
+  books happens in the Hardcover app, not on the site).
+- No review-text rendering beyond what Hardcover returns as plain
+  text — no rich text/markdown handling in v1.
 
-## Approach: data storage
+## Approach: data access
 
 Two approaches were considered:
 
-- **(A, chosen) Neon Postgres table**, mirroring the
-  `minerals_fossils` pattern. `is_favorite` and `reread_count` are
-  site-owned columns that the import's `ON CONFLICT` upsert never
-  touches, so re-running the import to add newly-logged books can
-  never clobber curation done on the site. This is the only approach
-  compatible with "site-owned fields must survive repeated re-imports"
-  without extra merge-logic to invent.
-- **(B, rejected) Static JSON snapshot**, mirroring the `games`/Notion
-  pattern. Rejected because the snapshot is meant to be fully
-  regenerated by its fetch script; preserving hand-edited
-  favorite/re-read data across regeneration would require either a
-  separate "overrides" file merged in at build time (extra moving
-  part, easy to lose sync) or hand-editing generated JSON directly
-  (fragile, no upsert semantics). Postgres gets this for free via
-  `ON CONFLICT DO UPDATE SET <goodreads columns only>`.
+- **(A, chosen) Live serverless GraphQL query**, mirroring
+  `api/fossils.ts`'s live-query shape (a Postgres query there, a
+  Hardcover GraphQL query here) rather than a build-time snapshot.
+  Since nothing is site-owned and there's no external data source with
+  meaningful downtime risk to hedge against with a fallback snapshot,
+  this is the simplest option that satisfies "reflects Hardcover
+  without a manual step."
+- **(B, rejected) Build-time snapshot**, mirroring the `games`/Notion
+  pattern (`scripts/fetch-games.mjs` → `src/data/board-games.json`).
+  Rejected because that pattern exists specifically to avoid shipping
+  a secret token to the client and to avoid a request round-trip on
+  every page load for data that only changes when someone edits
+  Notion by hand. Neither reason applies as strongly here, and a
+  snapshot would reintroduce exactly the "requires a manual step to
+  stay current" problem this redesign is meant to eliminate — the
+  user is actively adding books to Hardcover over the coming weeks,
+  and the whole point of switching off Goodreads was to stop requiring
+  a manual sync action to see new books on the site.
 
-## Data model
+## Hardcover integration
 
-`db/migrations/003_create_books.sql`:
+Two serverless functions, both server-side only (the API token never
+reaches client code):
 
-```sql
-CREATE TABLE IF NOT EXISTS books (
-  id SERIAL PRIMARY KEY,
-  goodreads_book_id TEXT NOT NULL UNIQUE,
-  title TEXT NOT NULL,
-  author TEXT NOT NULL,
-  isbn TEXT,
-  my_rating SMALLINT,
-  avg_rating NUMERIC(3, 2),
-  page_count INTEGER,
-  date_read DATE,
-  date_added DATE,
-  shelf TEXT NOT NULL DEFAULT 'read',
-  cover_image_url TEXT,
-  review_text TEXT,
-  goodreads_read_count INTEGER,
-  -- Site-owned: set via scripts/set-book-flags.mjs, never written by
-  -- the Goodreads CSV import.
-  is_favorite BOOLEAN NOT NULL DEFAULT FALSE,
-  reread_count INTEGER NOT NULL DEFAULT 0
-);
+**`api/books.ts`** — queries `user_books` where `status_id: 3` (read),
+requesting per book: title, contributor/author name(s), user rating,
+page count, dates read, cover image URL, and the nested
+`user_book_reads` list (for computing reread count). In the same
+request, queries the user's "Favorites" list for its member book IDs,
+and marks `isFavorite` on each returned book by membership.
+`Cache-Control: s-maxage=60, stale-while-revalidate=300`, matching
+`api/fossils.ts`.
 
-CREATE INDEX IF NOT EXISTS books_shelf_idx ON books (shelf);
-```
+**`api/currently-reading.ts`** — same endpoint/auth, `user_books`
+where `status_id: 2`. `Cache-Control: s-maxage=300,
+stale-while-revalidate=900` (currently-reading changes less often than
+once every few minutes in practice, so a slightly longer cache window
+than the full-library endpoint is reasonable). Returns `{ books: [] }`
+rather than an error if the shelf is empty or the request fails, so
+the section can render an empty state.
+
+Both handlers guard on `HARDCOVER_API_TOKEN` being present (matching
+`api/fossils.ts`'s `DATABASE_URL` guard) and return a 500 with a clear
+message if it's missing.
 
 `src/types/book.ts`:
 
 ```ts
 export type Book = {
-  id: number
-  goodreadsBookId: string
+  hardcoverBookId: string
   title: string
   author: string
-  isbn: string | null
-  myRating: number | null
-  avgRating: number | null
+  rating: number | null
   pageCount: number | null
   dateRead: string | null
-  dateAdded: string | null
-  shelf: string
   coverImageUrl: string | null
-  reviewText: string | null
-  goodreadsReadCount: number | null
+  rereadCount: number // max(user_book_reads.length - 1, 0)
   isFavorite: boolean
-  rereadCount: number
 }
 
 export type CurrentlyReadingBook = {
-  goodreadsBookId: string
+  hardcoverBookId: string
   title: string
   author: string
-  link: string
   coverImageUrl: string | null
 }
 ```
 
-## Goodreads CSV import
-
-`scripts/import-goodreads-csv.mjs <path-to-export.csv>` — build-time
-/ one-off only, same style as `scripts/migrate.mjs`. Reads
-`DATABASE_URL` from the environment, parses the CSV Goodreads exports
-(columns include `Book Id`, `Title`, `Author`, `ISBN`, `My Rating`,
-`Average Rating`, `Number of Pages`, `Date Read`, `Date Added`,
-`Exclusive Shelf`, `My Review`, `Read Count`), and for each row:
-
-```sql
-INSERT INTO books (goodreads_book_id, title, author, isbn, my_rating,
-  avg_rating, page_count, date_read, date_added, shelf,
-  review_text, goodreads_read_count)
-VALUES (...)
-ON CONFLICT (goodreads_book_id) DO UPDATE SET
-  title = EXCLUDED.title,
-  author = EXCLUDED.author,
-  isbn = EXCLUDED.isbn,
-  my_rating = EXCLUDED.my_rating,
-  avg_rating = EXCLUDED.avg_rating,
-  page_count = EXCLUDED.page_count,
-  date_read = EXCLUDED.date_read,
-  date_added = EXCLUDED.date_added,
-  shelf = EXCLUDED.shelf,
-  review_text = EXCLUDED.review_text,
-  goodreads_read_count = EXCLUDED.goodreads_read_count
-  -- is_favorite and reread_count intentionally omitted: never
-  -- overwritten by an import.
-```
-
-Cover images: Goodreads' CSV export does not include a cover URL.
-`cover_image_url` is left untouched by the import (NULL for new rows)
-— populating it is an open item, see below.
-
-`package.json` gains `"books:import": "node --env-file=.env.local scripts/import-goodreads-csv.mjs"`.
-
-## Setting favorite / re-read count
-
-`scripts/set-book-flags.mjs --title "<title>" [--favorite] [--reread N]`
-— looks up the book by case-insensitive title match (erroring with a
-list of candidates if the match is ambiguous), then updates
-`is_favorite`/`reread_count` directly. Reads `DATABASE_URL` the same
-way as the other scripts.
-
-`package.json` gains `"books:flag": "node --env-file=.env.local scripts/set-book-flags.mjs"`.
-
-## Currently-reading: live serverless endpoint
-
-`api/currently-reading.ts` — mirrors `api/fossils.ts`'s live-query
-shape rather than `games`' build-time-snapshot shape, specifically
-because "genuinely reflects Goodreads without a redeploy" was a
-stated goal and the RSS cap is a non-issue for a shelf that's never
-more than a handful of items.
-
-- Fetches `https://www.goodreads.com/review/list_rss/<GOODREADS_USER_ID>?shelf=currently-reading`
-  server-side at request time.
-- Parses the RSS XML with `fast-xml-parser` rather than hand-rolled
-  regex/string matching, since the latter would break silently if
-  Goodreads changes feed markup and give no signal that it broke.
-- Maps each `<item>` to a `CurrentlyReadingBook` (title, author, link,
-  cover image parsed out of the item's HTML `description`).
-- Response header `Cache-Control: s-maxage=1800, stale-while-revalidate=3600`
-  — edge-cached ~30 minutes, matching the "roughly 30 minutes" goal
-  above without hitting Goodreads on every page load.
-- Returns `{ books: [] }` (not an error) if `GOODREADS_USER_ID` is
-  unset or the feed request fails, so the section can render an empty
-  state instead of a page-level error.
-
-`GOODREADS_USER_ID` joins `.env.example`/`.env.local`/the Vercel
-dashboard env vars. It's the numeric Goodreads user ID (visible in
-the profile URL), not a secret, but kept configurable rather than
-hardcoded.
+**Open item (see below):** exact Hardcover field/type names (e.g. how
+contributors/authors are nested under `book`, the exact shape of the
+Favorites list query) need to be verified against a real authenticated
+query during implementation — the shapes above are based on published
+docs and third-party write-ups, not a live response inspected
+firsthand.
 
 ## Routing
 
@@ -241,35 +166,24 @@ hardcoded.
 ## Components
 
 `src/components/Books.tsx` orchestrates, mirroring `Games.tsx`'s
-composition-root shape — fetches once via `useBooks`, passes data
-down:
+composition-root shape:
 
 - **`CurrentlyReading.tsx`** — fetches `/api/currently-reading`
-  directly (separate from the main library fetch, since it's a
-  different endpoint/cache lifetime); renders an empty state when the
-  shelf is empty.
+  directly (separate endpoint/cache lifetime from the main library);
+  renders an empty state when nothing is in progress.
 - **`FavoritesShowcase.tsx`** — props `{ books: Book[] }`, filters to
-  `is_favorite`, same card-grid idiom as `FavoritesList`
+  `isFavorite`, same card-grid idiom as `FavoritesList`
   (`src/components/games/FavoritesList.tsx`).
 - **`StatsSummary.tsx`** — props `{ books: Book[] }`, computes total
-  read, read-this-year (from `dateRead` year), average `myRating`,
-  and most-frequent `author`, client-side — no new server logic
-  needed for simple aggregates over already-fetched data.
+  read, read-this-year (from `dateRead` year), average `rating`, and
+  most-frequent `author`, client-side from already-fetched data.
 - **`BookLibrary.tsx`** — full table with search (title/author) and
   sort (title/author/rating/date read), same pattern as
-  `GameInventory.tsx` (`src/components/games/GameInventory.tsx`).
+  `GameInventory.tsx`.
 
-`src/hooks/useBooks.ts` — fetches `/api/books`, mirrors
-`useBoardGames`'s `{ books, source }` shape (`'loading' | 'live' |
-'error'`); no static fallback snapshot needed here since, unlike
-Notion, the Postgres query has no reason to be unavailable that a
-retry/error state can't express (same reasoning `useFossils`-equivalent
-data fetching in `Fossils.tsx` already follows — no fallback JSON for
-that collection either).
-
-`api/books.ts` — live query against `books`, same shape as
-`api/fossils.ts` (method guard, `DATABASE_URL` presence check,
-`Cache-Control: s-maxage=60, stale-while-revalidate=300`, mapped rows).
+`src/hooks/useBooks.ts` — fetches `/api/books`, exposing `{ books,
+status }` (`'loading' | 'live' | 'error'`); no static fallback
+snapshot, consistent with `api/fossils.ts` having none either.
 
 ## Styling
 
@@ -279,44 +193,40 @@ shadow-glow-*`, no new colors or effects introduced.
 
 ## Dependencies to add
 
-- `fast-xml-parser` — RSS parsing in `api/currently-reading.ts`.
-- CSV parsing for the import script: check whether a lightweight
-  parser is warranted or whether Goodreads' export is simple enough
-  (no embedded newlines/complex quoting in practice) for a small
-  hand-written splitter — left to implementation to verify against a
-  real exported file; add a dependency (e.g. `csv-parse`) only if the
-  hand-written approach proves fragile.
+None. GraphQL requests are plain JSON over `fetch`; no CSV or XML
+parsing is needed with this data source.
 
 ## Testing
 
-- Unit tests for `scripts/import-goodreads-csv.mjs`'s CSV-row-to-SQL-params
-  mapping and the upsert's column exclusion (favorite/reread never in
-  the `SET` list).
-- Unit tests for `api/currently-reading.ts`'s RSS-item-to-`CurrentlyReadingBook`
-  mapping, including the empty-feed and unset-env-var cases.
+- Unit tests for the Hardcover-response-to-`Book`/`CurrentlyReadingBook`
+  mapping in `api/books.ts`/`api/currently-reading.ts`, including: the
+  reread-count computation (0, 1, and multiple `user_book_reads`
+  entries), favorite-membership matching, and the empty/error-fallback
+  cases.
 - Manual/visual verification per this repo's established practice: run
-  the dev server, screenshot `/books`, verify search/sort on the
-  library table, verify favorites filtering, verify stats numbers
-  against a known small dataset, verify currently-reading renders (or
-  shows its empty state without `GOODREADS_USER_ID` set locally).
+  the dev server with a real `HARDCOVER_API_TOKEN`, screenshot
+  `/books`, verify search/sort on the library table, verify favorites
+  filtering matches the Hardcover Favorites list, verify stats numbers
+  against known data, verify currently-reading renders (and its empty
+  state when nothing is in progress).
 
 ## README updates
 
-Add to the scripts table: `books:import` and `books:flag`, with the
-same one-line description style as the existing `fetch:games`/
-`db:migrate` rows. Add `GOODREADS_USER_ID` to the environment
-variables table. Add a short "Books data pipeline" paragraph to the
-existing "Data pipeline notes" section, matching the style of the
-existing board-games/fossils/RSS/meta-prerendering paragraphs there.
+Add `HARDCOVER_API_TOKEN` to the environment variables table
+(server-side secret, also required in the Vercel dashboard, same as
+the existing Notion/Neon vars). Add a short "Books" paragraph to the
+existing "Data pipeline notes" section explaining that — unlike the
+board-games/fossils pipelines — this one has no build step or database
+at all: both endpoints query Hardcover live on each request.
 
 ## Open items for implementation
 
-- **Cover images**: Goodreads' CSV export has no cover URL column.
-  Options to resolve during implementation: leave `cover_image_url`
-  null (simplest, book cards render a placeholder), or derive a cover
-  URL from `isbn`/`goodreads_book_id` via a public cover source (e.g.
-  Open Library's cover API, no key required) as a fallback when null.
-  Left open since it doesn't block the rest of the design.
-- Exact CSV column-name matching (Goodreads has changed export column
-  names before) should be verified against a real export file at
-  implementation time rather than assumed from documentation alone.
+- Verify Hardcover's exact GraphQL field names, nesting, and the
+  practical meaning of "max query depth 3" against a real query using
+  the user's API key — the query shapes in this spec are based on
+  published docs and third-party integration write-ups, not a
+  firsthand response.
+- Verify the exact query/mutation shape for reading a user's named
+  list ("Favorites") and its member books — confirm list membership
+  can be fetched in the same request as `user_books`, or whether it
+  needs a second query.
