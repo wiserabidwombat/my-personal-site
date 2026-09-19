@@ -45,6 +45,8 @@ Copy `.env.example` to `.env.local` (already gitignored) and fill in:
 | `NOTION_DATABASE_ID` | `scripts/fetch-games.mjs`, `api/games.ts` | ID of the Notion database holding the board game collection |
 | `NOTION_DATA_SOURCE_ID` | `api/games.ts` | Notion data source ID |
 | `DATABASE_URL` | `scripts/migrate.mjs`, `api/fossils.ts` | Neon Postgres connection string. In production this is auto-injected by the Vercel Marketplace Neon integration |
+| `HARDCOVER_API_TOKEN` | `api/books.ts`, `api/currently-reading.ts` | Hardcover Personal Access Token. Expires after 1 year with no programmatic renewal — regenerate manually at hardcover.app account settings when it does |
+| `HARDCOVER_USER_ID` | `api/books.ts`, `api/currently-reading.ts` | Numeric Hardcover user ID (not a secret) — get it by querying `{ me { id } }` against the Hardcover API with your token |
 
 These same variables must also be set in the Vercel dashboard for the deployed `api/*.ts` functions to work. Never commit real values — `.env.local` is gitignored.
 
@@ -83,6 +85,7 @@ src/
 - **Minerals & fossils:** Stored in Neon Postgres. Run `npm run db:migrate` after adding a new file to `db/migrations` to apply it.
 - **RSS feed:** `scripts/generate-rss.mjs` builds `public/rss.xml` from the same markdown-parsing logic the site itself uses, so the feed can't drift from what's rendered on the blog.
 - **Meta tag prerendering:** Since this is a pure client-side SPA, `scripts/prerender-meta.mjs` runs after `vite build` to write a real `dist/<route>/index.html` per page with the correct OpenGraph/Twitter tags baked in, so link-preview crawlers (which don't execute JS) see the right metadata. `vercel.json` rewrites everything else to `index.html` for client-side routing.
+- **Books:** Unlike the board-games/fossils pipelines above, this one has no build step and no database at all. `api/books.ts` and `api/currently-reading.ts` query the Hardcover GraphQL API live on every request (edge-cached briefly via `Cache-Control`), so a newly-finished or newly-starred book on Hardcover shows up on the site without a redeploy or a manual sync step.
 
 ## Testing
 
