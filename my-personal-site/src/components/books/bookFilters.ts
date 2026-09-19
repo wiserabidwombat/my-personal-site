@@ -23,3 +23,12 @@ export function sortBooks(books: Book[], key: BookSortKey): Book[] {
       return sorted.sort((a, b) => (b.dateRead ?? '').localeCompare(a.dateRead ?? ''))
   }
 }
+
+export function formatDateRead(dateRead: string | null): string {
+  if (!dateRead) return '—'
+  // Construct the Date from local y/m/d components directly rather than
+  // `new Date(dateRead)`, which parses 'YYYY-MM-DD' as UTC midnight and then
+  // renders one day early in any negative-UTC-offset timezone (all of the US).
+  const [year, month, day] = dateRead.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+}

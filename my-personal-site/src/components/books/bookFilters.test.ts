@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { searchBooks, sortBooks } from './bookFilters'
+import { searchBooks, sortBooks, formatDateRead } from './bookFilters'
 import type { Book } from '../../types/book'
 
 function makeBook(overrides: Partial<Book> = {}): Book {
@@ -76,5 +76,24 @@ describe('sortBooks', () => {
     const input = [hobbit, dune]
     sortBooks(input, 'title')
     expect(input).toEqual([hobbit, dune])
+  })
+})
+
+describe('formatDateRead', () => {
+  it('returns an em dash for null', () => {
+    expect(formatDateRead(null)).toBe('—')
+  })
+
+  it('formats an ISO date string', () => {
+    expect(formatDateRead('2026-05-08')).toBe('May 8, 2026')
+  })
+
+  // Regression test: new Date('2026-01-01') parses as UTC midnight, which
+  // renders as Dec 31, 2025 in any negative-UTC-offset timezone (all of the
+  // US) -- this is exactly the bug formatDateRead's y/m/d construction
+  // avoids. This test only catches a regression in timezones behind UTC,
+  // but that's every timezone this site's owner and most US visitors run in.
+  it('does not shift a year-boundary date to the previous year', () => {
+    expect(formatDateRead('2026-01-01')).toBe('Jan 1, 2026')
   })
 })

@@ -2,17 +2,11 @@ import { useMemo, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Search01Icon } from '@hugeicons/core-free-icons'
 import { Input } from '../../../@/components/ui/input'
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '../../../@/components/ui/table'
 import type { Book } from '../../types/book'
 import type { BooksStatus } from '../../hooks/useBooks'
 import { searchBooks, sortBooks, type BookSortKey } from './bookFilters'
+import { BookCard } from './BookCard'
+import { BookLibraryPagination } from './BookLibraryPagination'
 import { headingClass } from '../games/shared'
 
 const SORT_OPTIONS: { key: BookSortKey; label: string }[] = [
@@ -22,15 +16,6 @@ const SORT_OPTIONS: { key: BookSortKey; label: string }[] = [
   { key: 'rating', label: 'Rating' },
 ]
 
-function formatDateRead(dateRead: string | null): string {
-  if (!dateRead) return '—'
-  // Construct the Date from local y/m/d components directly rather than
-  // `new Date(dateRead)`, which parses 'YYYY-MM-DD' as UTC midnight and then
-  // renders one day early in any negative-UTC-offset timezone (all of the US).
-  const [year, month, day] = dateRead.split('-').map(Number)
-  return new Date(year, month - 1, day).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-}
-
 type Props = {
   books: Book[]
   status: BooksStatus
@@ -39,8 +24,29 @@ type Props = {
 export function BookLibrary({ books, status }: Props) {
   const [search, setSearch] = useState('')
   const [sortKey, setSortKey] = useState<BookSortKey>('dateRead')
+  const [pageSize, setPageSize] = useState(12)
+  const [currentPage, setCurrentPage] = useState(1)
 
-  const rows = useMemo(() => sortBooks(searchBooks(books, search), sortKey), [books, search, sortKey])
+  const filtered = useMemo(() => sortBooks(searchBooks(books, search), sortKey), [books, search, sortKey])
+
+  // Reset to page 1 whenever the result set or page size changes, so a stale
+  // page number never silently shows unrelated results. Adjusted during
+  // render (React's documented pattern for this) rather than in an effect,
+  // which would cost an extra render pass.
+  const filterSignature = `${search}|${sortKey}|${pageSize}|${books.length}`
+  const [prevFilterSignature, setPrevFilterSignature] = useState(filterSignature)
+  if (filterSignature !== prevFilterSignature) {
+    setPrevFilterSignature(filterSignature)
+    setCurrentPage(1)
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const safePage = Math.min(currentPage, totalPages)
+
+  const paginated = useMemo(
+    () => filtered.slice((safePage - 1) * pageSize, safePage * pageSize),
+    [filtered, safePage, pageSize],
+  )
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
@@ -80,50 +86,29 @@ export function BookLibrary({ books, status }: Props) {
         </div>
       </div>
 
-      <div className="mt-6 overflow-x-auto rounded-2xl border border-white/10">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Author</TableHead>
-              <TableHead>Rating</TableHead>
-              <TableHead>Date Read</TableHead>
-              <TableHead>Re-reads</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {status === 'loading' ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-slate-400">
-                  Loading your library...
-                </TableCell>
-              </TableRow>
-            ) : status === 'error' ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-slate-400">
-                  Unable to load your library right now. Please try again later.
-                </TableCell>
-              </TableRow>
-            ) : rows.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-slate-400">
-                  No books match your search.
-                </TableCell>
-              </TableRow>
-            ) : (
-              rows.map((book) => (
-                <TableRow key={book.hardcoverBookId}>
-                  <TableCell className="font-medium text-slate-100">{book.title}</TableCell>
-                  <TableCell className="text-slate-300">{book.author}</TableCell>
-                  <TableCell className="text-slate-300">{book.rating != null ? `${book.rating.toFixed(1)}/5` : '—'}</TableCell>
-                  <TableCell className="text-slate-300">{formatDateRead(book.dateRead)}</TableCell>
-                  <TableCell className="text-slate-300">{book.rereadCount}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {status === 'loading' ? (
+          <p className="col-span-full text-center text-slate-400">Loading your library...</p>
+        ) : status === 'error' ? (
+          <p className="col-span-full text-center text-slate-400">
+            Unable to load your library right now. Please try again later.
+          </p>
+        ) : paginated.length === 0 ? (
+          <p className="col-span-full text-center text-slate-400">No books match your search.</p>
+        ) : (
+          paginated.map((book) => <BookCard key={book.hardcoverBookId} book={book} />)
+        )}
       </div>
+
+      {status === 'live' && filtered.length > 0 && (
+        <BookLibraryPagination
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
+          currentPage={safePage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </section>
   )
 }
