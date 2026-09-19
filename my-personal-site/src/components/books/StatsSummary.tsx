@@ -30,7 +30,11 @@ export function StatsSummary({ books, status }: Props) {
             key={tile.label}
             className="rounded-2xl border-2 border-[var(--cyber-purple)] bg-[var(--deep-space-purple)]/40 p-4 text-center shadow-glow-purple backdrop-blur-md"
           >
-            <p className="text-2xl font-bold text-slate-100">{tile.value}</p>
+            {status === 'loading' ? (
+              <div className="mx-auto h-8 w-12 skeleton-shimmer rounded-md" aria-hidden="true" />
+            ) : (
+              <p className="text-2xl font-bold text-slate-100">{tile.value}</p>
+            )}
             <p className="mt-1 text-xs tracking-wide text-slate-400 uppercase">{tile.label}</p>
           </div>
         ))}
