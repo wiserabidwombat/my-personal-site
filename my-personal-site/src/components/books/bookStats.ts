@@ -12,6 +12,11 @@ export function computeBookStats(books: Book[], now: Date = new Date()): BookSta
   const totalRead = books.length
   const readThisYear = books.filter((book) => {
     if (book.dateRead == null) return false
+    // book.dateRead is always an ISO 'YYYY-MM-DD' string (Hardcover's date scalar,
+    // via api/books.ts), so the year is extracted via substring rather than
+    // `new Date(dateRead).getFullYear()`, which is timezone-dependent and can be
+    // off by one year at year boundaries (same bug class as BookLibrary.tsx's
+    // formatDateRead works around).
     const dateYear = parseInt(book.dateRead.substring(0, 4), 10)
     return dateYear === currentYear
   }).length

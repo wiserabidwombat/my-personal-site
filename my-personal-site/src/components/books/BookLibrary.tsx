@@ -24,7 +24,11 @@ const SORT_OPTIONS: { key: BookSortKey; label: string }[] = [
 
 function formatDateRead(dateRead: string | null): string {
   if (!dateRead) return '—'
-  return new Date(dateRead).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  // Construct the Date from local y/m/d components directly rather than
+  // `new Date(dateRead)`, which parses 'YYYY-MM-DD' as UTC midnight and then
+  // renders one day early in any negative-UTC-offset timezone (all of the US).
+  const [year, month, day] = dateRead.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
 type Props = {

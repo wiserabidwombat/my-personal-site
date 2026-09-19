@@ -39,7 +39,7 @@ export function CurrentlyReading() {
       <h2 className={headingClass}>Currently Reading</h2>
       {status === 'error' && (
         <p className="mt-2 text-center text-sm text-slate-400">
-          Unable to load the collection right now. Please try again later.
+          Unable to load what you're reading right now. Please try again later.
         </p>
       )}
       {status === 'live' && (
@@ -54,7 +54,7 @@ export function CurrentlyReading() {
               >
                 {book.coverImageUrl && (
                   <img
-                    src={getResizedImageUrl(book.coverImageUrl, 'thumbnail')}
+                    src={getResizedImageUrl(book.coverImageUrl, 'large')}
                     alt={`Cover of ${book.title}`}
                     loading="lazy"
                     className="h-24 w-16 flex-none rounded-md object-cover"

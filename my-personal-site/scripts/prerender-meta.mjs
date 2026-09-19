@@ -75,6 +75,11 @@ const staticPages = [
     title: 'Minerals & Fossils',
     description: "Browse Aaron's minerals and fossil collection.",
   },
+  {
+    path: '/books',
+    title: "Books I've Read",
+    description: "Browse Aaron's reading library, synced live from Hardcover.",
+  },
 ]
 
 const postPages = getAllPosts().map((post) => ({

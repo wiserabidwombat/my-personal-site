@@ -23,7 +23,7 @@ export function FavoritesShowcase({ books }: Props) {
           >
             {book.coverImageUrl && (
               <img
-                src={getResizedImageUrl(book.coverImageUrl, 'medium')}
+                src={getResizedImageUrl(book.coverImageUrl, 'large')}
                 alt={`Cover of ${book.title}`}
                 loading="lazy"
                 className="aspect-[2/3] w-full object-cover"

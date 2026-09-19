@@ -26,6 +26,10 @@ export type Book = {
   isFavorite: boolean
 }
 
+// Nests 4 levels deep (user_books -> book -> contributions -> author). Hardcover's
+// docs list a not-yet-shipped "max query depth 3" limit on their 2026 roadmap; if it
+// ships and breaks this, split into multiple top-level queries (still well under the
+// 5-top-level-query cap) rather than restructuring the data model.
 const BOOKS_READ_QUERY = `
   query BooksRead($userId: Int!) {
     user_books(where: { user_id: { _eq: $userId }, status_id: { _eq: 3 } }) {

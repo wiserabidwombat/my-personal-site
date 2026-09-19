@@ -1,22 +1,24 @@
 import type { Book } from '../../types/book'
+import type { BooksStatus } from '../../hooks/useBooks'
 import { computeBookStats } from './bookStats'
 import { headingClass } from '../games/shared'
 
 type Props = {
   books: Book[]
+  status: BooksStatus
 }
 
-export function StatsSummary({ books }: Props) {
-  const stats = computeBookStats(books)
+export function StatsSummary({ books, status }: Props) {
+  const stats = status === 'live' ? computeBookStats(books) : null
 
   const tiles: { label: string; value: string }[] = [
-    { label: 'Books Read', value: String(stats.totalRead) },
-    { label: 'Read This Year', value: String(stats.readThisYear) },
+    { label: 'Books Read', value: stats ? String(stats.totalRead) : '—' },
+    { label: 'Read This Year', value: stats ? String(stats.readThisYear) : '—' },
     {
       label: 'Average Rating',
-      value: stats.averageRating != null ? `${stats.averageRating.toFixed(1)}/5` : '—',
+      value: stats?.averageRating != null ? `${stats.averageRating.toFixed(1)}/5` : '—',
     },
-    { label: 'Most-Read Author', value: stats.mostReadAuthor ?? '—' },
+    { label: 'Most-Read Author', value: stats?.mostReadAuthor ?? '—' },
   ]
 
   return (

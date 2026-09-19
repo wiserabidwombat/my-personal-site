@@ -16,6 +16,10 @@ export type CurrentlyReadingBook = {
   coverImageUrl: string | null
 }
 
+// Nests 4 levels deep (user_books -> book -> contributions -> author). Hardcover's
+// docs list a not-yet-shipped "max query depth 3" limit on their 2026 roadmap; if it
+// ships and breaks this, split into multiple top-level queries (still well under the
+// 5-top-level-query cap) rather than restructuring the data model.
 const CURRENTLY_READING_QUERY = `
   query CurrentlyReading($userId: Int!) {
     user_books(where: { user_id: { _eq: $userId }, status_id: { _eq: 2 } }) {
@@ -60,8 +64,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return
   }
 
-  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=900')
-
   try {
     const response = await fetch('https://api.hardcover.app/v1/graphql', {
       method: 'POST',
@@ -89,9 +91,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error(payload.errors?.[0]?.message ?? 'Hardcover returned no data')
     }
 
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=900')
     res.status(200).json({ books: payload.data.user_books.map(mapCurrentlyReading) })
   } catch (error) {
     console.error('Hardcover currently-reading query failed', error)
+    // Deliberately different from api/books.ts: a transient failure here degrades to
+    // an empty "currently reading" state (uncached, so it self-heals on the next
+    // request) rather than a 502, since this section is decorative and low-stakes.
     res.status(200).json({ books: [] })
   }
 }

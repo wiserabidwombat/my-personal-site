@@ -11,7 +11,7 @@ export function Books() {
     <div className="bg-[var(--deep-space-black)] text-slate-200">
       <CurrentlyReading />
       <FavoritesShowcase books={books} />
-      <StatsSummary books={books} />
+      <StatsSummary books={books} status={status} />
       <BookLibrary books={books} status={status} />
     </div>
   )
