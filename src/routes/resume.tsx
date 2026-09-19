@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Download04Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '../../@/components/ui/badge'
@@ -6,7 +7,6 @@ import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components
 import { Button } from '../../@/components/ui/button'
 import { seoMeta } from '../lib/meta'
 import { summary, skillGroups, experience, credentials } from '../lib/resume-data'
-import { generateResumePdf } from '../lib/generate-resume-pdf'
 
 export const Route = createFileRoute('/resume')({
   head: () => ({
@@ -22,6 +22,21 @@ export const Route = createFileRoute('/resume')({
 const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]'
 
 function RouteComponent() {
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+
+  // jsPDF is a large library only needed for this one interaction -- a
+  // dynamic import keeps it out of the resume route's initial chunk, so
+  // visitors who never click download never pay for it.
+  async function handleDownload() {
+    setGeneratingPdf(true)
+    try {
+      const { generateResumePdf } = await import('../lib/generate-resume-pdf')
+      generateResumePdf()
+    } finally {
+      setGeneratingPdf(false)
+    }
+  }
+
   return (
     <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
       <section className="bg-synth-grid px-6 py-20 text-center">
@@ -34,12 +49,13 @@ function RouteComponent() {
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">{summary}</p>
           <Button
-            onClick={generateResumePdf}
+            onClick={handleDownload}
+            disabled={generatingPdf}
             variant="outline"
             className="mt-8 gap-2 border-[var(--laser-cyan)] text-[var(--laser-cyan)] hover:bg-[var(--laser-cyan)]/10 hover:shadow-glow-cyan"
           >
             <HugeiconsIcon icon={Download04Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
-            Download Resume (PDF)
+            {generatingPdf ? 'Preparing…' : 'Download Resume (PDF)'}
           </Button>
         </div>
       </section>

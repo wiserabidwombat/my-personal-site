@@ -21,7 +21,6 @@
     "@notionhq/client": "^5.26.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-router": "^1.170.24",
-    "@tanstack/react-router-devtools": "^1.167.1",
     "@xyflow/react": "^12.11.6",
     "buffer": "^6.0.3",
     "class-variance-authority": "^0.7.1",
