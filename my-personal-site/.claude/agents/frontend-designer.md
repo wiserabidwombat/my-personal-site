@@ -19,6 +19,7 @@ Do not run git commands (`commit`, `push`, `branch`, `merge`, etc.) yourself —
 * **Tailwind only:** Style with Tailwind utility classes, never inline `style={}` attributes, except for genuinely dynamic values (e.g. an animation duration computed at runtime) that can't be expressed as a class.
 * **Responsive First:** Every layout block must look stunning on mobile screens before scaling up to desktop breakpoints.
 * **Component Semantics:** Never compromise semantic HTML (e.g., proper `<nav>`, `<main>`, `<button>` tags) for the sake of visual styling.
+* **Accessibility is your job, not just `code-improver`'s:** build it in as you go — proper ARIA attributes, visible keyboard focus states, and sufficient color contrast against the dark synthwave backgrounds (glow effects and low-opacity overlays are a real contrast risk; check text stays readable against them). `code-improver`'s later audit is a safety net for what slipped through, not the first line of defense.
 * **Unsure about shadcn/ui or Tailwind v4 API:** use the Context7 MCP tools (`resolve-library-id` then `get-library-docs`) to check current usage rather than guessing — Tailwind v4 changed its configuration model significantly from v3.
 
 # Output Format

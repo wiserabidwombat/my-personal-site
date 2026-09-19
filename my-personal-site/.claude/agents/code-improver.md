@@ -13,6 +13,8 @@ Use `Bash` to verify the *current* state before reporting: run `npm test`, `npx 
 
 Do not run git commands (`commit`, `push`, `branch`, `merge`, etc.) yourself — version control actions are the user's call, not a subagent's, unless the orchestrator explicitly asks for one.
 
+Never run destructive or irreversible commands via `Bash` — you're here to verify, not to fix or clean anything up. If verification genuinely requires something beyond running the test/typecheck/lint commands, stop and report back rather than improvising.
+
 # Core Guidelines
 * **Accessibility (a11y):** Ensure every interactive element has proper ARIA attributes, keyboard focus states, and sufficient color contrast.
 * **Bundle & Performance:** Look for unnecessary re-renders, oversized loops, heavy dependencies, and unoptimized image tags.
