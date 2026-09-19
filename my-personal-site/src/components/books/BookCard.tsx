@@ -1,9 +1,14 @@
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ImageNotFound01Icon } from '@hugeicons/core-free-icons'
+import { useState } from 'react'
 import { Card, CardHeader, CardTitle } from '../../../@/components/ui/card'
 import type { Book } from '../../types/book'
 import { getResizedImageUrl } from '../../lib/image'
 import { formatDateRead } from './bookFilters'
+
+// Shown when a book has no cover URL at all, or its cover URL 404s/fails to
+// load (Hardcover's data isn't guaranteed to have a working image for every
+// book) -- a T-Rex with famously short arms failing to pick a book up off
+// the ground reads better than a plain broken-image icon.
+const NO_COVER_IMAGE = '/books/trex-no-cover.jpg'
 
 type Props = {
   book: Book
@@ -13,30 +18,24 @@ type Props = {
 // minus the click-to-open-modal behavior -- there's no book detail view in
 // this feature, so the card is purely presentational.
 export function BookCard({ book }: Props) {
+  const [coverFailed, setCoverFailed] = useState(false)
+  // 'large' returns the cover URL unresized/uncropped -- see
+  // FavoritesShowcase.tsx and CurrentlyReading.tsx for why: the wsrv proxy's
+  // 'thumbnail'/'medium' sizes hard-crop to a square, which double-crops
+  // badly when rendered into this card's book-proportioned (2:3) box.
+  const coverUrl =
+    !coverFailed && book.coverImageUrl ? getResizedImageUrl(book.coverImageUrl, 'large') : NO_COVER_IMAGE
+  const showCover = coverUrl !== NO_COVER_IMAGE
+
   return (
     <Card className="gap-0 p-0 text-left ring-white/10">
-      {book.coverImageUrl ? (
-        <img
-          // 'large' returns the cover URL unresized/uncropped -- see
-          // FavoritesShowcase.tsx and CurrentlyReading.tsx for why: the
-          // wsrv proxy's 'thumbnail'/'medium' sizes hard-crop to a square,
-          // which double-crops badly when rendered into this card's
-          // book-proportioned (2:3) box.
-          src={getResizedImageUrl(book.coverImageUrl, 'large')}
-          alt={`Cover of ${book.title}`}
-          loading="lazy"
-          className="aspect-[2/3] w-full rounded-t-2xl object-cover"
-        />
-      ) : (
-        <div className="flex aspect-[2/3] w-full items-center justify-center rounded-t-2xl bg-[var(--deep-space-black)]/60">
-          <HugeiconsIcon
-            icon={ImageNotFound01Icon}
-            strokeWidth={1.5}
-            className="size-8 text-slate-500"
-            aria-hidden="true"
-          />
-        </div>
-      )}
+      <img
+        src={coverUrl}
+        alt={showCover ? `Cover of ${book.title}` : `No cover available for ${book.title}`}
+        loading="lazy"
+        onError={() => setCoverFailed(true)}
+        className="aspect-[2/3] w-full rounded-t-2xl object-cover"
+      />
 
       <CardHeader className="gap-1.5 py-4">
         <CardTitle className="line-clamp-2 text-base font-semibold text-slate-100">{book.title}</CardTitle>

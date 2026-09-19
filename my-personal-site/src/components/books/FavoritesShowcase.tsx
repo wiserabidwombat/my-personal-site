@@ -1,12 +1,40 @@
+import { useState } from 'react'
 import type { Book } from '../../types/book'
 import type { BooksStatus } from '../../hooks/useBooks'
 import { getResizedImageUrl } from '../../lib/image'
 import { headingClass } from '../games/shared'
 import { FavoriteCardSkeleton } from './FavoriteCardSkeleton'
 
+// Shown when a book has no cover URL at all, or its cover URL 404s/fails to
+// load -- see BookCard.tsx for the full rationale.
+const NO_COVER_IMAGE = '/books/trex-no-cover.jpg'
+
 // Fills one full row of the lg:grid-cols-4 layout below without
 // overcommitting to a favorites-list size that isn't known yet.
 const SKELETON_COUNT = 4
+
+function FavoriteCard({ book }: { book: Book }) {
+  const [coverFailed, setCoverFailed] = useState(false)
+  const coverUrl =
+    !coverFailed && book.coverImageUrl ? getResizedImageUrl(book.coverImageUrl, 'large') : NO_COVER_IMAGE
+  const showCover = coverUrl !== NO_COVER_IMAGE
+
+  return (
+    <div className="flex flex-col overflow-hidden rounded-2xl border-2 border-[var(--neon-pink)] bg-[var(--deep-space-purple)]/40 shadow-glow-pink backdrop-blur-md">
+      <img
+        src={coverUrl}
+        alt={showCover ? `Cover of ${book.title}` : `No cover available for ${book.title}`}
+        loading="lazy"
+        onError={() => setCoverFailed(true)}
+        className="aspect-[2/3] w-full object-cover"
+      />
+      <div className="p-4">
+        <p className="font-semibold text-slate-100">{book.title}</p>
+        <p className="text-sm text-slate-400">{book.author}</p>
+      </div>
+    </div>
+  )
+}
 
 type Props = {
   books: Book[]
@@ -29,25 +57,7 @@ export function FavoritesShowcase({ books, status }: Props) {
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {status === 'loading'
           ? Array.from({ length: SKELETON_COUNT }, (_, index) => <FavoriteCardSkeleton key={index} />)
-          : favorites.map((book) => (
-              <div
-                key={book.hardcoverBookId}
-                className="flex flex-col overflow-hidden rounded-2xl border-2 border-[var(--neon-pink)] bg-[var(--deep-space-purple)]/40 shadow-glow-pink backdrop-blur-md"
-              >
-                {book.coverImageUrl && (
-                  <img
-                    src={getResizedImageUrl(book.coverImageUrl, 'large')}
-                    alt={`Cover of ${book.title}`}
-                    loading="lazy"
-                    className="aspect-[2/3] w-full object-cover"
-                  />
-                )}
-                <div className="p-4">
-                  <p className="font-semibold text-slate-100">{book.title}</p>
-                  <p className="text-sm text-slate-400">{book.author}</p>
-                </div>
-              </div>
-            ))}
+          : favorites.map((book) => <FavoriteCard key={book.hardcoverBookId} book={book} />)}
       </div>
     </section>
   )
