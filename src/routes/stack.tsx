@@ -12,6 +12,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
 import { StackFlowDiagram } from '../components/StackFlowDiagram'
+import { dataFlowDiagram, buildDeployDiagram, aiWorkflowDiagram } from '../components/stackDiagrams'
 import { seoMeta } from '../lib/meta'
 
 export const Route = createFileRoute('/stack')({
@@ -151,7 +152,44 @@ function StackRouteComponent() {
           fossils/minerals path touches image storage.
         </p>
         <div className="mt-8 overflow-x-auto rounded-2xl border border-[var(--neon-pink)]/40 bg-[var(--deep-space-black)] p-4 shadow-glow-pink">
-          <StackFlowDiagram />
+          <StackFlowDiagram
+            nodes={dataFlowDiagram.nodes}
+            edges={dataFlowDiagram.edges}
+            ariaLabel="Site architecture and data flow diagram"
+          />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-6 py-16">
+        <h2 className={headingClass}>Build &amp; Deploy</h2>
+        <p className="mt-2 text-slate-300">
+          Every push runs the same Vercel build — tests, type checks, then the production build —
+          and the branch alone decides whether it lands as a preview or goes live.
+        </p>
+        <div className="mt-8 overflow-x-auto rounded-2xl border border-[var(--laser-cyan)]/40 bg-[var(--deep-space-black)] p-4 shadow-glow-cyan">
+          <StackFlowDiagram
+            nodes={buildDeployDiagram.nodes}
+            edges={buildDeployDiagram.edges}
+            height={480}
+            ariaLabel="Build and deploy pipeline diagram"
+          />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-6 py-16">
+        <h2 className={headingClass}>How I Build With AI</h2>
+        <p className="mt-2 text-slate-300">
+          This site — and most of what's on it — is built with Claude Code. Work gets scoped and
+          planned up front, then handed to subagents that implement and review in a loop until it
+          holds up, before a PR ever opens.
+        </p>
+        <div className="mt-8 overflow-x-auto rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-black)] p-4 shadow-glow-purple">
+          <StackFlowDiagram
+            nodes={aiWorkflowDiagram.nodes}
+            edges={aiWorkflowDiagram.edges}
+            height={680}
+            ariaLabel="AI-assisted development workflow diagram"
+          />
         </div>
       </section>
     </div>
