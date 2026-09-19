@@ -6,7 +6,11 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // .worktrees holds other in-progress branches checked out as full copies
+  // of this repo (see superpowers:using-git-worktrees) -- since the repo
+  // root and this project root are now the same directory, ESLint's
+  // default file discovery would otherwise lint their files too.
+  globalIgnores(['dist', '.worktrees']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
