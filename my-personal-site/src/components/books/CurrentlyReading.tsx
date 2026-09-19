@@ -2,8 +2,14 @@ import { useEffect, useState } from 'react'
 import type { CurrentlyReadingBook } from '../../types/book'
 import { getResizedImageUrl } from '../../lib/image'
 import { headingClass } from '../games/shared'
+import { CurrentlyReadingSkeleton } from './CurrentlyReadingSkeleton'
 
 type Status = 'loading' | 'live' | 'error'
+
+// A currently-reading shelf is realistically 1-3 books; two skeleton slots
+// fills a natural row on the sm:grid-cols-2/lg:grid-cols-3 grid below
+// without overcommitting to a shelf size that isn't known yet.
+const SKELETON_COUNT = 2
 
 export function CurrentlyReading() {
   const [books, setBooks] = useState<CurrentlyReadingBook[]>([])
@@ -32,11 +38,16 @@ export function CurrentlyReading() {
     }
   }, [])
 
-  if (status === 'loading') return null
-
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
       <h2 className={headingClass}>Currently Reading</h2>
+      {status === 'loading' && (
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: SKELETON_COUNT }, (_, index) => (
+            <CurrentlyReadingSkeleton key={index} />
+          ))}
+        </div>
+      )}
       {status === 'error' && (
         <p className="mt-2 text-center text-sm text-slate-400">
           Unable to load what you're reading right now. Please try again later.

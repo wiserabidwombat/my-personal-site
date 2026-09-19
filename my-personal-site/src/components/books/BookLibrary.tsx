@@ -6,6 +6,7 @@ import type { Book } from '../../types/book'
 import type { BooksStatus } from '../../hooks/useBooks'
 import { searchBooks, sortBooks, type BookSortKey } from './bookFilters'
 import { BookCard } from './BookCard'
+import { BookCardSkeleton } from './BookCardSkeleton'
 import { BookLibraryPagination } from './BookLibraryPagination'
 import { headingClass } from '../games/shared'
 
@@ -88,7 +89,7 @@ export function BookLibrary({ books, status }: Props) {
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {status === 'loading' ? (
-          <p className="col-span-full text-center text-slate-400">Loading your library...</p>
+          Array.from({ length: pageSize }, (_, index) => <BookCardSkeleton key={index} />)
         ) : status === 'error' ? (
           <p className="col-span-full text-center text-slate-400">
             Unable to load your library right now. Please try again later.

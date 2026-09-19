@@ -10,7 +10,7 @@ export function Books() {
   return (
     <div className="bg-[var(--deep-space-black)] text-slate-200">
       <CurrentlyReading />
-      <FavoritesShowcase books={books} />
+      <FavoritesShowcase books={books} status={status} />
       <StatsSummary books={books} status={status} />
       <BookLibrary books={books} status={status} />
     </div>
