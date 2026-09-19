@@ -8,9 +8,10 @@ import {
   TriangleIcon,
   Notion01Icon,
   DatabaseLightningIcon,
+  Book01Icon,
 } from '@hugeicons/core-free-icons'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
-import { MermaidDiagram } from '../components/MermaidDiagram'
+import { StackFlowDiagram } from '../components/StackFlowDiagram'
 import { seoMeta } from '../lib/meta'
 
 export const Route = createFileRoute('/stack')({
@@ -87,41 +88,15 @@ const stack: { name: string; role: string; icon: typeof Atom01Icon; glow: Glow }
     icon: DatabaseLightningIcon,
     glow: 'cyan',
   },
+  {
+    name: 'Hardcover',
+    role: 'The reading library behind the books page — queried live from Hardcover\'s GraphQL API on every request, no database of its own.',
+    icon: Book01Icon,
+    glow: 'purple',
+  },
 ]
 
 const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]'
-
-// A strict linear chain -- every node connects only to the next one in
-// sequence, with no branching edges. Mermaid ranks nodes by their edges, so
-// two nodes sharing a source (e.g. Vercel --> Notion and Vercel --> Neon)
-// would land at the same rank and get placed side by side; keeping every
-// node's in/out degree at 1 is what forces the single vertical column, on
-// desktop and mobile alike.
-const dataFlowDiagram = `
-flowchart TD
-    Browser["🖥️ Browser"]
-    ReactRouter["React + TanStack Router<br/>(File-based routing)"]
-    Tailwind["Tailwind CSS + shadcn/ui<br/>(Styling &amp; Components)"]
-    Vercel["▲ Vercel<br/>(Hosting + Serverless API Routes)"]
-    Notion["Notion<br/>Board Game Collection"]
-    Neon["Neon Postgres<br/>Minerals &amp; Fossils Catalog"]
-    Blob["Vercel Blob<br/>(Image Storage)"]
-    Wsrv["wsrv.nl<br/>(Image Resizing, feeds Minerals page)"]
-
-    Browser --> ReactRouter
-    ReactRouter --> Tailwind
-    Tailwind --> Vercel
-    Vercel --> Notion
-    Notion --> Neon
-    Neon --> Blob
-    Blob --> Wsrv
-
-    classDef pinkNode fill:#1a0f2e,stroke:#ff2fd0,color:#ffffff,stroke-width:2px
-    classDef cyanNode fill:#0d1b2a,stroke:#00e5ff,color:#ffffff,stroke-width:2px
-
-    class Browser,Tailwind,Notion,Blob pinkNode
-    class ReactRouter,Vercel,Neon,Wsrv cyanNode
-`.trim()
 
 function StackRouteComponent() {
   return (
@@ -169,10 +144,14 @@ function StackRouteComponent() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-3xl px-6 py-16">
+      <section className="mx-auto max-w-5xl px-6 py-16">
         <h2 className={headingClass}>Data Flow</h2>
-        <div className="mt-8 flex justify-center overflow-x-auto rounded-2xl border border-[#ff2fd0]/40 bg-[#0a0612] p-4 shadow-glow-pink">
-          <MermaidDiagram chart={dataFlowDiagram} />
+        <p className="mt-2 text-slate-300">
+          Vercel's serverless API routes branch out to three independent data sources — only the
+          fossils/minerals path touches image storage.
+        </p>
+        <div className="mt-8 overflow-x-auto rounded-2xl border border-[var(--neon-pink)]/40 bg-[var(--deep-space-black)] p-4 shadow-glow-pink">
+          <StackFlowDiagram />
         </div>
       </section>
     </div>
