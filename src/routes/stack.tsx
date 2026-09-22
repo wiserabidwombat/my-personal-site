@@ -85,7 +85,7 @@ const stack: { name: string; role: string; icon: typeof Atom01Icon; glow: Glow }
   },
   {
     name: 'Neon',
-    role: 'Serverless Postgres storing the minerals and fossils catalog, queried on demand with zero always-on infrastructure.',
+    role: 'Serverless Postgres storing the minerals and fossils catalog — compute spins up to run a query and scales back to zero when idle, so nothing runs around the clock.',
     icon: DatabaseLightningIcon,
     glow: 'cyan',
   },
