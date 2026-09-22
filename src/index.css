@@ -249,7 +249,10 @@ code {
   &::before {
     content: '';
     position: absolute;
-    inset: 40% 0 0 0;
+    /* Fixed offset (not a % of section height) so the horizon sits at the
+       same spot behind the heading on every page, regardless of how much
+       content follows the heading (a blockquote vs. a one-line paragraph). */
+    inset: 12rem 0 0 0;
     background-image:
       linear-gradient(color-mix(in oklab, var(--laser-cyan) 60%, transparent) 1px, transparent 1px),
       linear-gradient(90deg, color-mix(in oklab, var(--laser-cyan) 60%, transparent) 1px, transparent 1px);
@@ -264,7 +267,9 @@ code {
     content: '';
     position: absolute;
     inset: 0 0 auto 0;
-    height: 45%;
+    /* Fixed height, same reason as ::before above -- keeps the glow's
+       brightest edge anchored just behind the heading on every hero. */
+    height: 14rem;
     background: radial-gradient(
       ellipse at bottom,
       color-mix(in oklab, var(--neon-pink) 40%, transparent),
