@@ -30,6 +30,16 @@ function StackNode({ data }: NodeProps<Node<StackNodeData>>) {
 
 const nodeTypes = { stackNode: StackNode }
 
+// Matches the StackNode Card's `w-44`. Used to figure out how wide a
+// diagram's content actually is, so a viewport too narrow for fitView to
+// reach MIN_ZOOM gets a wider (scrollable) container instead of a silently
+// clipped one -- ReactFlow's pane is `overflow: hidden` and panning is off,
+// so today, on mobile, whatever doesn't fit is just gone.
+const NODE_WIDTH = 176
+// The library's own default -- kept explicit so the width math below can't
+// drift from the value actually governing fitView's zoom floor.
+const MIN_ZOOM = 0.5
+
 type StackFlowDiagramProps = {
   nodes: Node<StackNodeData>[]
   edges: Edge[]
@@ -41,14 +51,29 @@ type StackFlowDiagramProps = {
 // fitView frames the whole graph on mount so it never needs an initial pan
 // to be readable.
 export function StackFlowDiagram({ nodes, edges, height = 650, ariaLabel }: StackFlowDiagramProps) {
+  const xs = nodes.map((node) => node.position.x)
+  const contentWidth = Math.max(...xs) - Math.min(...xs) + NODE_WIDTH
+  // fitView only clips when even MIN_ZOOM is too much zoom for the container
+  // to hold the content (contentWidth * MIN_ZOOM > container width) -- a
+  // narrower container just gets less than its requested 0.15 padding,
+  // which isn't a bug worth avoiding. A small buffer covers the gap between
+  // this estimate and ReactFlow's own measured node width.
+  const minContainerWidth = Math.ceil(contentWidth * MIN_ZOOM) + 8
+
   return (
-    <div className="w-full" style={{ height }} role="img" aria-label={ariaLabel}>
+    <div
+      className="w-full"
+      style={{ height, width: `max(100%, ${minContainerWidth}px)` }}
+      role="img"
+      aria-label={ariaLabel}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.15 }}
+        minZoom={MIN_ZOOM}
         proOptions={{ hideAttribution: true }}
         nodesDraggable={false}
         nodesConnectable={false}
