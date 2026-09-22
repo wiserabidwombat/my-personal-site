@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Search01Icon } from '@hugeicons/core-free-icons'
 import { Input } from '../../../@/components/ui/input'
@@ -27,6 +27,12 @@ export function BookLibrary({ books, status }: Props) {
   const [sortKey, setSortKey] = useState<BookSortKey>('dateRead')
   const [pageSize, setPageSize] = useState(12)
   const [currentPage, setCurrentPage] = useState(1)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    headingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   const filtered = useMemo(() => sortBooks(searchBooks(books, search), sortKey), [books, search, sortKey])
 
@@ -51,7 +57,9 @@ export function BookLibrary({ books, status }: Props) {
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
-      <h2 className={headingClass}>Library</h2>
+      <h2 ref={headingRef} className={`${headingClass} scroll-mt-24`}>
+        Library
+      </h2>
       <p className="mt-2 text-slate-300">Everything read so far.</p>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
@@ -107,7 +115,7 @@ export function BookLibrary({ books, status }: Props) {
           onPageSizeChange={setPageSize}
           currentPage={safePage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={handlePageChange}
         />
       )}
     </section>
