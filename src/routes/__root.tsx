@@ -2,6 +2,7 @@ import { createRootRoute, HeadContent } from '@tanstack/react-router'
 import { Navbar } from '../components/navbar'
 import { PageTransition } from '../components/PageTransition'
 import { Footer } from '../components/Footer'
+import { ThemeProvider } from '../hooks/useTheme'
 import { seoMeta } from '../lib/meta'
 
 export const Route = createRootRoute({
@@ -34,13 +35,15 @@ function RootComponent() {
     // long ones: main grows via flex-1 to fill any leftover space, so the
     // footer only ever sits right after real content or at the screen's
     // bottom edge, never floating mid-page.
-    <div className="flex min-h-screen flex-col">
-      <HeadContent />
-      <Navbar />
-      <main className="flex-1">
-        <PageTransition />
-      </main>
-      <Footer />
-    </div>
+    <ThemeProvider>
+      <div className="flex min-h-screen flex-col">
+        <HeadContent />
+        <Navbar />
+        <main className="flex-1">
+          <PageTransition />
+        </main>
+        <Footer />
+      </div>
+    </ThemeProvider>
   )
 }

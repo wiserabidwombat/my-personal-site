@@ -9,6 +9,7 @@ import {
 } from '@hugeicons/core-free-icons'
 // import { Badge } from '../../@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
+import { useTheme } from '../hooks/useTheme'
 import dallasSkyline from '../assets/dallas-skyline.webp'
 
 // const transmissionLog = [
@@ -46,45 +47,72 @@ const systemMetrics = [
 
 const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]'
 
+function HeroText() {
+  return (
+    <div className="relative z-10 mx-auto max-w-3xl px-6 pt-24 pb-12 sm:pt-28 sm:pb-16">
+      <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
+        Full-stack engineer &middot; Gamer &middot; Outdoorsman &middot; Dallas, TX
+      </p>
+      <h1 className="mt-4 text-4xl font-extrabold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-5xl">
+        Hi, I'm Aaron Tilley.
+      </h1>
+      <p className="mx-auto mt-6 max-w-xl text-center text-lg leading-relaxed text-slate-200">
+        Full-stack engineer by day, gamer, fly fisherman, and lifelong learner by night. Welcome
+        to my digital workspace.
+      </p>
+      <Link
+        to="/about"
+        className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-[var(--laser-cyan)] px-6 py-3 text-sm font-semibold text-[var(--laser-cyan)] shadow-glow-cyan transition-colors duration-300 hover:bg-[var(--laser-cyan)] hover:text-[var(--deep-space-black)]"
+      >
+        Learn More About Me
+        <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
+      </Link>
+    </div>
+  )
+}
+
 export function Home() {
+  const { theme } = useTheme()
+
   return (
     <div className="bg-[var(--deep-space-black)] text-slate-200">
-      <section className="bg-synth-grid animate-synth-grid px-6 py-28 text-center">
-        <div className="relative z-10 mx-auto max-w-3xl">
-          <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
-            Full-stack engineer &middot; gamer &middot; outdoorsman
-          </p>
-          <h1 className="mt-4 text-4xl font-extrabold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-5xl">
-            Hi, I'm Aaron Tilley.
-          </h1>
-          <p className="mx-auto mt-6 max-w-xl text-center text-lg leading-relaxed text-slate-200">
-            Full-stack engineer by day, gamer, fly fisherman, and lifelong learner by night.
-            Welcome to my digital workspace.
-          </p>
-          <Link
-            to="/about"
-            className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-[var(--laser-cyan)] px-6 py-3 text-sm font-semibold text-[var(--laser-cyan)] shadow-glow-cyan transition-colors duration-300 hover:bg-[var(--laser-cyan)] hover:text-[var(--deep-space-black)]"
-          >
-            Learn More About Me
-            <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
+      {/* One continuous night scene -- sky, the skyline anchored at its
+          bottom edge, then a neon floor rising out of the water -- rather
+          than text, a photo, and a grid as three separate stacked blocks.
+          The scene is inherently nocturnal (it's a night skyline), so it
+          only renders in dark mode; light mode keeps the plain themed hero
+          every other page uses. */}
+      {theme === 'dark' ? (
+        <section className="relative isolate overflow-hidden bg-gradient-to-b from-[#05030c] via-[#12081f] to-[#241040] text-center">
+          <HeroText />
 
-      <section className="px-6 py-16 text-center">
-        <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
-          Home Base
-        </p>
-        <div className="mx-auto mt-6 max-w-5xl overflow-hidden rounded-2xl border border-[var(--neon-pink)]/40 shadow-glow-pink">
-          <img
-            src={dallasSkyline}
-            alt="Pixel-art neon skyline of Dallas, Texas at night, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center"
-            className="w-full"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-      </section>
+          <div className="relative">
+            <img
+              src={dallasSkyline}
+              alt="Pixel-art neon skyline of Dallas, Texas at night, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center reflected in the water below"
+              className="block w-full select-none"
+              loading="eager"
+              decoding="async"
+            />
+            {/* Blends the flat sky gradient above into the image's own sky,
+                so the headline's backdrop stays dark and legible right up to
+                the seam instead of cutting to the photo's brighter stars. */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#241040] to-transparent sm:h-28" />
+          </div>
+
+          {/* The city's own reflection breaks into an actual neon grid,
+              which recedes toward the viewer and fades into the page
+              background. */}
+          <div className="bg-synth-floor animate-synth-grid relative h-36 sm:h-44">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#01097e]/60 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-[var(--deep-space-black)]" />
+          </div>
+        </section>
+      ) : (
+        <section className="bg-synth-grid animate-synth-grid text-center">
+          <HeroText />
+        </section>
+      )}
 
       {/* <section className="mx-auto max-w-5xl px-6 py-16">
         <h2 className={headingClass}>Transmission Log</h2>

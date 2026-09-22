@@ -284,6 +284,32 @@ code {
   }
 }
 
+/* Same perspective floor as bg-synth-grid, minus the horizon glow --
+   for a standalone floor strip (e.g. rising out of a photo's own
+   reflection) where that glow would just wash out the grid lines rather
+   than sit behind a heading. Grid fills the element edge-to-edge instead
+   of the fixed offset bg-synth-grid uses to clear heading text. */
+@utility bg-synth-floor {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: var(--deep-space-black);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(color-mix(in oklab, var(--laser-cyan) 60%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--laser-cyan) 60%, transparent) 1px, transparent 1px);
+    background-size: 60px 60px;
+    transform: perspective(300px) rotateX(65deg);
+    transform-origin: bottom;
+    mask-image: linear-gradient(to top, black 40%, transparent 95%);
+    -webkit-mask-image: linear-gradient(to top, black 40%, transparent 95%);
+  }
+}
+
 /* Neon glow box-shadows. Defined as @utility rules (like bg-synth-grid)
    rather than left to App.css's `@theme inline` block, which would bake the
    rgba() values directly into the compiled class with no var() indirection
