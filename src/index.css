@@ -288,7 +288,13 @@ code {
    for a standalone floor strip (e.g. rising out of a photo's own
    reflection) where that glow would just wash out the grid lines rather
    than sit behind a heading. Grid fills the element edge-to-edge instead
-   of the fixed offset bg-synth-grid uses to clear heading text. */
+   of the fixed offset bg-synth-grid uses to clear heading text.
+   The mask reaches full opacity sooner (55%/90%, vs. bg-synth-grid's
+   40%/95%) because this variant is pulled up (negative margin, in
+   Home.tsx) to overlap a photo's own water reflection: the grid needs
+   to already be solid well before the overlap ends, or both the
+   image's own fade-out and this mask's fade-in land in the same band
+   and cancel into a visible gap instead of a handoff. */
 @utility bg-synth-floor {
   position: relative;
   overflow: hidden;
@@ -305,8 +311,8 @@ code {
     background-size: 60px 60px;
     transform: perspective(300px) rotateX(65deg);
     transform-origin: bottom;
-    mask-image: linear-gradient(to top, black 40%, transparent 95%);
-    -webkit-mask-image: linear-gradient(to top, black 40%, transparent 95%);
+    mask-image: linear-gradient(to top, black 55%, transparent 90%);
+    -webkit-mask-image: linear-gradient(to top, black 55%, transparent 90%);
   }
 }
 

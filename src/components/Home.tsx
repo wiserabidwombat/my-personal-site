@@ -86,27 +86,34 @@ export function Home() {
         <section className="relative isolate overflow-hidden bg-gradient-to-b from-[#05030c] via-[#12081f] to-[#241040] text-center">
           <HeroText />
 
-          <div className="relative">
-            <img
-              src={dallasSkyline}
-              alt="Pixel-art neon skyline of Dallas, Texas at night, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center reflected in the water below"
-              className="block w-full select-none"
-              loading="eager"
-              decoding="async"
-            />
-            {/* Blends the flat sky gradient above into the image's own sky,
-                so the headline's backdrop stays dark and legible right up to
-                the seam instead of cutting to the photo's brighter stars. */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#241040] to-transparent sm:h-28" />
-          </div>
+          {/* The mask fades the image's own top (sky/stars) and bottom
+              (water line) edges to transparent, so the flat section
+              gradient above shows through the top seam and the floor grid
+              below shows through the bottom seam -- no separate solid-color
+              blend divs needed. image-rendering keeps the pixel art crisp
+              instead of browser-smoothed. On mobile the panorama is cropped
+              to a fixed height rather than shrunk to a sliver, anchored left
+              so Reunion Tower and the Margaret Hunt Hill Bridge stay in
+              frame even though the American Airlines Center end gets
+              cropped off; at sm+ the full panorama displays uncropped. */}
+          <img
+            src={dallasSkyline}
+            alt="Pixel-art neon skyline of Dallas, Texas at night, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center reflected in the water below"
+            className="block h-48 w-full object-cover [object-position:left_bottom] select-none [image-rendering:pixelated] [mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] sm:h-auto"
+            loading="eager"
+            decoding="async"
+          />
 
           {/* The city's own reflection breaks into an actual neon grid,
-              which recedes toward the viewer and fades into the page
-              background. */}
-          <div className="bg-synth-floor animate-synth-grid relative h-36 sm:h-44">
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#01097e]/60 to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-[var(--deep-space-black)]" />
-          </div>
+              pulled up to overlap the image's own faded water line so the
+              two connect with no gap or seam, then recedes toward the
+              viewer and fades into the page background (see the
+              bg-synth-floor mask in index.css). bg-synth-floor's own
+              background-color is opaque (it's meant to stand alone on other
+              pages) -- forced transparent here so the overlap actually
+              reveals the image's reflection underneath instead of painting
+              a solid rectangle over it. */}
+          <div className="bg-synth-floor animate-synth-grid relative -mt-24 h-36 !bg-transparent sm:-mt-32 sm:h-44" />
         </section>
       ) : (
         <section className="bg-synth-grid animate-synth-grid text-center">
