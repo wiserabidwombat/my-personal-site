@@ -9,6 +9,7 @@ import {
 } from '@hugeicons/core-free-icons'
 // import { Badge } from '../../@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
+import dallasSkyline from '../assets/dallas-skyline.webp'
 
 // const transmissionLog = [
 //   {
@@ -67,6 +68,21 @@ export function Home() {
             Learn More About Me
             <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
           </Link>
+        </div>
+      </section>
+
+      <section className="px-6 py-16 text-center">
+        <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
+          Home Base
+        </p>
+        <div className="mx-auto mt-6 max-w-5xl overflow-hidden rounded-2xl border border-[var(--neon-pink)]/40 shadow-glow-pink">
+          <img
+            src={dallasSkyline}
+            alt="Pixel-art neon skyline of Dallas, Texas at night, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center"
+            className="w-full"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </section>
 
