@@ -289,12 +289,23 @@ code {
    reflection) where that glow would just wash out the grid lines rather
    than sit behind a heading. Grid fills the element edge-to-edge instead
    of the fixed offset bg-synth-grid uses to clear heading text.
-   The mask reaches full opacity sooner (55%/90%, vs. bg-synth-grid's
-   40%/95%) because this variant is pulled up (negative margin, in
-   Home.tsx) to overlap a photo's own water reflection: the grid needs
-   to already be solid well before the overlap ends, or both the
-   image's own fade-out and this mask's fade-in land in the same band
-   and cancel into a visible gap instead of a handoff. */
+   Remember the mask is `to top`: its 0% stop is the element's physical
+   BOTTOM and its 100% stop is the physical TOP, and that flat gradient
+   is then perspective-compressed by the rotateX transform below, so the
+   local top edge (the "far"/horizon side) ends up squeezed into a much
+   smaller on-screen band than its percentage suggests. Keep the opaque
+   zone large (0-75%) so the grid stays readable across nearly the whole
+   floor, and keep the fade-to-transparent zone narrow and late
+   (75%-96%, with only the last 4% fully invisible) so as little of that
+   already-compressed top band as possible goes fully blank -- a wide,
+   early fade here (the previous 55%/90%) is what left an empty band
+   between the photo's reflection and the visible grid. Line opacity is
+   also bumped from 60% to 75% so the grid still reads clearly against
+   the deep space background once the fade window is narrower. This mask
+   never touches the physical bottom (its 0% stop stays fully opaque),
+   so it can't double up with the separate bottom-fade overlay div in
+   Home.tsx -- that overlay alone fades the floor into the page
+   background. */
 @utility bg-synth-floor {
   position: relative;
   overflow: hidden;
@@ -306,13 +317,13 @@ code {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(color-mix(in oklab, var(--laser-cyan) 60%, transparent) 1px, transparent 1px),
-      linear-gradient(90deg, color-mix(in oklab, var(--laser-cyan) 60%, transparent) 1px, transparent 1px);
+      linear-gradient(color-mix(in oklab, var(--laser-cyan) 75%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--laser-cyan) 75%, transparent) 1px, transparent 1px);
     background-size: 60px 60px;
     transform: perspective(300px) rotateX(65deg);
     transform-origin: bottom;
-    mask-image: linear-gradient(to top, black 55%, transparent 90%);
-    -webkit-mask-image: linear-gradient(to top, black 55%, transparent 90%);
+    mask-image: linear-gradient(to top, black 75%, transparent 96%);
+    -webkit-mask-image: linear-gradient(to top, black 75%, transparent 96%);
   }
 }
 

@@ -113,10 +113,10 @@ export function Home() {
               pages) -- forced transparent here so the overlap actually
               reveals the image's reflection underneath instead of painting
               a solid rectangle over it. */}
-          <div className="bg-synth-floor animate-synth-grid relative -mt-24 h-44 !bg-transparent sm:-mt-32 sm:h-52" />
+          <div className="bg-synth-floor animate-synth-grid relative -mt-40 h-44 !bg-transparent sm:-mt-48 sm:h-52" />
 
           {/* The floor grid's own mask only fades its TOP edge (to blend
-              into the skyline's reflection above); its bottom 55% is fully
+              into the skyline's reflection above); its bottom 75% is fully
               opaque grid with a transparent background, so whatever sits
               behind the section shows through the gaps -- which was this
               section's own gradient, ending in a solid color right at the
