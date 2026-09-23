@@ -8,7 +8,8 @@ import { BlogGrid } from '../components/blog/BlogGrid'
 import { MultiSelectFilter } from '../components/games/MultiSelectFilter'
 import { useBlogFilterState } from '../components/blog/useBlogFilterState'
 import { toggleValue } from '../components/blog/shared'
-import { seoMeta } from '../lib/meta'
+import { seoMeta, canonicalLink } from '../lib/meta'
+import { blogMeta } from './routeMeta'
 
 type BlogSearch = {
   tag?: string
@@ -19,12 +20,8 @@ export const Route = createFileRoute('/blog')({
     tag: typeof search.tag === 'string' ? search.tag : undefined,
   }),
   head: () => ({
-    meta: seoMeta({
-      title: 'Blog',
-      description:
-        'Notes on code, engineering leadership, and everything in between -- Aaron Tilley writes about software development, teams, and AI-assisted workflows.',
-      path: '/blog',
-    }),
+    meta: seoMeta(blogMeta),
+    links: [canonicalLink(blogMeta.path)],
   }),
   component: BlogRouteComponent,
 })

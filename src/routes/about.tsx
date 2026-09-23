@@ -4,15 +4,13 @@ import boardGamePhoto from '../assets/board-game.jpg'
 import flyFishingPhoto from '../assets/fly-fishing.jpg'
 import golfPhoto from '../assets/highest-golf.jpg'
 import beefJerkyPhoto from '../assets/beef-jerky.jpg'
-import { seoMeta } from '../lib/meta'
+import { seoMeta, canonicalLink } from '../lib/meta'
+import { aboutMeta } from './routeMeta'
 
 export const Route = createFileRoute('/about')({
   head: () => ({
-    meta: seoMeta({
-      title: 'About',
-      description: 'Senior Developer specializing in React, .NET, and enterprise CRM systems.',
-      path: '/about',
-    }),
+    meta: seoMeta(aboutMeta),
+    links: [canonicalLink(aboutMeta.path)],
   }),
   component: AboutRouteComponent,
 })

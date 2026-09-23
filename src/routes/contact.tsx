@@ -1,15 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Mail01Icon, Linkedin01Icon } from '@hugeicons/core-free-icons'
-import { seoMeta } from '../lib/meta'
+import { seoMeta, canonicalLink } from '../lib/meta'
+import { contactMeta } from './routeMeta'
 
 export const Route = createFileRoute('/contact')({
   head: () => ({
-    meta: seoMeta({
-      title: 'Contact',
-      description: "Get in touch with Aaron Tilley -- reach out by email or connect on LinkedIn.",
-      path: '/contact',
-    }),
+    meta: seoMeta(contactMeta),
+    links: [canonicalLink(contactMeta.path)],
   }),
   component: ContactRouteComponent,
 })

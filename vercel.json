@@ -1,5 +1,13 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.aarontilley.me" }],
+      "destination": "https://aarontilley.me/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/((?!api/).*)", "destination": "/app-shell.html" }
   ]
 }

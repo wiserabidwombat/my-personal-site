@@ -4,7 +4,7 @@ import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
 import { buttonVariants } from '../../@/components/ui/button'
 import { getPostBySlug } from '../lib/blog'
 import { BlogPostView } from '../components/blog/BlogPostView'
-import { seoMeta, SITE_URL } from '../lib/meta'
+import { seoMeta, canonicalLink, SITE_URL } from '../lib/meta'
 
 export const Route = createFileRoute('/blog_/$slug')({
   loader: ({ params }) => getPostBySlug(params.slug),
@@ -16,6 +16,7 @@ export const Route = createFileRoute('/blog_/$slug')({
       image: loaderData ? `${SITE_URL}${loaderData.image}` : undefined,
       type: 'article',
     }),
+    links: [canonicalLink(`/blog/${params.slug}`)],
   }),
   component: BlogSlugRouteComponent,
 })

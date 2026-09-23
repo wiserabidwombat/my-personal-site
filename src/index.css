@@ -103,6 +103,31 @@
   --synth-floor-line-opacity: 68%;
 }
 
+/* Theme-conditional MARKUP shown/hidden purely off the `data-theme`
+   attribute on <html> (never JS theme state) -- used by components
+   (HeroSkyline's two skyline <img>s, the navbar's sun/moon icon) that now
+   mount BOTH theme variants unconditionally instead of picking one via a
+   JS ternary. That's what lets scripts/prerender-meta.mjs bake genuinely
+   theme-agnostic HTML: index.html's inline script sets data-theme
+   synchronously before first paint, these selectors key off that same
+   attribute, and there's zero light/dark flash on a hard/prerendered load.
+   Toggling data-theme (see useTheme.ts) re-runs these selectors instantly,
+   so the runtime theme toggle still swaps with no JS-computed conditional
+   class needed here. Dark is the default (no override needed for it),
+   matching this file's dark-first tokens throughout. */
+.theme-dark-only {
+  display: block;
+}
+.theme-light-only {
+  display: none;
+}
+[data-theme='light'] .theme-dark-only {
+  display: none;
+}
+[data-theme='light'] .theme-light-only {
+  display: block;
+}
+
 /* Body-text overrides: Tailwind's slate-* palette is used directly across
    the app for text color (e.g. `text-slate-200`) rather than a text-color
    theme token, so it's re-themed here by targeting Tailwind's own generated
@@ -363,18 +388,29 @@ code {
   }
 }
 
-/* Dawn sky gradient for Home's light-theme hero scene, mirroring the dark
-   scene's own hardcoded gradient (HeroSkyline.tsx) with on-palette tokens
-   instead of literal hex stops -- the dark scene's literals are genuinely
-   dark-only (a near-black night sky has no light-theme equivalent), so
-   rather than force them through [data-theme='light'] overrides, the light
-   scene gets its own gradient built from the existing --neon-pink/
-   --deep-space-purple/--deep-space-black tokens. The faint pink tint in the
-   top stop is pulled from the light skyline art's own dominant hue (sampled
-   directly from the asset), fading down to the same --deep-space-black the
-   rest of the page (and the bottom-fade overlay div) already resolve to, so
-   there's no seam at the section's own bottom edge. */
-@utility hero-sky-light {
+/* Home hero sky gradient. Applied as a single, unconditional class in
+   HeroSkyline.tsx (rather than a JS ternary picking between two Tailwind
+   gradient classes based on theme state) so the markup prerendering bakes
+   into dist/<route>/index.html is theme-agnostic -- index.html's inline
+   script (which sets data-theme on <html> synchronously before first
+   paint) then picks the right gradient below via plain CSS, with zero
+   light/dark flash on a hard/prerendered load. Dark is the default scene
+   (no [data-theme]
+   qualifier needed), matching this file's dark-first tokens throughout.
+   [data-theme='light'] below swaps in the dawn gradient, mirroring the dark
+   scene's own hardcoded gradient with on-palette tokens instead of literal
+   hex stops -- the dark scene's literals are genuinely dark-only (a
+   near-black night sky has no light-theme equivalent), so only the light
+   variant is built from the existing --neon-pink/--deep-space-purple/
+   --deep-space-black tokens. The faint pink tint in the top stop is pulled
+   from the light skyline art's own dominant hue (sampled directly from the
+   asset), fading down to the same --deep-space-black the rest of the page
+   (and the bottom-fade overlay div) already resolve to, so there's no seam
+   at the section's own bottom edge. */
+@utility hero-sky {
+  background-image: linear-gradient(to bottom, #05030c, #12081f, #241040);
+}
+[data-theme='light'] .hero-sky {
   background-image: linear-gradient(
     to bottom,
     color-mix(in oklab, var(--neon-pink) 12%, var(--deep-space-purple)),

@@ -50,52 +50,55 @@ export function HeroSkyline() {
     // light both get the full scene (a plain themed hero was tried for
     // light and dropped -- see index.css's bg-synth-grid, still used by
     // every OTHER page's hero); only the sky gradient, the skyline art, and
-    // the floor grid's line color are theme-specific, all driven by `theme`
-    // or by [data-theme='light'] CSS overrides, never by Tailwind's
+    // the floor grid's line color are theme-specific. All of it is driven
+    // purely by [data-theme='light'] CSS overrides now (index.css), never
+    // by a JS ternary reading `theme` and never by Tailwind's
     // prefers-color-scheme-based `dark:` variant (this app's theme is a
     // React Context + data-theme attribute, toggled from the navbar --
-    // Tailwind's own dark mode is unused here).
-    <section
-      className={`relative isolate overflow-hidden text-center ${
-        theme === 'dark'
-          ? 'bg-gradient-to-b from-[#05030c] via-[#12081f] to-[#241040]'
-          : 'hero-sky-light'
-      }`}
-    >
+    // Tailwind's own dark mode is unused here) -- that's what lets
+    // scripts/prerender-meta.mjs bake theme-agnostic HTML with no
+    // light/dark flash on a hard/prerendered load, since the server has no
+    // real `theme` value to read (see useTheme.ts's SSR guard).
+    <section className="hero-sky relative isolate overflow-hidden text-center">
       <HeroText />
 
-      {/* Both themed images are always mounted (one just `hidden`), not
-          conditionally rendered, so a runtime theme toggle swaps classNames
-          instantly with no late fetch or blank frame -- getInitialTheme()
-          (useTheme.ts) already resolves the theme synchronously before first
-          paint via index.html's inline script, so there's no initial-load
-          flash to defend against, only the toggle. Both are still eager
-          (never `loading="lazy"`, which on a `display:none`/`hidden` image
-          can silently skip loading it altogether, breaking the very toggle
-          this is meant to protect), but fetchPriority now tells the browser
-          which one actually matters for THIS paint: the active image is
-          "high" (it's competing for LCP), the inactive one is "low" (it
-          still loads, just deprioritized so it stops contending for
-          bandwidth with the active image and the rest of the page's critical
-          path). This keeps the no-flash guarantee absolute -- both images
-          are always decoded and ready before a toggle -- while fixing the
-          actual LCP contention, which was the always-mounted approach
-          competing with itself, not the mounting strategy itself. Each
-          image's own mask fades its top (sky/stars) and bottom (water line)
-          edges to transparent, so the section's own gradient shows through
-          the top seam and the floor grid below shows through the bottom
-          seam -- no separate solid-color blend divs needed. The two images
-          share an identical aspect ratio and water-line row (verified
-          against the source pixels), so they can share one mask/height/
-          position with no per-theme adjustment. On mobile the panorama is
-          cropped to a fixed height rather than shrunk to a sliver, anchored
-          left so Reunion Tower and the Margaret Hunt Hill Bridge stay in
-          frame even though the American Airlines Center end gets cropped
-          off; at sm+ the full panorama displays uncropped. */}
+      {/* Both themed images are always mounted, shown/hidden purely by the
+          theme-dark-only/theme-light-only CSS classes (index.css, keyed off
+          the `data-theme` attribute on <html>) rather than a JS ternary
+          picking `hidden` from `theme` state -- so scripts/prerender-meta.mjs
+          can bake theme-agnostic markup with no light/dark flash on a
+          hard/prerendered load (the server has no real `theme` to read; see
+          useTheme.ts's SSR guard), while a runtime toggle still swaps
+          instantly since it's the same data-theme attribute driving both.
+          Both are still eager (never `loading="lazy"`, which on a
+          `display:none`/hidden image can silently skip loading it
+          altogether, breaking the very toggle this is meant to protect),
+          but fetchPriority still tells the browser which one actually
+          matters for THIS paint -- it stays keyed off `theme` (a plain
+          resource-priority hint, not visible markup, so it doesn't need to
+          be CSS-driven): the active image is "high" (it's competing for
+          LCP), the inactive one is "low" (it still loads, just deprioritized
+          so it stops contending for bandwidth with the active image and the
+          rest of the page's critical path). This keeps the no-flash
+          guarantee absolute -- both images are always decoded and ready
+          before a toggle -- while fixing the actual LCP contention, which
+          was the always-mounted approach competing with itself, not the
+          mounting strategy itself. Each image's own mask fades its top
+          (sky/stars) and bottom (water line) edges to transparent, so the
+          section's own gradient shows through the top seam and the floor
+          grid below shows through the bottom seam -- no separate
+          solid-color blend divs needed. The two images share an identical
+          aspect ratio and water-line row (verified against the source
+          pixels), so they can share one mask/height/position with no
+          per-theme adjustment. On mobile the panorama is cropped to a fixed
+          height rather than shrunk to a sliver, anchored left so Reunion
+          Tower and the Margaret Hunt Hill Bridge stay in frame even though
+          the American Airlines Center end gets cropped off; at sm+ the full
+          panorama displays uncropped. */}
       <img
         src={dallasSkylineDark}
         alt="Pixel-art neon skyline of Dallas, Texas at night, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center reflected in the water below"
-        className={`${skylineImgClass} ${theme === 'dark' ? '' : 'hidden'}`}
+        className={`${skylineImgClass} theme-dark-only`}
         loading="eager"
         decoding="async"
         fetchPriority={theme === 'dark' ? 'high' : 'low'}
@@ -103,7 +106,7 @@ export function HeroSkyline() {
       <img
         src={dallasSkylineLight}
         alt="Pixel-art Dallas, Texas skyline at dawn, rendered in a pastel palette, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center reflected in the water below"
-        className={`${skylineImgClass} ${theme === 'light' ? '' : 'hidden'}`}
+        className={`${skylineImgClass} theme-light-only`}
         loading="eager"
         decoding="async"
         fetchPriority={theme === 'light' ? 'high' : 'low'}

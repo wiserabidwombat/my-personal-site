@@ -1,14 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Games } from '../components/Games'
-import { seoMeta } from '../lib/meta'
+import { seoMeta, canonicalLink } from '../lib/meta'
+import { gamesMeta } from './routeMeta'
 
 export const Route = createFileRoute('/games')({
   head: () => ({
-    meta: seoMeta({
-      title: 'Game Inventory',
-      description: "Browse Aaron's board game collection.",
-      path: '/games',
-    }),
+    meta: seoMeta(gamesMeta),
+    links: [canonicalLink(gamesMeta.path)],
   }),
   component: Games,
 })

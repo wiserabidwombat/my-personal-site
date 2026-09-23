@@ -5,6 +5,17 @@ export type Theme = 'dark' | 'light'
 const STORAGE_KEY = 'theme'
 
 function getInitialTheme(): Theme {
+  // renderToString() (scripts/prerender-meta.mjs) runs with no DOM at all --
+  // reading document here would throw before React even gets to render a
+  // single node. Default to dark, matching index.html's own inline-script
+  // fallback for when localStorage has no saved preference; the actual
+  // theme-conditional MARKUP (HeroSkyline, the navbar's sun/moon icon) is
+  // CSS-driven off the `data-theme` attribute, not this value, so a
+  // prerendered page still paints correctly for either theme regardless of
+  // what this returns on the server.
+  if (typeof document === 'undefined') {
+    return 'dark'
+  }
   // index.html's inline script already sets this attribute before React
   // even loads, so reading it back keeps this hook in sync with that single
   // source of truth instead of re-deriving the choice a second way.
