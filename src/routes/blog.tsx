@@ -29,8 +29,14 @@ export const Route = createFileRoute('/blog')({
 // Shorter hero than the site default (bg-synth-grid's 26rem min-height and
 // 11rem horizon) so the first post card lands above the fold on a ~800px
 // laptop viewport. Horizon and glow move up with it to stay behind the text.
+// The grid's visible horizon tracks the hero's BOTTOM edge (the floor is
+// perspective-projected up from there), so the subtitle's clearance above
+// it comes from trimming the top padding, not the bottom -- the text sits
+// higher while the hero's height and the grid stay where they were.
+// lg's min-height restores the pre-trim 302px desktop height (root font is
+// 18px from 1024px up), since the trimmed text alone would let it shrink.
 const compactHeroClass =
-  '[--synth-grid-min-height:16rem] [--synth-grid-horizon:7.5rem] [--synth-grid-glow-y:7rem] [--synth-grid-glow-height:9rem]'
+  '[--synth-grid-min-height:16rem] lg:[--synth-grid-min-height:16.75rem] [--synth-grid-horizon:7.5rem] [--synth-grid-glow-y:6rem] [--synth-grid-glow-height:9rem]'
 
 function BlogRouteComponent() {
   const posts = getAllPosts()
@@ -52,7 +58,7 @@ function BlogRouteComponent() {
 
   return (
     <div className="bg-[var(--deep-space-black)] text-slate-200">
-      <section className={cn('bg-synth-grid px-6 py-10 text-center sm:py-12', compactHeroClass)}>
+      <section className={cn('bg-synth-grid px-6 pt-6 pb-10 text-center sm:pt-8 sm:pb-12', compactHeroClass)}>
         <div className="relative z-10">
           <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
             Transmission Log
@@ -70,7 +76,7 @@ function BlogRouteComponent() {
               <HugeiconsIcon icon={RssIcon} strokeWidth={2} className="size-6" aria-hidden="true" />
             </a>
           </div>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">
+          <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-300">
             Notes on code, teams, and everything in between.
           </p>
         </div>
@@ -85,7 +91,7 @@ function BlogRouteComponent() {
           onSearchChange={setSearch}
         />
         {filteredPosts.length > 0 ? (
-          <BlogGrid posts={filteredPosts} />
+          <BlogGrid posts={filteredPosts} latestSlug={posts[0]?.slug} />
         ) : (
           <BlogEmptyState onClear={clearFilters} />
         )}
