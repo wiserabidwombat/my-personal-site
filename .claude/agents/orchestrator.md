@@ -1,7 +1,7 @@
 ---
 name: orchestrator
 description: The master agent responsible for breaking down feature requests and delegating them to specialized subagents.
-tools: [Agent(system-architect, staff-engineer, frontend-designer, code-improver), Read, Grep, Glob]
+tools: [Agent, Read, Grep, Glob]
 model: opus
 ---
 

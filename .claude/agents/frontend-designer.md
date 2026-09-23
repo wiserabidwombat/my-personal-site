@@ -1,7 +1,7 @@
 ---
 name: frontend-designer
 description: Expert in UI/UX design, mobile responsiveness, animations, and neon retro design systems.
-tools: [Read, Write, Edit, Grep, Glob, mcp__context7__*]
+tools: [Read, Write, Edit, Bash, Grep, Glob, mcp__context7__*]
 skills: [synthwave-ui]
 model: sonnet
 ---
