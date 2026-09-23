@@ -10,12 +10,14 @@ function BulletList({ bullets }: { bullets: string[] }) {
   )
 }
 
+// Below sm, company and role dates always sit on their own line under the
+// name/title (flex-col); from sm up they share the line, right-aligned.
 export function ResumeExperience() {
   return (
     <div className="mt-6 space-y-10">
       {experience.map((company) => (
         <div key={company.name}>
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <div className="flex flex-col gap-y-1 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-4">
             <h3 className="text-xl font-bold text-slate-50">
               {company.name}
               {company.location && <span className="font-normal text-slate-400"> — {company.location}</span>}
@@ -26,7 +28,7 @@ export function ResumeExperience() {
           <div className="mt-4 space-y-6 border-l-2 border-[var(--cyber-purple)]/40 pl-6">
             {company.roles.map((role) => (
               <div key={role.title + (role.dateRange ?? '')}>
-                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <div className="flex flex-col gap-y-1 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-4">
                   <h4 className="font-semibold text-[var(--neon-pink)]">{role.title}</h4>
                   {role.dateRange && <span className="text-xs text-slate-400">{role.dateRange}</span>}
                 </div>

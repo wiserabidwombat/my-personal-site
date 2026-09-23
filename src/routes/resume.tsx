@@ -69,7 +69,7 @@ function RouteComponent() {
       </section>
 
       <section className={sectionClass}>
-        <SectionHeading icon={Mortarboard02Icon}>Education &amp; Professional Development</SectionHeading>
+        <SectionHeading icon={Mortarboard02Icon}>Education &amp; Certifications</SectionHeading>
         <ResumeEducation />
       </section>
     </div>

@@ -20,19 +20,20 @@ export function JourneyTimeline() {
           <span className="absolute top-1.5 -left-[calc(1.25rem+5.5px)] size-2.5 rounded-full bg-[var(--laser-cyan)] sm:-left-[calc(2rem+5.5px)]" />
           <p className="text-xs font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">{entry.years}</p>
           <p className={cn('mt-1', bodyText, 'leading-snug font-semibold text-slate-100')}>
-            {/* A combined entry (e.g. MEDHOST) lists its role progression,
-                oldest first; each title stays unbroken and wraps at arrows. */}
+            {/* A combined entry (e.g. MEDHOST) stacks its role progression one
+                title per line, oldest first, each later title led by a small
+                cyan arrow -- so it wraps within the content width at any size. */}
             {entry.roles.map((role, index) => (
-              <span key={role}>
+              <span key={role} className="block">
                 {index > 0 && (
                   <>
-                    <span className="font-normal text-[var(--laser-cyan)]" aria-hidden="true">
-                      {' → '}
+                    <span className="mr-1.5 font-normal text-[var(--laser-cyan)]" aria-hidden="true">
+                      ↳
                     </span>
-                    <span className="sr-only">, then </span>
+                    <span className="sr-only">then </span>
                   </>
                 )}
-                <span className={cn(entry.roles.length > 1 && 'whitespace-nowrap')}>{role}</span>
+                {role}
               </span>
             ))}
           </p>
