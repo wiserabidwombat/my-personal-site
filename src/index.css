@@ -27,6 +27,11 @@
   --glow-purple: 0 0 10px rgba(139, 47, 224, 0.7), 0 0 30px rgba(139, 47, 224, 0.4);
   --glow-cyan: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 30px rgba(0, 240, 255, 0.4);
 
+  /* Text selection (see ::selection below): translucent neon pink with
+     near-white text -- ~10:1 contrast over the deep-space background. */
+  --selection-bg: color-mix(in oklab, var(--neon-pink) 38%, transparent);
+  --selection-fg: #fdf4ff;
+
   /* Neon glow shadows (box-shadow, e.g. hover:shadow-glow-cyan). Defined as
      plain runtime custom properties -- rather than inside App.css's
      `@theme inline` block -- so [data-theme="light"] can override them; a
@@ -86,6 +91,12 @@
   --glow-pink: 0 1px 3px rgba(157, 23, 77, 0.25);
   --glow-purple: 0 1px 3px rgba(109, 40, 217, 0.25);
   --glow-cyan: 0 1px 3px rgba(21, 94, 117, 0.25);
+
+  /* Light text can't work here: 38% berry over the pale background is a
+     light pink (~1.8:1 against white). A lighter tint of the same berry
+     with the darkest text shade keeps it translucent and ~12:1 readable. */
+  --selection-bg: color-mix(in oklab, var(--neon-pink) 22%, transparent);
+  --selection-fg: #18122b;
 
   --shadow-glow-pink: 0 4px 14px rgba(157, 23, 77, 0.22);
   --shadow-glow-purple: 0 4px 14px rgba(109, 40, 217, 0.22);
@@ -196,6 +207,15 @@
 
 body {
   margin: 0;
+}
+
+/* Site-wide text selection. Overrides each element's own color so selected
+   neon headings and body copy read the same, and drops text-shadow so a
+   heading's neon glow doesn't smear behind the selected text. */
+::selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-fg);
+  text-shadow: none;
 }
 
 /*
