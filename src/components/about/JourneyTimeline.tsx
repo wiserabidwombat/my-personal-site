@@ -31,7 +31,7 @@ const entries: Entry[] = [
     years: '2016 – 2019',
     role: 'Quality Engineer',
     company: 'Armor Defense Inc., Richardson TX',
-    detail: 'Moved into engineering, building the quality practices behind a security product.',
+    detail: 'Moved into engineering, enusring quality testing and reliable software.',
   },
   {
     years: '2019 – 2022',
@@ -55,7 +55,7 @@ const entries: Entry[] = [
     years: '2026 – Present',
     role: 'Senior Developer',
     company: 'Alight Solutions',
-    detail: 'Leading a Salesforce → Dynamics 365 CRM migration.',
+    detail: 'Developing a Salesforce → Dynamics 365 CRM migration.',
   },
 ]
 
