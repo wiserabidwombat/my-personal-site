@@ -9,11 +9,13 @@ import {
   Notion01Icon,
   DatabaseLightningIcon,
   Book01Icon,
+  Github01Icon,
 } from '@hugeicons/core-free-icons'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { StackFlowDiagram } from '../components/StackFlowDiagram'
 import { dataFlowDiagram, buildDeployDiagram, aiWorkflowDiagram } from '../components/stackDiagrams'
 import { seoMeta, canonicalLink } from '../lib/meta'
+import { neonOutlineButton } from '../lib/styles'
 import { stackMeta } from './routeMeta'
 
 export const Route = createFileRoute('/stack')({
@@ -97,6 +99,8 @@ const stack: { name: string; role: string; icon: typeof Atom01Icon; glow: Glow }
 
 const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]'
 
+const SOURCE_REPO_URL = 'https://github.com/wiserabidwombat/my-personal-site'
+
 function StackRouteComponent() {
   return (
     <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
@@ -112,6 +116,16 @@ function StackRouteComponent() {
             A quick look at the stack powering this digital workspace — from the components on
             screen to the databases behind them.
           </p>
+          <a
+            href={SOURCE_REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`mt-8 gap-2 ${neonOutlineButton}`}
+          >
+            <HugeiconsIcon icon={Github01Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
+            View the source on GitHub
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
         </div>
       </section>
 
