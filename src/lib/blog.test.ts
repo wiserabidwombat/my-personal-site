@@ -3,9 +3,13 @@ import {
   buildPostsFromRaw,
   collectTags,
   findPostBySlug,
+  formatPostDate,
   getAllPosts,
   getAllTags,
   getPostBySlug,
+  postOgImagePath,
+  readingMinutes,
+  tagLabel,
 } from './blog'
 
 describe('buildPostsFromRaw', () => {
@@ -187,5 +191,77 @@ describe('getPostBySlug (real seed content)', () => {
 describe('getAllTags (real seed content)', () => {
   it('includes the tags from both seed posts, deduped and sorted', () => {
     expect(getAllTags()).toEqual(['ai', 'boardgames', 'coding', 'leadership', 'teams'])
+  })
+})
+
+describe('tagLabel', () => {
+  it('uses the override for acronyms and joined words', () => {
+    expect(tagLabel('ai')).toBe('AI')
+    expect(tagLabel('boardgames')).toBe('Board Games')
+  })
+
+  it('title-cases other tags word by word', () => {
+    expect(tagLabel('leadership')).toBe('Leadership')
+    expect(tagLabel('design-systems')).toBe('Design Systems')
+  })
+})
+
+describe('readingMinutes', () => {
+  it('rounds up at 225 words per minute', () => {
+    expect(readingMinutes(Array(225).fill('word').join(' '))).toBe(1)
+    expect(readingMinutes(Array(226).fill('word').join(' '))).toBe(2)
+  })
+
+  it('never reports less than one minute', () => {
+    expect(readingMinutes('')).toBe(1)
+  })
+})
+
+describe('formatPostDate', () => {
+  it('formats in en-US with a short month, independent of time zone', () => {
+    expect(formatPostDate('2026-08-14')).toBe('Aug 14, 2026')
+  })
+
+  it('returns unparseable input unchanged', () => {
+    expect(formatPostDate('someday')).toBe('someday')
+  })
+})
+
+describe('postOgImagePath', () => {
+  it('prefers ogImage over the card image', () => {
+    expect(postOgImagePath({ image: '/blog/art.svg', ogImage: '/blog/art.png' })).toBe('/blog/art.png')
+  })
+
+  it('uses a raster card image when there is no ogImage', () => {
+    expect(postOgImagePath({ image: '/blog/photo.jpg' })).toBe('/blog/photo.jpg')
+  })
+
+  it('never returns an SVG, falling back to the site default instead', () => {
+    expect(postOgImagePath({ image: '/blog/art.svg' })).toBeUndefined()
+    expect(postOgImagePath({ image: '/blog/a.png', ogImage: '/blog/b.SVG' })).toBeUndefined()
+  })
+})
+
+describe('ogImage frontmatter', () => {
+  it('is parsed when present', () => {
+    const [post] = buildPostsFromRaw({
+      '/content/blog/og.md': `---
+title: OG Post
+slug: og-post
+image: /blog/og.svg
+ogImage: /blog/og.png
+blurb: Has a preview image.
+date: "2026-01-01"
+---
+Body.
+`,
+    })
+    expect(post.ogImage).toBe('/blog/og.png')
+  })
+
+  it('every seed post has its own raster preview image', () => {
+    for (const post of getAllPosts()) {
+      expect(postOgImagePath(post), post.slug).toMatch(/\.(png|jpe?g)$/)
+    }
   })
 })

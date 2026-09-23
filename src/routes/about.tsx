@@ -8,6 +8,7 @@ import { BeyondTheCode } from '../components/about/BeyondTheCode'
 import { bodyText, proseWidth, timelineContentIndent } from '../components/about/typography'
 import { buttonVariants } from '../../@/components/ui/button'
 import { seoMeta, canonicalLink } from '../lib/meta'
+import { pageContainer, neonOutlineButton } from '../lib/styles'
 import { aboutMeta } from './routeMeta'
 
 export const Route = createFileRoute('/about')({
@@ -27,15 +28,8 @@ const headingClass = 'flex items-center gap-2 text-2xl font-bold text-[var(--neo
 // (item 9) -- was previously split between max-w-3xl and max-w-4xl.
 // Tighter py on mobile: adjacent sections stack both paddings, so py-12
 // left ~96px between sections on a small screen.
-const sectionClass = 'mx-auto max-w-4xl px-6 py-8 sm:py-12'
+const sectionClass = cn(pageContainer, 'py-8 sm:py-12')
 const proseClass = cn(bodyText, proseWidth)
-// Outline CTA: transparent with a 1px neon border so it reads on the dark
-// background instead of the shared outline variant's near-black fill.
-// Scoped here -- that variant is used by ~10 other components.
-const outlineCtaClass = cn(
-  buttonVariants({ variant: 'outline' }),
-  'border-[var(--laser-cyan)] bg-transparent text-[var(--laser-cyan)] hover:bg-[var(--laser-cyan)]/10 hover:text-[var(--laser-cyan)] hover:shadow-glow-cyan',
-)
 
 function AboutRouteComponent() {
   return (
@@ -127,7 +121,7 @@ function AboutRouteComponent() {
           <Link to="/resume" className={buttonVariants({ variant: 'default' })}>
             View my resume
           </Link>
-          <Link to="/contact" className={outlineCtaClass}>
+          <Link to="/contact" className={neonOutlineButton}>
             Get in touch
           </Link>
         </div>

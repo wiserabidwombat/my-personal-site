@@ -1,4 +1,4 @@
-import { SkillPill } from './SkillPill'
+import { OutlinePill } from '../OutlinePill'
 
 const toolkit = [
   {
@@ -32,7 +32,7 @@ export function ToolkitGrid() {
           </h3>
           <div className="mt-3 flex flex-wrap gap-2">
             {group.skills.map((skill) => (
-              <SkillPill key={skill}>{skill}</SkillPill>
+              <OutlinePill key={skill}>{skill}</OutlinePill>
             ))}
           </div>
         </div>

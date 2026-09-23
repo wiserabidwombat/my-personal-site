@@ -22,6 +22,10 @@ function parsePost(raw: string, filePath: string): BlogPost {
     }
   }
 
+  if (data.ogImage !== undefined && typeof data.ogImage !== 'string') {
+    throw new Error(`Blog post "${filePath}" has an "ogImage" field that isn't a string`)
+  }
+
   if (
     data.tags !== undefined &&
     (!Array.isArray(data.tags) || data.tags.some((tag: unknown) => typeof tag !== 'string'))
@@ -33,6 +37,7 @@ function parsePost(raw: string, filePath: string): BlogPost {
     title: data.title,
     slug: data.slug,
     image: data.image,
+    ogImage: data.ogImage,
     blurb: data.blurb,
     date: data.date,
     author: data.author,
@@ -92,4 +97,48 @@ export function getPostBySlug(slug: string): BlogPost | undefined {
 
 export function getAllTags(): string[] {
   return collectTags(loadPosts())
+}
+
+// Display labels for tag slugs. Slugs (frontmatter values, ?tag= URLs) stay
+// as-is; only what's rendered changes. Tags not listed here are title-cased
+// word by word ("design-systems" -> "Design Systems").
+const TAG_LABELS: Record<string, string> = {
+  ai: 'AI',
+  boardgames: 'Board Games',
+}
+
+export function tagLabel(tag: string): string {
+  return (
+    TAG_LABELS[tag] ??
+    tag
+      .split(/[-_\s]+/)
+      .filter(Boolean)
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join(' ')
+  )
+}
+
+// Link-preview (og:image / twitter:image) path for a post, or undefined to
+// fall back to the site-wide default image. LinkedIn, Facebook, and X don't
+// render SVG previews, so an SVG is never returned: the card image is used
+// only when it's already raster, and an SVG-illustrated post needs a raster
+// `ogImage` in its frontmatter (1200x630) to get its own preview.
+export function postOgImagePath(post: Pick<BlogPost, 'image' | 'ogImage'>): string | undefined {
+  const candidate = post.ogImage ?? post.image
+  return /\.svg$/i.test(candidate) ? undefined : candidate
+}
+
+const WORDS_PER_MINUTE = 225
+
+export function readingMinutes(body: string): number {
+  const words = body.split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE))
+}
+
+// Fixed en-US locale (not the visitor's) so the prerendered HTML and the
+// client render always agree -- "Aug 14, 2026".
+export function formatPostDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })
 }

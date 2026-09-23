@@ -1,68 +1,76 @@
 import { Link } from '@tanstack/react-router'
-import { Badge } from '../../../@/components/ui/badge'
-import { Card, CardHeader, CardTitle, CardDescription } from '../../../@/components/ui/card'
+import { cn } from 'cn'
+import { formatPostDate, readingMinutes, tagLabel } from '../../lib/blog'
 import type { BlogPost } from '../../types/blog-post'
-
-export type Glow = 'pink' | 'cyan' | 'purple'
-
-const glowStyles: Record<Glow, { ring: string; shadow: string }> = {
-  pink: { ring: 'ring-[var(--neon-pink)]/50', shadow: 'shadow-glow-pink' },
-  cyan: { ring: 'ring-[var(--laser-cyan)]/50', shadow: 'shadow-glow-cyan' },
-  purple: { ring: 'ring-[var(--cyber-purple)]/50', shadow: 'shadow-glow-purple' },
-}
-
-function formatDate(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return date.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    timeZone: 'UTC',
-  })
-}
 
 type Props = {
   post: BlogPost
-  glow?: Glow
+  // Featured: image and text split 50/50 from md up. Otherwise a compact
+  // horizontal card (image ~1/3) from md up -- a smaller version of the
+  // same layout, switching at the same breakpoint. Both stack below md.
+  featured?: boolean
+  // Shows the LATEST label. Only the route knows whether this card is the
+  // newest post overall vs. merely the first match of a filter.
+  latest?: boolean
 }
 
-export function BlogCard({ post, glow = 'cyan' }: Props) {
-  const style = glowStyles[glow]
-
+// The whole card is one link, with nothing interactive nested inside it.
+// Tags are plain accent text here, so the toolbar's filter chips stay the
+// only full-size pills on the page. One border color for every card;
+// hover/focus lift it and brighten the border, plus a focus ring.
+export function BlogCard({ post, featured = false, latest = false }: Props) {
   return (
     <Link
       to="/blog/$slug"
       params={{ slug: post.slug }}
-      className="group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--laser-cyan)]"
+      className={cn(
+        'group flex flex-col overflow-hidden rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/50 text-left transition duration-300',
+        'hover:-translate-y-1 hover:border-[var(--laser-cyan)]/70 motion-reduce:hover:translate-y-0',
+        'focus-visible:-translate-y-1 focus-visible:border-[var(--laser-cyan)]/70 focus-visible:ring-2 focus-visible:ring-[var(--laser-cyan)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--deep-space-black)] focus-visible:outline-none',
+        featured ? 'md:grid md:grid-cols-2' : 'md:flex-row',
+      )}
     >
-      <Card
-        className={`${style.ring} ${style.shadow} h-full bg-[var(--deep-space-purple)]/50 backdrop-blur-md transition-transform duration-300 group-hover:-translate-y-1`}
-      >
+      {/* Flush to the card edges (clipped by its radius) on both variants.
+          16:9 is the image's minimum: a compact card's image column is a
+          stretched flex item whose aspect-video sets the row's minimum
+          height, and if the text runs taller the image fills that height
+          with object-cover -- cropping the illustration's sides rather than
+          leaving empty space, same as the featured card's md:h-full. */}
+      <div className={cn('relative shrink-0', !featured && 'md:aspect-video md:w-1/3')}>
+        {/* Decorative: the title beside it already names the post, and alt
+            text would be read again as part of the link's name. */}
         <img
           src={post.image}
-          alt={post.title}
-          loading="lazy"
-          className="aspect-video w-full object-cover transition-[filter] duration-300 group-hover:brightness-110"
-        />
-        <CardHeader>
-          {post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {post.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-[10px] capitalize">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
+          alt=""
+          loading={featured ? 'eager' : 'lazy'}
+          className={cn(
+            'aspect-video w-full object-cover transition-[filter] duration-300 group-hover:brightness-110',
+            featured ? 'md:h-full' : 'md:absolute md:inset-0 md:h-full',
           )}
-          <CardTitle className="mt-1 text-base font-bold text-slate-50">{post.title}</CardTitle>
-          <CardDescription className="line-clamp-3 text-slate-300">{post.blurb}</CardDescription>
-          <p className="mt-2 text-xs font-medium tracking-wide text-[var(--laser-cyan)] uppercase">
-            <time dateTime={post.date}>{formatDate(post.date)}</time>
-            {post.author && <> &middot; {post.author}</>}
+        />
+        {latest && (
+          <span className="absolute top-3 left-3 rounded-md border border-[var(--neon-pink)]/60 bg-[var(--deep-space-black)]/80 px-2 py-0.5 text-[11px] font-semibold tracking-[0.2em] text-[var(--neon-pink)] uppercase backdrop-blur-sm">
+            Latest
+          </span>
+        )}
+      </div>
+      <div
+        className={cn(
+          'flex min-w-0 flex-1 flex-col gap-2 p-5',
+          featured ? 'md:justify-center md:gap-3 md:p-8' : 'md:justify-center md:px-6 md:py-4',
+        )}
+      >
+        {post.tags.length > 0 && (
+          <p className="text-xs font-semibold tracking-wider text-[var(--laser-cyan)] uppercase">
+            {post.tags.map(tagLabel).join(' · ')}
           </p>
-        </CardHeader>
-      </Card>
+        )}
+        <h2 className={cn('font-bold text-slate-50', featured ? 'text-xl sm:text-2xl' : 'text-lg')}>{post.title}</h2>
+        <p className={cn('text-slate-300', !featured && 'md:line-clamp-2')}>{post.blurb}</p>
+        <p className="mt-auto pt-1 text-xs font-medium tracking-wide text-slate-400 uppercase">
+          <time dateTime={post.date}>{formatPostDate(post.date)}</time> &middot; {readingMinutes(post.body)} min read
+        </p>
+      </div>
     </Link>
   )
 }

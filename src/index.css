@@ -292,8 +292,11 @@ code {
   /* Guarantees every hero has enough room for the floor grid to read at a
      normal size and for the glow below to fully fade out, even on pages
      whose heading has little or no content after it (e.g. a one-line
-     tagline vs. a blockquote). Pages with more content simply grow past it. */
-  min-height: 26rem;
+     tagline vs. a blockquote). Pages with more content simply grow past it.
+     The --synth-grid-* variables below let one page (e.g. Blog's shorter
+     hero) retune height, horizon, and glow position together; every other
+     page gets these defaults unchanged. */
+  min-height: var(--synth-grid-min-height, 26rem);
 
   &::before {
     content: '';
@@ -301,7 +304,7 @@ code {
     /* Fixed offset (not a % of section height) so the horizon sits at the
        same spot behind the heading on every page, regardless of how much
        content follows the heading (a blockquote vs. a one-line paragraph). */
-    inset: 11rem 0 0 0;
+    inset: var(--synth-grid-horizon, 11rem) 0 0 0;
     background-image:
       linear-gradient(color-mix(in oklab, var(--laser-cyan) 60%, transparent) 1px, transparent 1px),
       linear-gradient(90deg, color-mix(in oklab, var(--laser-cyan) 60%, transparent) 1px, transparent 1px);
@@ -321,7 +324,7 @@ code {
        visible seam cutting across text on shorter pages). */
     inset: 0;
     background: radial-gradient(
-      ellipse 44rem 13rem at 50% 12rem,
+      ellipse 44rem var(--synth-grid-glow-height, 13rem) at 50% var(--synth-grid-glow-y, 12rem),
       color-mix(in oklab, var(--neon-pink) 40%, transparent),
       transparent 70%
     );
