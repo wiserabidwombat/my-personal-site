@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { createContext, createElement, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 
 export type Theme = 'dark' | 'light'
 
@@ -11,7 +11,19 @@ function getInitialTheme(): Theme {
   return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
 }
 
-export function useTheme() {
+type ThemeContextValue = {
+  theme: Theme
+  toggleTheme: () => void
+}
+
+// A plain useState-per-call hook can't be shared across components -- each
+// caller would get its own independent copy, so toggling in one place (the
+// navbar) would never be reflected anywhere another component reads theme
+// (e.g. Home's dark/light hero swap). Context makes every consumer read the
+// same value and re-render together.
+const ThemeContext = createContext<ThemeContextValue | null>(null)
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
 
   useEffect(() => {
@@ -28,5 +40,13 @@ export function useTheme() {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
   }, [])
 
-  return { theme, toggleTheme }
+  return createElement(ThemeContext.Provider, { value: { theme, toggleTheme } }, children)
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext)
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider')
+  }
+  return context
 }

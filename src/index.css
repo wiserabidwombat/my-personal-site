@@ -37,6 +37,15 @@
   --shadow-glow-purple: 0 0 10px rgba(139, 47, 224, 0.7), 0 0 30px rgba(139, 47, 224, 0.4);
   --shadow-glow-cyan: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 30px rgba(0, 240, 255, 0.4);
 
+  /* Home's floor-grid line color/opacity (bg-synth-floor below), broken out
+     into their own tokens rather than reusing --laser-cyan directly so
+     [data-theme='light'] can retune them independently -- --laser-cyan
+     itself re-themes to a deep teal that reads off-palette against the
+     light hero's pastel dawn skyline. Kept separate from bg-synth-grid
+     (used by every other page's hero), which is intentionally untouched. */
+  --synth-floor-line: var(--laser-cyan);
+  --synth-floor-line-opacity: 90%;
+
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
@@ -81,6 +90,17 @@
   --shadow-glow-pink: 0 4px 14px rgba(157, 23, 77, 0.22);
   --shadow-glow-purple: 0 4px 14px rgba(109, 40, 217, 0.22);
   --shadow-glow-cyan: 0 4px 14px rgba(21, 94, 117, 0.22);
+
+  /* Home's floor grid reads teal-on-pink (off-palette) if it just inherits
+     --laser-cyan's light-mode remap -- --cyber-purple's own light-mode
+     violet is much closer to the light skyline art's actual dominant hue
+     (sampled directly from the asset), so the grid reuses that token
+     instead. Opacity is knocked down from dark mode's 90%: the same value
+     read as too heavy/saturated against the light hero's pale background
+     in screenshots, competing with the skyline instead of receding behind
+     it. */
+  --synth-floor-line: var(--cyber-purple);
+  --synth-floor-line-opacity: 68%;
 }
 
 /* Body-text overrides: Tailwind's slate-* palette is used directly across
@@ -282,6 +302,85 @@ code {
       transparent 70%
     );
   }
+}
+
+/* Same perspective floor as bg-synth-grid, minus the horizon glow --
+   for a standalone floor strip (e.g. rising out of a photo's own
+   reflection) where that glow would just wash out the grid lines rather
+   than sit behind a heading. Grid fills the element edge-to-edge instead
+   of the fixed offset bg-synth-grid uses to clear heading text.
+   Remember the mask is `to top`: its 0% stop is the element's physical
+   BOTTOM and its 100% stop is the physical TOP, and that flat gradient
+   is then perspective-compressed by the rotateX transform below, so the
+   local top edge (the "far"/horizon side) ends up squeezed into a much
+   smaller on-screen band than its percentage suggests. Keep the opaque
+   zone large (0-75%) so the grid stays readable across nearly the whole
+   floor, and keep the fade-to-transparent zone narrow and late
+   (75%-96%, with only the last 4% fully invisible) so as little of that
+   already-compressed top band as possible goes fully blank -- a wide,
+   early fade here (the previous 55%/90%) is what left an empty band
+   between the photo's reflection and the visible grid. Line opacity is
+   tuned up to 90% in dark mode (not full color-mix removal) so the lower
+   half of the floor -- compressed hard by the perspective transform --
+   reads as a clear grid instead of fading into near-invisibility, while
+   still leaving a little headroom above this value; tuned against
+   screenshots cropped tight on that lower band, where 90% read exactly as
+   clearly as 100% did. The lines should stay subtler than the skyline
+   photo's own bright neon -- re-check that visually if this value changes.
+   This mask never touches the physical bottom (its 0% stop stays fully
+   opaque), so it can't double up with the separate bottom-fade overlay div
+   in HeroSkyline.tsx -- that overlay alone fades the floor into the page
+   background. Line color/opacity are read from --synth-floor-line(-opacity)
+   (defined above, re-themed under [data-theme='light']) rather than
+   --laser-cyan directly, so this utility -- unlike bg-synth-grid, which
+   every other page's hero also uses -- can be retuned for Home's light
+   scene alone. */
+@utility bg-synth-floor {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: var(--deep-space-black);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(
+        color-mix(in oklab, var(--synth-floor-line) var(--synth-floor-line-opacity), transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in oklab, var(--synth-floor-line) var(--synth-floor-line-opacity), transparent) 1px,
+        transparent 1px
+      );
+    background-size: 60px 60px;
+    transform: perspective(300px) rotateX(65deg);
+    transform-origin: bottom;
+    mask-image: linear-gradient(to top, black 75%, transparent 96%);
+    -webkit-mask-image: linear-gradient(to top, black 75%, transparent 96%);
+  }
+}
+
+/* Dawn sky gradient for Home's light-theme hero scene, mirroring the dark
+   scene's own hardcoded gradient (HeroSkyline.tsx) with on-palette tokens
+   instead of literal hex stops -- the dark scene's literals are genuinely
+   dark-only (a near-black night sky has no light-theme equivalent), so
+   rather than force them through [data-theme='light'] overrides, the light
+   scene gets its own gradient built from the existing --neon-pink/
+   --deep-space-purple/--deep-space-black tokens. The faint pink tint in the
+   top stop is pulled from the light skyline art's own dominant hue (sampled
+   directly from the asset), fading down to the same --deep-space-black the
+   rest of the page (and the bottom-fade overlay div) already resolve to, so
+   there's no seam at the section's own bottom edge. */
+@utility hero-sky-light {
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--neon-pink) 12%, var(--deep-space-purple)),
+    var(--deep-space-purple),
+    var(--deep-space-black)
+  );
 }
 
 /* Neon glow box-shadows. Defined as @utility rules (like bg-synth-grid)

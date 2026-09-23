@@ -1,14 +1,9 @@
 import { Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
-import {
-  ArrowRight02Icon,
-  GameController01Icon,
-  BookOpen01Icon,
-  FishingRodIcon,
-  Brain01Icon,
-} from '@hugeicons/core-free-icons'
+import { GameController01Icon, BookOpen01Icon, FishingRodIcon, Brain01Icon } from '@hugeicons/core-free-icons'
 // import { Badge } from '../../@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
+import { HeroSkyline } from './home/HeroSkyline'
 
 // const transmissionLog = [
 //   {
@@ -48,27 +43,7 @@ const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:va
 export function Home() {
   return (
     <div className="bg-[var(--deep-space-black)] text-slate-200">
-      <section className="bg-synth-grid animate-synth-grid px-6 py-28 text-center">
-        <div className="relative z-10 mx-auto max-w-3xl">
-          <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
-            Full-stack engineer &middot; gamer &middot; outdoorsman
-          </p>
-          <h1 className="mt-4 text-4xl font-extrabold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-5xl">
-            Hi, I'm Aaron Tilley.
-          </h1>
-          <p className="mx-auto mt-6 max-w-xl text-center text-lg leading-relaxed text-slate-200">
-            Full-stack engineer by day, gamer, fly fisherman, and lifelong learner by night.
-            Welcome to my digital workspace.
-          </p>
-          <Link
-            to="/about"
-            className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-[var(--laser-cyan)] px-6 py-3 text-sm font-semibold text-[var(--laser-cyan)] shadow-glow-cyan transition-colors duration-300 hover:bg-[var(--laser-cyan)] hover:text-[var(--deep-space-black)]"
-          >
-            Learn More About Me
-            <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
+      <HeroSkyline />
 
       {/* <section className="mx-auto max-w-5xl px-6 py-16">
         <h2 className={headingClass}>Transmission Log</h2>
@@ -89,7 +64,17 @@ export function Home() {
         </div>
       </section> */}
 
-      <section className="mx-auto max-w-5xl px-6 py-16">
+      {/* Top padding is deliberately smaller than the bottom's below sm:
+          this section renders after HeroSkyline, and on mobile it already
+          leaves visible breathing room before this section even starts --
+          both the dark and light hero scenes share the same bottom-fade
+          overlay div (see HeroSkyline.tsx) fading the skyline's floor grid
+          into the page background, plus HeroText's own pb-12 (sm:pb-16)
+          below the CTA button, already inside the hero section -- so the
+          full py-16 amount stacked on top of either hero read as a dead
+          gap. At sm+ this section gets the full pt-16 back, since that gap
+          only showed up on mobile. */}
+      <section className="mx-auto max-w-5xl px-6 pt-8 pb-16 sm:pt-16">
         <h2 className={headingClass}>Current Status</h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {currentStatus.map((item) => (
