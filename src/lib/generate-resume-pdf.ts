@@ -232,20 +232,26 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
   })
 
   // Education and Professional Development
-  const credentialRow = (credential: (typeof credentials)[number]) => ({
-    title: credential.detail ? `${credential.title} — ${credential.detail}` : credential.title,
-    dateLabel: credential.location ? `${credential.date} · ${credential.location}` : credential.date,
-  })
-  const firstCredential = credentialRow(credentials[0])
-  const education = writeSectionHeading(
-    'Education and Professional Development',
-    rowHeight(firstCredential.title, firstCredential.dateLabel, 'bold', 10, LINE.body),
-  )
+  // Laid out like a role: institution (bold) with date · location
+  // right-aligned, then the degree on its own line in the role-title style
+  // (italic) -- so a long degree name never has to share a line with dates.
+  type CredentialItem = (typeof credentials)[number]
+  const credentialDate = (credential: CredentialItem) =>
+    credential.location ? `${credential.date} · ${credential.location}` : credential.date
+  const credentialBlock = (credential: CredentialItem) =>
+    rowHeight(credential.title, credentialDate(credential), 'bold', 10, LINE.body) +
+    (credential.detail ? lineCount(credential.detail, 'normal', 10, CONTENT_WIDTH) * LINE.role : 0)
+  const education = writeSectionHeading('Education and Professional Development', credentialBlock(credentials[0]))
   for (const credential of credentials) {
-    const { title, dateLabel } = credentialRow(credential)
+    const entry = keepTogether(credential.title, credentialBlock(credential))
     font('bold', 10)
-    writeRow(title, dateLabel, LINE.body)
+    writeRow(credential.title, credentialDate(credential), LINE.body)
     education.content()
+    if (credential.detail) {
+      font('italic', 10)
+      writeLines(credential.detail, MARGIN, CONTENT_WIDTH, LINE.role)
+    }
+    entry.content()
   }
 
   return {

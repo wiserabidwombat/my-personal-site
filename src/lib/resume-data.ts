@@ -20,7 +20,7 @@ export const contact: ContactInfo = {
 }
 
 export const summary =
-  'Senior Developer with 18 years of experience across banking, healthcare, and security software. Progressed from technical support and quality assurance into software engineering and team leadership. Currently building React components inside Microsoft Dynamics 365 for a Salesforce-to-Dynamics 365 migration serving 3,000+ clients.'
+  '18 years of experience across banking, healthcare, and security software. Progressed from technical support and quality assurance into software engineering and team leadership. Currently building React components inside Microsoft Dynamics 365 for a Salesforce-to-Dynamics 365 migration serving 3,000+ clients.'
 
 export const skillGroups = [
   {
@@ -95,7 +95,6 @@ export const experience: Company[] = [
               'Building React-based web resource components embedded within Microsoft Dynamics 365 CRM to support the migration off Salesforce',
               'Leveraging D365 tables, Power Apps, and Power Automate (Cloud Flows) to support end-to-end workflows for client creation, documentation, tracking, and communication',
               'Updating existing backend services to source and display client data from Dynamics 365 instead of Salesforce, ensuring continuity across the broader platform ecosystem',
-              'Supporting a platform-wide migration affecting 3,000+ clients',
             ],
           },
         ],
@@ -231,7 +230,7 @@ export type Credential = {
 export const credentials: Credential[] = [
   {
     kind: 'certification',
-    title: 'AWS Certified Developer - Associate',
+    title: 'AWS Certified Developer – Associate',
     date: 'January 2022',
   },
   {
