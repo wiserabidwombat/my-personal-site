@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Search01Icon } from '@hugeicons/core-free-icons'
-import { Input } from '../../../@/components/ui/input'
+import { Input } from '@/components/ui/input'
 import type { Book } from '../../types/book'
 import type { BooksStatus } from '../../hooks/useBooks'
 import { searchBooks, sortBooks, type BookSortKey } from './bookFilters'

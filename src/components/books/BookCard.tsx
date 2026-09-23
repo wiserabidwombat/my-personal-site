@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, CardHeader, CardTitle } from '../../../@/components/ui/card'
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Book } from '../../types/book'
 import { getResizedImageUrl } from '../../lib/image'
 import { formatDateRead } from './bookFilters'

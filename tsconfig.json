@@ -1,5 +1,14 @@
 {
   "files": [],
+  // Not used for compilation (see the project references below) -- it's
+  // here so the shadcn CLI, which reads the root tsconfig, resolves the
+  // "@/*" alias from components.json to src/ instead of creating a literal
+  // "@" folder at the repo root.
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" },

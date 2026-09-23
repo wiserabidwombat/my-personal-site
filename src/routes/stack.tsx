@@ -10,7 +10,7 @@ import {
   DatabaseLightningIcon,
   Book01Icon,
 } from '@hugeicons/core-free-icons'
-import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { StackFlowDiagram } from '../components/StackFlowDiagram'
 import { dataFlowDiagram, buildDeployDiagram, aiWorkflowDiagram } from '../components/stackDiagrams'
 import { seoMeta, canonicalLink } from '../lib/meta'

@@ -1,6 +1,6 @@
 import { useMemo, useState, useSyncExternalStore } from 'react'
-import { Badge } from '../../../@/components/ui/badge'
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '../../../@/components/ui/carousel'
+import { Badge } from '@/components/ui/badge'
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel'
 import type { Specimen } from '../../types/specimen'
 import { headingClass } from '../games/shared'
 import { getResizedImageUrl } from '../../lib/image'

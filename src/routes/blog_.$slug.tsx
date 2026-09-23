@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
-import { buttonVariants } from '../../@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { getPostBySlug, postOgImagePath } from '../lib/blog'
 import { BlogPostView } from '../components/blog/BlogPostView'
 import { seoMeta, canonicalLink, SITE_URL } from '../lib/meta'

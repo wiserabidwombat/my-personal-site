@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Badge, badgeVariants } from '../../../@/components/ui/badge'
-import { Popover, PopoverContent, PopoverTrigger } from '../../../@/components/ui/popover'
+import { Badge, badgeVariants } from '@/components/ui/badge'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 type Props = {
   tags: string[]

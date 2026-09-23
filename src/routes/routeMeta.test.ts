@@ -4,9 +4,9 @@
 // head() actually renders in the browser.
 //
 // Route .tsx files themselves can't be imported here -- vitest.config.ts
-// runs the `node` environment with no react/jsx or path-alias plugins
+// runs the `node` environment with no react/jsx plugin
 // configured, and every route file pulls in its full UI/component graph
-// (Tailwind-classed JSX, shadcn/ui primitives, `../../@/...` aliases, .jpg
+// (Tailwind-classed JSX, shadcn/ui primitives, .jpg
 // asset imports) that only Vite's real dev-server transform pipeline (which
 // scripts/prerender-meta.mjs itself gets, via `server.ssrLoadModule`)
 // resolves -- so a plain import of e.g. about.tsx would fail for reasons

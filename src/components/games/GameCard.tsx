@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ExternalLinkIcon } from '@hugeicons/core-free-icons'
-import { Card, CardHeader, CardTitle } from '../../../@/components/ui/card'
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { TagList } from './TagList'
 import { GameDetailModal } from './GameDetailModal'
 import type { BoardGame } from '../../types/board-game'
