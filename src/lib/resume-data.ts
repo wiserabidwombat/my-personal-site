@@ -1,8 +1,8 @@
 export const fullName = 'Aaron Tilley'
-export const heroTitle = 'Software Developer'
+export const heroTitle = 'Senior Developer'
 
 export const summary =
-  "A solution-focused, analytical thinker with 16+ years' experience in multiple roles with increasing levels of responsibility. Recognized leader and team player with excellent communication, interpersonal, and problem-solving skills. Quickly and easily adapts to new technologies, software, and environments."
+  'Senior Developer with 18 years of experience across banking, healthcare, and security software. Progressed from technical support and quality assurance into software engineering and team leadership. Currently building React components inside Microsoft Dynamics 365 for a Salesforce-to-Dynamics 365 migration serving 3,000+ clients.'
 
 export const skillGroups = [
   {
@@ -11,30 +11,27 @@ export const skillGroups = [
   },
   {
     label: 'Frameworks & Libraries',
-    skills: ['React', 'Angular', '.NET', 'Tailwind CSS', 'shadcn/ui', 'npm', 'TanStack Router'],
+    skills: ['React', 'Angular', '.NET', 'SignalR', 'Tailwind CSS', 'shadcn/ui', 'TanStack Router'],
   },
   {
-    label: 'Cloud & DevOps',
+    label: 'Cloud & Platforms',
     skills: [
       'AWS Lambda',
+      'AWS ECS',
       'AWS RDS',
       'AWS DynamoDB',
-      'AWS ECS',
+      'AWS SQS',
       'Docker',
-      'D365 Power Apps',
-      'D365 Cloudflows',
       'Terraform',
-      'GIT',
-      'GitHub',
+      'Elasticsearch',
+      'Microsoft Dynamics 365',
+      'Power Apps',
+      'Power Automate',
     ],
   },
   {
-    label: 'Enterprise Platforms',
-    skills: ['Microsoft Dynamics (D365)', 'Microservices Architecture'],
-  },
-  {
-    label: 'Tools',
-    skills: ['Git', 'GitHub', 'Jira', 'Visual Studio', 'SSMS', 'VS Code'],
+    label: 'Tools & Practices',
+    skills: ['Git', 'GitHub', 'Jira', 'Visual Studio', 'VS Code', 'SSMS', 'npm', 'Microservices Architecture'],
   },
 ]
 
@@ -48,6 +45,9 @@ export type Role = {
   dateRange?: string
   bullets?: string[]
   projects?: Project[]
+  // One-line blurb for this role's entry in the About page's "My Journey"
+  // timeline (see src/lib/journey.ts). Not shown on the resume.
+  aboutDetail?: string
 }
 
 export type Company = {
@@ -55,6 +55,9 @@ export type Company = {
   location?: string
   dateRange: string
   roles: Role[]
+  // Set to show this company as ONE About timeline entry (its role
+  // progression plus this blurb) instead of one entry per role.
+  aboutCombined?: { detail: string }
 }
 
 export const experience: Company[] = [
@@ -66,6 +69,7 @@ export const experience: Company[] = [
       {
         title: 'Senior Developer',
         dateRange: 'June 2026 – Present',
+        aboutDetail: 'Developing a Salesforce → Dynamics 365 CRM migration.',
         projects: [
           {
             name: 'Salesforce-to-Dynamics 365 Migration',
@@ -81,6 +85,7 @@ export const experience: Company[] = [
       {
         title: 'Team Lead',
         dateRange: 'April 2023 – June 2026',
+        aboutDetail: 'Led a development team while staying hands-on with the code.',
         projects: [
           {
             name: 'Health Pros Platform',
@@ -97,7 +102,7 @@ export const experience: Company[] = [
               'Led the integration of two previously independent client tools (Smart Select MD and Health Pros) into the unified Alight domain, eliminating standalone URLs and consolidating the user experience',
               "Migrated features and business logic into Alight's Angular front-end architecture, aligning UI and navigation with the broader platform",
               "Re-engineered backend services to integrate with Alight's existing notification, ticketing, and communication systems",
-              'Led the team through the migration while maintaining continuity of service for 3,000+ clients at 99% uptime',
+              'Led the team through the migration while maintaining continuity of service for existing clients',
             ],
           },
         ],
@@ -105,13 +110,13 @@ export const experience: Company[] = [
       {
         title: 'Developer',
         dateRange: 'July 2022 – April 2023',
+        aboutDetail: 'Joined to build out enterprise-scale full-stack systems.',
         projects: [
           {
             name: 'Smart Select MD',
             bullets: [
               'Developed a client-facing healthcare navigation tool using Angular, C# services on AWS ECS, SQL, and Elasticsearch, enabling users to search for doctors and facilities by specialty or condition',
               'Built search functionality that combined member health insurance data with provider cost, rating, and quality information to support informed care decisions',
-              'Contributed to a platform supporting 3,000+ clients while maintaining 99% uptime',
             ],
           },
         ],
@@ -126,17 +131,19 @@ export const experience: Company[] = [
       {
         title: 'Software Engineer',
         dateRange: 'April 2019 – May 2022',
+        aboutDetail: 'Grew from quality into full-time development on the same product.',
         bullets: [
           'Built and deployed microservices to scale security platform from 10k to 100k agents',
-          'Deployed and troubleshot AWS SQS, RDS, Dynamo and Lambda infrastructure',
+          'Deployed and troubleshot AWS SQS, RDS, DynamoDB, and Lambda infrastructure',
           'Developed and deployed microservices for interacting with Qualys Cloud Security Assessment (CSPM)',
         ],
       },
       {
         title: 'Quality Engineer',
         dateRange: 'May 2016 – April 2019',
+        aboutDetail: 'Moved into engineering, ensuring quality testing and reliable software.',
         bullets: [
-          'Performed end to end web application and API testing',
+          'Performed end-to-end web application and API testing',
           'Tested Linux and Windows applications',
           'Developed and implemented test plans and test cases, and documented outcomes',
         ],
@@ -147,13 +154,15 @@ export const experience: Company[] = [
     name: 'MEDHOST',
     location: 'Plano, TX',
     dateRange: '2011 – 2016',
+    aboutCombined: {
+      detail: 'Supported mission-critical emergency department software where reliability wasn’t optional.',
+    },
     roles: [
       {
         title: 'Quality Assurance Analyst',
         dateRange: 'October 2014 – May 2016',
         bullets: [
-          'Designed, developed, and implemented test plans, test cases, and processes to identify issues',
-          "Analyzed and documented root cause related to software, databases, HL7 interfaces, and API's",
+          'Analyzed and documented root cause related to software, databases, HL7 interfaces, and APIs',
           'Managed database, including configuration, debugging, modifying, and updating stored procedures',
         ],
       },
@@ -161,8 +170,7 @@ export const experience: Company[] = [
         title: 'Implementation Technical Engineer',
         dateRange: 'November 2013 – October 2014',
         bullets: [
-          'Served as subject matter expert for the team on all aspects of hardware and software',
-          'Scoped, planned, initiated, and set goals and requirements and implemented new projects to provide positive outcomes for customers',
+          'Scoped, planned, and implemented new customer projects, from defining goals and requirements through delivery',
         ],
       },
       {
@@ -171,7 +179,6 @@ export const experience: Company[] = [
         bullets: [
           'Reviewed and resolved escalated issues requiring advanced troubleshooting and provided root cause analysis',
           'Provided leadership, mentoring, training, and instruction to Support Specialists in the Customer Support Group',
-          'Managed a portfolio of 30–35 MEDHOST customers, including conference calls, item tracking, software upgrades, and ongoing maintenance and repairs',
         ],
       },
     ],
@@ -183,6 +190,7 @@ export const experience: Company[] = [
     roles: [
       {
         title: 'Systems Analyst II / Officer',
+        aboutDetail: 'Cut my teeth supporting production systems in a high-stakes financial environment.',
         bullets: [
           'Monitored bank-wide IT infrastructure to maintain uptime for essential systems, including Online Banking, Bill Pay, and ATM/POS networks',
           'Administered mainframe, UNIX/Linux, and Windows platforms supporting trading applications and e-commerce software',
@@ -193,21 +201,27 @@ export const experience: Company[] = [
 ]
 
 export type Credential = {
+  kind: 'degree' | 'certification'
   title: string
   date: string
   detail?: string
   location?: string
+  // One-line blurb for the About timeline; only degrees appear there.
+  aboutDetail?: string
 }
 
 export const credentials: Credential[] = [
   {
+    kind: 'certification',
     title: 'AWS Certified Developer - Associate',
     date: 'January 2022',
   },
   {
+    kind: 'degree',
     title: 'University of North Texas',
     detail: 'Bachelor of Science in Business Computer Information Systems',
     date: 'December 2004',
     location: 'Denton, TX',
+    aboutDetail: 'Turned that high-school BASIC habit into a real foundation in systems and software.',
   },
 ]

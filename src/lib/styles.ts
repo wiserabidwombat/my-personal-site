@@ -5,6 +5,10 @@ import { buttonVariants } from '../../@/components/ui/button'
 // page's headings, prose, and grids start on the same left edge.
 export const pageContainer = 'mx-auto max-w-4xl px-6'
 
+// Section heading below a hero: neon pink, no glow (the hero H1 keeps the
+// page's one glow), with an accent icon -- see SectionHeading.
+export const sectionHeading = 'flex items-center gap-2 text-2xl font-bold text-[var(--neon-pink)]'
+
 // Outlined pill (transparent, 1px cyan border/text). Used for skill pills on
 // About, tag pills on blog cards, and -- with outlinePillActive layered on
 // top -- the blog's tag filter chips.
