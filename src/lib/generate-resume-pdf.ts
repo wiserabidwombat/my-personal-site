@@ -31,7 +31,12 @@ const LINE = { body: 13, company: 15, role: 13, project: 12, bullet: 12.5 }
 const BULLET_INDENT = 14
 const BULLET_GAP = 12
 const BULLET_TEXT_WIDTH = CONTENT_WIDTH - BULLET_INDENT - BULLET_GAP
-const SECTION_HEADING_HEIGHT = 21 // 6 above + rule 3 below the baseline + 12 after
+// Every section heading's baseline sits this far below the previous line's
+// baseline, whatever that line's own leading (13pt body vs 12.5pt bullet),
+// so the space above each section is identical -- and larger than the
+// ~20.5pt between companies, so a new section reads as a bigger break.
+const SECTION_SPACE_ABOVE = 26
+const SECTION_SPACE_BELOW = 15 // rule 3pt below the heading baseline + 12pt after
 const COMPANY_GAP = 8
 const ROLE_GAP = 4 // above each role after a company's first
 const ROW_GAP = 12 // minimum space between a row's left text and its right-aligned dates
@@ -50,6 +55,7 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
   const doc = new jsPDF({ unit: 'pt', format: 'letter' })
   const headings: HeadingPlacement[] = []
   let y = MARGIN
+  let lastLeading = 0 // advance of the most recent text line, see SECTION_SPACE_ABOVE
 
   const page = () => doc.getNumberOfPages()
   const font = (style: 'normal' | 'bold' | 'italic', size: number) => {
@@ -99,6 +105,7 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
       ensureSpace(lineHeight)
       doc.text(line, x, y)
       y += lineHeight
+      lastLeading = lineHeight
     }
   }
   // Left text wraps within the space the right-aligned text leaves, so a
@@ -113,6 +120,7 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
       doc.text(line, MARGIN, y)
       if (right && i === 0) doc.text(right, PAGE_WIDTH - MARGIN, y, { align: 'right' })
       y += lineHeight
+      lastLeading = lineHeight
     })
   }
   const writeBullets = (bullets: string[]) => {
@@ -124,18 +132,22 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
         if (i === 0) doc.text('•', MARGIN + BULLET_INDENT, y)
         doc.text(line, MARGIN + BULLET_INDENT + BULLET_GAP, y)
         y += LINE.bullet
+        lastLeading = LINE.bullet
       })
     }
   }
   const writeSectionHeading = (title: string, firstItemHeight: number) => {
-    const block = keepTogether(title, SECTION_HEADING_HEIGHT + firstItemHeight)
-    y += 6
+    const spaceAbove = SECTION_SPACE_ABOVE - lastLeading
+    const startPage = page()
+    const block = keepTogether(title, spaceAbove + SECTION_SPACE_BELOW + firstItemHeight)
+    // No gap at the top of a fresh page -- it only separates from content above.
+    if (page() === startPage) y += spaceAbove
     font('bold', 12)
     doc.text(title.toUpperCase(), MARGIN, y)
     y += 3
     doc.setLineWidth(0.75)
     doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y)
-    y += 12
+    y += SECTION_SPACE_BELOW - 3
     return block
   }
 
