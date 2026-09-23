@@ -99,7 +99,7 @@ export function Home() {
           <img
             src={dallasSkyline}
             alt="Pixel-art neon skyline of Dallas, Texas at night, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center reflected in the water below"
-            className="block h-48 w-full object-cover [object-position:left_bottom] select-none [image-rendering:pixelated] [mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] sm:h-auto"
+            className="block h-56 w-full object-cover [object-position:left_bottom] select-none [image-rendering:pixelated] [mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] sm:h-auto"
             loading="eager"
             decoding="async"
           />
@@ -154,7 +154,22 @@ export function Home() {
         </div>
       </section> */}
 
-      <section className="mx-auto max-w-5xl px-6 py-16">
+      {/* Top padding is deliberately smaller than the bottom's below sm:
+          this section renders after both hero variants (see the
+          theme === 'dark' ternary above), and on mobile BOTH already
+          leave visible breathing room before this section even starts --
+          the dark hero's own bottom-fade overlay div fades the skyline's
+          floor grid into the page background. The light hero's cushion
+          comes from a different source: bg-synth-grid's mask (index.css)
+          is `to top`, so its 0% stop is the element's physical BOTTOM,
+          and black is held solid through 40% -- the grid stays fully
+          opaque all the way to this section's edge, with no bottom fade
+          at all. The actual breathing room there is HeroText's own
+          pb-12 (sm:pb-16) below the CTA button, already inside the hero
+          section -- so the full py-16 amount stacked on top of either
+          hero read as a dead gap. At sm+ both hero variants get the full
+          pt-16 back, since that gap only showed up on mobile. */}
+      <section className="mx-auto max-w-5xl px-6 pt-8 pb-16 sm:pt-16">
         <h2 className={headingClass}>Current Status</h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {currentStatus.map((item) => (

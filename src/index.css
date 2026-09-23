@@ -300,8 +300,13 @@ code {
    already-compressed top band as possible goes fully blank -- a wide,
    early fade here (the previous 55%/90%) is what left an empty band
    between the photo's reflection and the visible grid. Line opacity is
-   also bumped from 60% to 75% so the grid still reads clearly against
-   the deep space background once the fade window is narrower. This mask
+   tuned up to 90% (not full color-mix removal) so the lower half of the
+   floor -- compressed hard by the perspective transform -- reads as a
+   clear grid instead of fading into near-invisibility, while still
+   leaving a little headroom above this value; tuned against screenshots
+   cropped tight on that lower band, where 90% read exactly as clearly as
+   100% did. The lines should stay subtler than the skyline photo's own
+   bright neon -- re-check that visually if this value changes. This mask
    never touches the physical bottom (its 0% stop stays fully opaque),
    so it can't double up with the separate bottom-fade overlay div in
    Home.tsx -- that overlay alone fades the floor into the page
@@ -317,8 +322,8 @@ code {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(color-mix(in oklab, var(--laser-cyan) 75%, transparent) 1px, transparent 1px),
-      linear-gradient(90deg, color-mix(in oklab, var(--laser-cyan) 75%, transparent) 1px, transparent 1px);
+      linear-gradient(color-mix(in oklab, var(--laser-cyan) 90%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--laser-cyan) 90%, transparent) 1px, transparent 1px);
     background-size: 60px 60px;
     transform: perspective(300px) rotateX(65deg);
     transform-origin: bottom;
