@@ -158,7 +158,7 @@ export const experience: Company[] = [
       {
         title: 'Quality Engineer',
         dateRange: 'May 2016 – April 2019',
-        aboutDetail: 'Moved into engineering, ensuring quality testing and reliable software.',
+        aboutDetail: 'Moved into engineering, building quality practices into every release.',
         bullets: [
           'Performed end-to-end testing of the web application, APIs, and Linux and Windows applications across two-week Agile releases',
           'Drove logging improvements that surfaced errors earlier, so issues were caught before they reached release',

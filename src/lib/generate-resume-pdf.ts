@@ -247,7 +247,7 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
     })
   })
 
-  // Education and Professional Development
+  // Education & Certifications
   // Laid out like a role: institution (bold) with date · location
   // right-aligned, then the degree on its own line in the role-title style
   // (italic) -- so a long degree name never has to share a line with dates.
@@ -257,7 +257,7 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
   const credentialBlock = (credential: CredentialItem) =>
     rowHeight(credential.title, credentialDate(credential), 'bold', 10, LINE.body) +
     (credential.detail ? lineCount(credential.detail, 'normal', 10, CONTENT_WIDTH) * LINE.role : 0)
-  const education = writeSectionHeading('Education and Professional Development', credentialBlock(credentials[0]))
+  const education = writeSectionHeading('Education & Certifications', credentialBlock(credentials[0]))
   for (const credential of credentials) {
     const entry = keepTogether(credential.title, credentialBlock(credential))
     font('bold', 10)
