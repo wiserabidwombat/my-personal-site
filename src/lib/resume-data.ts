@@ -19,7 +19,7 @@ export const contact: ContactInfo = {
   email: 'aaronltilley1@gmail.com',
   linkedInUrl: 'https://www.linkedin.com/in/aaron-tilley-46b16112/',
   websiteUrl: 'https://aarontilley.me',
-  githubUrl: 'https://github.com/your-username', // placeholder -- set your profile URL
+  githubUrl: 'https://github.com/wiserabidwombat',
 }
 
 export const summary =
