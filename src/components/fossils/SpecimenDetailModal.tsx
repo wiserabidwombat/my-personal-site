@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { Specimen } from '../../types/specimen'
 import { SpecimenDetailContent } from './SpecimenDetailContent'
 

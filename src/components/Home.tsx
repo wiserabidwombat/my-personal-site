@@ -1,8 +1,8 @@
 import { Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { GameController01Icon, BookOpen01Icon, FishingRodIcon, Brain01Icon } from '@hugeicons/core-free-icons'
-// import { Badge } from '../../@/components/ui/badge'
-import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
+// import { Badge } from '@/components/ui/badge'
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { HeroSkyline } from './home/HeroSkyline'
 
 // const transmissionLog = [

@@ -1,6 +1,6 @@
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ImageNotFound01Icon } from '@hugeicons/core-free-icons'
-import { Badge } from '../../../@/components/ui/badge'
+import { Badge } from '@/components/ui/badge'
 import type { Specimen } from '../../types/specimen'
 import { getResizedImageUrl } from '../../lib/image'
 

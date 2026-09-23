@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, CardHeader, CardTitle } from '../../../@/components/ui/card'
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import type { BoardGame } from '../../types/board-game'
 import { headingClass } from './shared'
 import { GameDetailModal } from './GameDetailModal'

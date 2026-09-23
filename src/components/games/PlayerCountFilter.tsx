@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowDown01Icon } from '@hugeicons/core-free-icons'
-import { buttonVariants } from '../../../@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '../../../@/components/ui/popover'
-import { Command, CommandGroup, CommandItem, CommandList } from '../../../@/components/ui/command'
+import { buttonVariants } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
 import { PLAYER_COUNT_OPTIONS } from './shared'
 
 type Props = {

@@ -1,4 +1,4 @@
-import { Badge } from '../../../@/components/ui/badge'
+import { Badge } from '@/components/ui/badge'
 import {
   Pagination,
   PaginationContent,
@@ -7,7 +7,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '../../../@/components/ui/pagination'
+} from '@/components/ui/pagination'
 
 const PAGE_SIZE_OPTIONS = [6, 12, 24]
 

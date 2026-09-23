@@ -1,7 +1,7 @@
 import { ReactFlow, Position, Handle, type Node, type Edge, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/base.css'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Card, CardHeader, CardTitle } from '../../@/components/ui/card'
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { glowStyles, type StackNodeData } from './stackFlowTheme'
 
 // A real React component per node -- unlike Mermaid's text-based nodes,

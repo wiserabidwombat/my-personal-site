@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Search01Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
-import { Input } from '../../../@/components/ui/input'
-import { Badge } from '../../../@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 import {
   Pagination,
   PaginationContent,
@@ -11,7 +11,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '../../../@/components/ui/pagination'
+} from '@/components/ui/pagination'
 import type { BoardGamesSource } from '../../hooks/useBoardGames'
 import type { BoardGame } from '../../types/board-game'
 import { headingClass, formatRange, toggleValue } from './shared'

@@ -1,5 +1,5 @@
 import { cn } from 'cn'
-import { buttonVariants } from '../../@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 
 // Shared page container below a hero -- one max width and gutter so every
 // page's headings, prose, and grids start on the same left edge.

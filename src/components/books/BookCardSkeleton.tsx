@@ -1,4 +1,4 @@
-import { Card, CardHeader } from '../../../@/components/ui/card'
+import { Card, CardHeader } from '@/components/ui/card'
 
 function Bar({ className }: { className: string }) {
   return <div className={`skeleton-shimmer rounded-md ${className}`} aria-hidden="true" />

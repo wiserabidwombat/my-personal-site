@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowDown01Icon } from '@hugeicons/core-free-icons'
-import { Badge } from '../../../@/components/ui/badge'
-import { buttonVariants } from '../../../@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '../../../@/components/ui/popover'
+import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Command,
   CommandEmpty,
@@ -11,7 +11,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '../../../@/components/ui/command'
+} from '@/components/ui/command'
 
 type Props = {
   label: string
