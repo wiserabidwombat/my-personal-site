@@ -8,7 +8,7 @@ import { BeyondTheCode } from '../components/about/BeyondTheCode'
 import { bodyText, proseWidth, timelineContentIndent } from '../components/about/typography'
 import { buttonVariants } from '../../@/components/ui/button'
 import { seoMeta, canonicalLink } from '../lib/meta'
-import { pageContainer, neonOutlineButton } from '../lib/styles'
+import { pageContainer, neonOutlineButton, sectionHeading } from '../lib/styles'
 import { aboutMeta } from './routeMeta'
 
 export const Route = createFileRoute('/about')({
@@ -23,7 +23,7 @@ const heroRoles = ['SENIOR DEVELOPER', 'FULL-STACK ENGINEER', 'TEAM ENABLER']
 
 // No glow (item 6): heading keeps the neon-pink color but drops the
 // text-shadow that every other glowing element on this page also drops.
-const headingClass = 'flex items-center gap-2 text-2xl font-bold text-[var(--neon-pink)]'
+const headingClass = sectionHeading
 // Shared across every section below the hero so the left edge lines up
 // (item 9) -- was previously split between max-w-3xl and max-w-4xl.
 // Tighter py on mobile: adjacent sections stack both paddings, so py-12
