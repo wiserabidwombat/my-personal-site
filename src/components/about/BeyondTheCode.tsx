@@ -1,4 +1,6 @@
 import { Link } from '@tanstack/react-router'
+import { cn } from 'cn'
+import { bodyText, mutedText, proseWidth } from './typography'
 import boardGamePhoto from '../../assets/board-game.jpg'
 import flyFishingPhoto from '../../assets/fly-fishing.jpg'
 import golfPhoto from '../../assets/highest-golf.jpg'
@@ -15,11 +17,15 @@ const photos = [
 
 export function BeyondTheCode() {
   return (
-    <div className="mt-6 grid gap-8 md:grid-cols-2">
-      <ul className="space-y-4">
+    // Stacked rather than side-by-side: capped at prose width the text can't
+    // fill half the row, and a 2x2 photo grid beside it left dead space
+    // below the list on desktop. One row of four (2x2 on mobile) spans the
+    // full container width like the Toolkit grid.
+    <div className="mt-6 space-y-8">
+      <ul className={cn('space-y-4', bodyText, proseWidth)}>
         <li>
           <span className="font-semibold text-[var(--laser-cyan)]">At the Table:</span>{' '}
-          <span className="text-slate-300">
+          <span>
             Diving into complex{' '}
             <Link to="/games" className={linkClass}>
               strategy board games
@@ -29,14 +35,14 @@ export function BeyondTheCode() {
         </li>
         <li>
           <span className="font-semibold text-[var(--laser-cyan)]">In the Elements:</span>{' '}
-          <span className="text-slate-300">
+          <span>
             Out on the water fly fishing, playing a fast-paced game of pickleball, exploring the great
             outdoors, covering every corner of the golf course.
           </span>
         </li>
         <li>
           <span className="font-semibold text-[var(--laser-cyan)]">Unwinding:</span>{' '}
-          <span className="text-slate-300">
+          <span>
             Catching a great movie, getting lost in a good book, cooking and smoking good food,{' '}
             <Link to="/minerals_fossils" className={linkClass}>
               collecting minerals and fossils
@@ -45,7 +51,7 @@ export function BeyondTheCode() {
           </span>
         </li>
       </ul>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {photos.map((photo) => (
           <figure key={photo.alt}>
             <img
@@ -53,7 +59,7 @@ export function BeyondTheCode() {
               alt={photo.alt}
               className="aspect-square w-full rounded-2xl border border-[var(--laser-cyan)]/40 object-cover"
             />
-            <figcaption className="mt-2 text-xs text-slate-400">{photo.caption}</figcaption>
+            <figcaption className={cn('mt-2', mutedText)}>{photo.caption}</figcaption>
           </figure>
         ))}
       </div>

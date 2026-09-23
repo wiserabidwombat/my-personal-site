@@ -6,16 +6,12 @@ const toolkit = [
     skills: ['React', 'Angular', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'HTML5', 'CSS3'],
   },
   {
-    category: 'Data & Visualization',
-    skills: ['SQL', 'Data Analytics'],
+    category: 'Data & Cloud',
+    skills: ['SQL', 'Data Analytics', 'AWS', 'CI/CD'],
   },
   {
     category: 'Enterprise CRM & Platform',
     skills: ['Dynamics 365', 'Power Apps', 'Power Automate', '.NET / C#'],
-  },
-  {
-    category: 'Cloud & Infrastructure',
-    skills: ['AWS', 'CI/CD'],
   },
   {
     category: 'Emerging Tech',

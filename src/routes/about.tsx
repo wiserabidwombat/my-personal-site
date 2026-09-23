@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { cn } from 'cn'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { HistoryIcon, Wrench01Icon, GamepadIcon } from '@hugeicons/core-free-icons'
 import { JourneyTimeline } from '../components/about/JourneyTimeline'
 import { ToolkitGrid } from '../components/about/ToolkitGrid'
 import { BeyondTheCode } from '../components/about/BeyondTheCode'
+import { bodyText, proseWidth, timelineContentIndent } from '../components/about/typography'
 import { buttonVariants } from '../../@/components/ui/button'
 import { seoMeta, canonicalLink } from '../lib/meta'
 import { aboutMeta } from './routeMeta'
@@ -23,8 +25,17 @@ const heroRoles = ['SENIOR DEVELOPER', 'FULL-STACK ENGINEER', 'TEAM ENABLER']
 const headingClass = 'flex items-center gap-2 text-2xl font-bold text-[var(--neon-pink)]'
 // Shared across every section below the hero so the left edge lines up
 // (item 9) -- was previously split between max-w-3xl and max-w-4xl.
-const sectionClass = 'mx-auto max-w-4xl px-6 py-12'
-const bodyTextClass = 'text-[17px] leading-relaxed font-normal text-slate-200 sm:text-[18px]'
+// Tighter py on mobile: adjacent sections stack both paddings, so py-12
+// left ~96px between sections on a small screen.
+const sectionClass = 'mx-auto max-w-4xl px-6 py-8 sm:py-12'
+const proseClass = cn(bodyText, proseWidth)
+// Outline CTA: transparent with a 1px neon border so it reads on the dark
+// background instead of the shared outline variant's near-black fill.
+// Scoped here -- that variant is used by ~10 other components.
+const outlineCtaClass = cn(
+  buttonVariants({ variant: 'outline' }),
+  'border-[var(--laser-cyan)] bg-transparent text-[var(--laser-cyan)] hover:bg-[var(--laser-cyan)]/10 hover:text-[var(--laser-cyan)] hover:shadow-glow-cyan',
+)
 
 function AboutRouteComponent() {
   return (
@@ -60,7 +71,7 @@ function AboutRouteComponent() {
       </section>
 
       <section className={sectionClass}>
-        <p className={bodyTextClass}>
+        <p className={proseClass}>
           I am a Senior Developer specializing in creating robust, scalable applications while fostering
           collaborative, high-performing engineering teams. I believe that great software isn't just about
           clean code—it's about empowering the developers beside you to grow, innovate, and succeed together.
@@ -72,17 +83,23 @@ function AboutRouteComponent() {
           <HugeiconsIcon icon={HistoryIcon} strokeWidth={2} className="size-6 text-[var(--neon-pink)]" aria-hidden="true" />
           My Journey
         </h2>
-        <p className={`mt-4 ${bodyTextClass}`}>
+        <p className={cn('mt-4', proseClass)}>
           My passion for coding started back in high school, writing simple programs in BASIC.
         </p>
         <div className="mt-8">
           <JourneyTimeline />
         </div>
-        <p className={`mt-8 ${bodyTextClass}`}>
-          Today, my focus is split between architecting clean full-stack systems and mentoring teams. I am an
-          execution-driven learner who is constantly evolving—currently mastering the seamless implementation
-          of AI into modern development workflows to accelerate delivery and code quality.
-        </p>
+        {/* Set apart as the section's conclusion: mt-12 clears the timeline's
+            own 32px entry gap, the indent lines it up with the entries' text
+            column (not the line), and a short pink rule marks the break. */}
+        <div className={cn('mt-12', timelineContentIndent)}>
+          <div aria-hidden="true" className="mb-5 h-px w-16 bg-linear-to-r from-[var(--neon-pink)] to-transparent" />
+          <p className={proseClass}>
+            Today, my focus is split between architecting clean full-stack systems and mentoring teams. I am an
+            execution-driven learner who is constantly evolving—currently mastering the seamless implementation
+            of AI into modern development workflows to accelerate delivery and code quality.
+          </p>
+        </div>
       </section>
 
       <section className={sectionClass}>
@@ -98,18 +115,19 @@ function AboutRouteComponent() {
           <HugeiconsIcon icon={GamepadIcon} strokeWidth={2} className="size-6 text-[var(--neon-pink)]" aria-hidden="true" />
           Beyond the Code
         </h2>
-        <p className={`mt-3 ${bodyTextClass}`}>
+        <p className={cn('mt-3', proseClass)}>
           When I'm not playing with code or AIs, I like to unplug and stay active. You can usually find me:
         </p>
         <BeyondTheCode />
       </section>
 
-      <section className={`${sectionClass} text-center`}>
-        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <section className={cn(sectionClass, 'text-center')}>
+        <p className="text-xl font-semibold text-slate-100">Want to work together?</p>
+        <div className="mt-5 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link to="/resume" className={buttonVariants({ variant: 'default' })}>
             View my resume
           </Link>
-          <Link to="/contact" className={buttonVariants({ variant: 'outline' })}>
+          <Link to="/contact" className={outlineCtaClass}>
             Get in touch
           </Link>
         </div>
