@@ -19,11 +19,10 @@ export const Route = createFileRoute('/contact')({
   component: ContactRouteComponent,
 })
 
-// Placeholder copy for the "What I'm open to" section -- replace with real
-// text. Each string renders as its own paragraph.
+// "What I'm open to" copy -- each string renders as its own paragraph.
 const openTo = [
-  'TODO: Describe the kinds of roles, projects, or collaborations you are open to (for example, role types, full-time vs. contract, remote vs. on-site).',
-  'TODO: Add anything a person should include in a first message, or how quickly you usually reply.',
+  "I'm open to full-time developer roles at the senior or lead level, as well as contract work. I'm available remotely, or for hybrid work local to Dallas–Fort Worth, with a focus on full-stack development and team leadership.",
+  "If you have a role that fits, I'd love to hear from you. Please don't reach out about unrelated roles.",
 ]
 
 const sectionClass = cn(pageContainer, 'py-8 sm:py-10')
