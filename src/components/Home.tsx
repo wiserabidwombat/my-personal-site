@@ -1,16 +1,9 @@
 import { Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
-import {
-  ArrowRight02Icon,
-  GameController01Icon,
-  BookOpen01Icon,
-  FishingRodIcon,
-  Brain01Icon,
-} from '@hugeicons/core-free-icons'
+import { GameController01Icon, BookOpen01Icon, FishingRodIcon, Brain01Icon } from '@hugeicons/core-free-icons'
 // import { Badge } from '../../@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
-import { useTheme } from '../hooks/useTheme'
-import dallasSkyline from '../assets/dallas-skyline.webp'
+import { HeroSkyline } from './home/HeroSkyline'
 
 // const transmissionLog = [
 //   {
@@ -47,93 +40,10 @@ const systemMetrics = [
 
 const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]'
 
-function HeroText() {
-  return (
-    <div className="relative z-10 mx-auto max-w-3xl px-6 pt-24 pb-12 sm:pt-28 sm:pb-16">
-      <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
-        Full-stack engineer &middot; Gamer &middot; Outdoorsman &middot; Dallas, TX
-      </p>
-      <h1 className="mt-4 text-4xl font-extrabold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-5xl">
-        Hi, I'm Aaron Tilley.
-      </h1>
-      <p className="mx-auto mt-6 max-w-xl text-center text-lg leading-relaxed text-slate-200">
-        Full-stack engineer by day, gamer, fly fisherman, and lifelong learner by night. Welcome
-        to my digital workspace.
-      </p>
-      <Link
-        to="/about"
-        className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-[var(--laser-cyan)] px-6 py-3 text-sm font-semibold text-[var(--laser-cyan)] shadow-glow-cyan transition-colors duration-300 hover:bg-[var(--laser-cyan)] hover:text-[var(--deep-space-black)]"
-      >
-        Learn More About Me
-        <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
-      </Link>
-    </div>
-  )
-}
-
 export function Home() {
-  const { theme } = useTheme()
-
   return (
     <div className="bg-[var(--deep-space-black)] text-slate-200">
-      {/* One continuous night scene -- sky, the skyline anchored at its
-          bottom edge, then a neon floor rising out of the water -- rather
-          than text, a photo, and a grid as three separate stacked blocks.
-          The scene is inherently nocturnal (it's a night skyline), so it
-          only renders in dark mode; light mode keeps the plain themed hero
-          every other page uses. */}
-      {theme === 'dark' ? (
-        <section className="relative isolate overflow-hidden bg-gradient-to-b from-[#05030c] via-[#12081f] to-[#241040] text-center">
-          <HeroText />
-
-          {/* The mask fades the image's own top (sky/stars) and bottom
-              (water line) edges to transparent, so the flat section
-              gradient above shows through the top seam and the floor grid
-              below shows through the bottom seam -- no separate solid-color
-              blend divs needed. image-rendering keeps the pixel art crisp
-              instead of browser-smoothed. On mobile the panorama is cropped
-              to a fixed height rather than shrunk to a sliver, anchored left
-              so Reunion Tower and the Margaret Hunt Hill Bridge stay in
-              frame even though the American Airlines Center end gets
-              cropped off; at sm+ the full panorama displays uncropped. */}
-          <img
-            src={dallasSkyline}
-            alt="Pixel-art neon skyline of Dallas, Texas at night, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center reflected in the water below"
-            className="block h-56 w-full object-cover [object-position:left_bottom] select-none [image-rendering:pixelated] [mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] sm:h-auto"
-            loading="eager"
-            decoding="async"
-          />
-
-          {/* The city's own reflection breaks into an actual neon grid,
-              pulled up to overlap the image's own faded water line so the
-              two connect with no gap or seam, then recedes toward the
-              viewer and fades into the page background (see the
-              bg-synth-floor mask in index.css). bg-synth-floor's own
-              background-color is opaque (it's meant to stand alone on other
-              pages) -- forced transparent here so the overlap actually
-              reveals the image's reflection underneath instead of painting
-              a solid rectangle over it. */}
-          <div className="bg-synth-floor animate-synth-grid relative -mt-40 h-44 !bg-transparent sm:-mt-48 sm:h-52" />
-
-          {/* The floor grid's own mask only fades its TOP edge (to blend
-              into the skyline's reflection above); its bottom 75% is fully
-              opaque grid with a transparent background, so whatever sits
-              behind the section shows through the gaps -- which was this
-              section's own gradient, ending in a solid color right at the
-              section's bottom edge and creating a hard line against the
-              plain section below. This overlay fades just that bottom
-              slice out to the page background instead, well clear of the
-              top seam/overlap above. */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-[var(--deep-space-black)] sm:h-20"
-          />
-        </section>
-      ) : (
-        <section className="bg-synth-grid animate-synth-grid text-center">
-          <HeroText />
-        </section>
-      )}
+      <HeroSkyline />
 
       {/* <section className="mx-auto max-w-5xl px-6 py-16">
         <h2 className={headingClass}>Transmission Log</h2>
@@ -155,20 +65,15 @@ export function Home() {
       </section> */}
 
       {/* Top padding is deliberately smaller than the bottom's below sm:
-          this section renders after both hero variants (see the
-          theme === 'dark' ternary above), and on mobile BOTH already
-          leave visible breathing room before this section even starts --
-          the dark hero's own bottom-fade overlay div fades the skyline's
-          floor grid into the page background. The light hero's cushion
-          comes from a different source: bg-synth-grid's mask (index.css)
-          is `to top`, so its 0% stop is the element's physical BOTTOM,
-          and black is held solid through 40% -- the grid stays fully
-          opaque all the way to this section's edge, with no bottom fade
-          at all. The actual breathing room there is HeroText's own
-          pb-12 (sm:pb-16) below the CTA button, already inside the hero
-          section -- so the full py-16 amount stacked on top of either
-          hero read as a dead gap. At sm+ both hero variants get the full
-          pt-16 back, since that gap only showed up on mobile. */}
+          this section renders after HeroSkyline, and on mobile it already
+          leaves visible breathing room before this section even starts --
+          both the dark and light hero scenes share the same bottom-fade
+          overlay div (see HeroSkyline.tsx) fading the skyline's floor grid
+          into the page background, plus HeroText's own pb-12 (sm:pb-16)
+          below the CTA button, already inside the hero section -- so the
+          full py-16 amount stacked on top of either hero read as a dead
+          gap. At sm+ this section gets the full pt-16 back, since that gap
+          only showed up on mobile. */}
       <section className="mx-auto max-w-5xl px-6 pt-8 pb-16 sm:pt-16">
         <h2 className={headingClass}>Current Status</h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
