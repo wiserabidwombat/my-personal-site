@@ -24,3 +24,17 @@ export const neonOutlineButton = cn(
   buttonVariants({ variant: 'outline' }),
   'border-[var(--laser-cyan)] bg-transparent text-[var(--laser-cyan)] hover:bg-[var(--laser-cyan)]/10 hover:text-[var(--laser-cyan)] hover:shadow-glow-cyan',
 )
+
+// Compact hero (Blog, Contact): shorter than the site default
+// (bg-synth-grid's 26rem min-height and 11rem horizon) so the first cards
+// land above the fold on a ~800px laptop viewport. Horizon and glow move up with it to stay behind the text.
+// The grid's visible horizon tracks the hero's BOTTOM edge (the floor is
+// perspective-projected up from there), so the subtitle's clearance above
+// it comes from trimming the top padding, not the bottom -- the text sits
+// higher while the hero's height and the grid stay where they were.
+// lg's min-height restores the pre-trim 302px desktop height (root font is
+// 18px from 1024px up), since the trimmed text alone would let it shrink.
+export const compactHero = cn(
+  'bg-synth-grid px-6 pt-6 pb-10 text-center sm:pt-8 sm:pb-12',
+  '[--synth-grid-min-height:16rem] lg:[--synth-grid-min-height:16.75rem] [--synth-grid-horizon:7.5rem] [--synth-grid-glow-y:6rem] [--synth-grid-glow-height:9rem]',
+)

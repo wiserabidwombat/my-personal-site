@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
 import { cn } from 'cn'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Briefcase01Icon, Download04Icon, Mortarboard02Icon, Wrench01Icon } from '@hugeicons/core-free-icons'
@@ -8,6 +7,7 @@ import { SectionHeading } from '../components/SectionHeading'
 import { ResumeExperience } from '../components/resume/ResumeExperience'
 import { ResumeSkills } from '../components/resume/ResumeSkills'
 import { ResumeEducation } from '../components/resume/ResumeEducation'
+import { useResumePdfDownload } from '../hooks/useResumePdfDownload'
 import { seoMeta, canonicalLink } from '../lib/meta'
 import { heroTitle, summary } from '../lib/resume-data'
 import { neonOutlineButton, pageContainer } from '../lib/styles'
@@ -25,20 +25,7 @@ export const Route = createFileRoute('/resume')({
 const sectionClass = cn(pageContainer, 'py-8 sm:py-12')
 
 function RouteComponent() {
-  const [generatingPdf, setGeneratingPdf] = useState(false)
-
-  // jsPDF is a large library only needed for this one interaction -- a
-  // dynamic import keeps it out of the resume route's initial chunk, so
-  // visitors who never click download never pay for it.
-  async function handleDownload() {
-    setGeneratingPdf(true)
-    try {
-      const { generateResumePdf } = await import('../lib/generate-resume-pdf')
-      generateResumePdf()
-    } finally {
-      setGeneratingPdf(false)
-    }
-  }
+  const { download: handleDownload, generating: generatingPdf } = useResumePdfDownload()
 
   return (
     <div className="bg-[var(--deep-space-black)] text-left text-slate-200">

@@ -10,6 +10,8 @@ export type ContactInfo = {
   linkedInUrl: string
   websiteUrl: string
   phone?: string
+  // Contact page's GitHub card; leave empty ('') to hide the card.
+  githubUrl?: string
 }
 
 export const contact: ContactInfo = {
@@ -17,6 +19,7 @@ export const contact: ContactInfo = {
   email: 'aaronltilley1@gmail.com',
   linkedInUrl: 'https://www.linkedin.com/in/aaron-tilley-46b16112/',
   websiteUrl: 'https://aarontilley.me',
+  githubUrl: 'https://github.com/your-username', // placeholder -- set your profile URL
 }
 
 export const summary =
