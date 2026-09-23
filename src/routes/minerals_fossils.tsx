@@ -1,14 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Fossils } from '../components/Fossils'
-import { seoMeta } from '../lib/meta'
+import { seoMeta, canonicalLink } from '../lib/meta'
+import { mineralsFossilsMeta } from './routeMeta'
 
 export const Route = createFileRoute('/minerals_fossils')({
   head: () => ({
-    meta: seoMeta({
-      title: 'Minerals & Fossils',
-      description: "Browse Aaron's minerals and fossil collection.",
-      path: '/minerals_fossils',
-    }),
+    meta: seoMeta(mineralsFossilsMeta),
+    links: [canonicalLink(mineralsFossilsMeta.path)],
   }),
   component: Fossils,
 })

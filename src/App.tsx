@@ -1,7 +1,9 @@
-import { createRouter, RouterProvider } from '@tanstack/react-router'
-import { routeTree } from './routeTree.gen'
+import { RouterProvider } from '@tanstack/react-router'
+import { createAppRouter } from './router'
 
-const router = createRouter({ routeTree })
+// No history argument -- createAppRouter() (src/router.ts) defaults to
+// createRouter()'s own browser history, same as before this was extracted.
+const router = createAppRouter()
 
 function App() {
   return <RouterProvider router={router} />

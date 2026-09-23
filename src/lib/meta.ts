@@ -41,3 +41,15 @@ export function seoMeta({ title, description, path, image = DEFAULT_OG_IMAGE, ty
     { name: 'twitter:image', content: image },
   ]
 }
+
+// Builds a route's canonical <link>, reusing SITE_URL so every absolute-URL
+// builder in this file stays anchored to the one apex domain. Every leaf
+// route calls this with the same path it already passes to seoMeta() (see
+// each route's head() in src/routes/*.tsx); the root route deliberately does
+// NOT call this, since TanStack Router's dedup behavior for `links` (unlike
+// `meta`, which it explicitly merges/overrides by name) isn't confirmed --
+// each leaf route supplying its own is the only way to guarantee exactly one
+// canonical tag per page rather than risking two.
+export function canonicalLink(path: string): { rel: 'canonical'; href: string } {
+  return { rel: 'canonical', href: `${SITE_URL}${path}` }
+}

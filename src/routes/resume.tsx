@@ -5,16 +5,14 @@ import { Download04Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '../../@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
 import { Button } from '../../@/components/ui/button'
-import { seoMeta } from '../lib/meta'
+import { seoMeta, canonicalLink } from '../lib/meta'
 import { summary, skillGroups, experience, credentials } from '../lib/resume-data'
+import { resumeMeta } from './routeMeta'
 
 export const Route = createFileRoute('/resume')({
   head: () => ({
-    meta: seoMeta({
-      title: 'Resume',
-      description: "View Aaron Tilley's professional experience and technical skills.",
-      path: '/resume',
-    }),
+    meta: seoMeta(resumeMeta),
+    links: [canonicalLink(resumeMeta.path)],
   }),
   component: RouteComponent,
 })

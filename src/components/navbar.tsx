@@ -85,7 +85,23 @@ export function Navbar() {
             aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             className="text-[var(--laser-cyan)] transition-colors duration-300 hover:text-[var(--neon-pink)]"
           >
-            <HugeiconsIcon icon={theme === 'dark' ? Sun02Icon : Moon02Icon} size={22} strokeWidth={2} />
+            {/* Both icons are always mounted, shown/hidden purely by the
+                theme-dark-only/theme-light-only CSS classes (index.css,
+                keyed off the `data-theme` attribute on <html>) rather than
+                a JS ternary picking one icon component from `theme` state --
+                so scripts/prerender-meta.mjs can bake theme-agnostic markup
+                with no light/dark flash on a hard/prerendered load (the
+                server has no real `theme` to read; see useTheme.ts's SSR
+                guard), while a runtime toggle still swaps instantly since
+                it's the same data-theme attribute driving both. */}
+            <HugeiconsIcon icon={Sun02Icon} size={22} strokeWidth={2} className="theme-dark-only" aria-hidden="true" />
+            <HugeiconsIcon
+              icon={Moon02Icon}
+              size={22}
+              strokeWidth={2}
+              className="theme-light-only"
+              aria-hidden="true"
+            />
           </button>
 
           <button

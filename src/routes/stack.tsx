@@ -13,15 +13,13 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription } from '../../@/components/ui/card'
 import { StackFlowDiagram } from '../components/StackFlowDiagram'
 import { dataFlowDiagram, buildDeployDiagram, aiWorkflowDiagram } from '../components/stackDiagrams'
-import { seoMeta } from '../lib/meta'
+import { seoMeta, canonicalLink } from '../lib/meta'
+import { stackMeta } from './routeMeta'
 
 export const Route = createFileRoute('/stack')({
   head: () => ({
-    meta: seoMeta({
-      title: 'About This Site',
-      description: 'The tools and technology stack behind this site.',
-      path: '/stack',
-    }),
+    meta: seoMeta(stackMeta),
+    links: [canonicalLink(stackMeta.path)],
   }),
   component: StackRouteComponent,
 })
