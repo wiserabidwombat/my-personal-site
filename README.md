@@ -20,7 +20,8 @@ Each data source uses the strategy that fits how often it changes and where it l
 
 This site is developed with [Claude Code](https://claude.com/claude-code) in VS Code. Multi-part tasks go through an orchestrator agent (`.claude/agents/orchestrator.md`) that delegates to specialized agents in `.claude/agents/`, and a custom `synthwave-ui` design skill (`.claude/skills/synthwave-ui/SKILL.md`) keeps styling consistent across pages.
 
-I generate a thorough prompt that is specific and has details, but allows the orchestrator and subagents leeway to implement.
+I generate a thorough prompt that is specific and has details, but allows the orchestrator and subagents leeway to implement.  I also let Claude determine when
+the orchestrator is needed, all though the orchestrator is thorough, it uses a lot of tokes, so Claude uses it when it determines the complexity warrants it.
 
 ## Tech stack
 
