@@ -2,22 +2,25 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
 import { buttonVariants } from '../../@/components/ui/button'
-import { getPostBySlug } from '../lib/blog'
+import { getPostBySlug, postOgImagePath } from '../lib/blog'
 import { BlogPostView } from '../components/blog/BlogPostView'
 import { seoMeta, canonicalLink, SITE_URL } from '../lib/meta'
 
 export const Route = createFileRoute('/blog_/$slug')({
   loader: ({ params }) => getPostBySlug(params.slug),
-  head: ({ loaderData, params }) => ({
-    meta: seoMeta({
-      title: loaderData?.title ?? 'Post not found',
-      description: loaderData?.blurb ?? 'That transmission never made it through.',
-      path: `/blog/${params.slug}`,
-      image: loaderData ? `${SITE_URL}${loaderData.image}` : undefined,
-      type: 'article',
-    }),
-    links: [canonicalLink(`/blog/${params.slug}`)],
-  }),
+  head: ({ loaderData, params }) => {
+    const ogImage = loaderData ? postOgImagePath(loaderData) : undefined
+    return {
+      meta: seoMeta({
+        title: loaderData?.title ?? 'Post not found',
+        description: loaderData?.blurb ?? 'That transmission never made it through.',
+        path: `/blog/${params.slug}`,
+        image: ogImage ? `${SITE_URL}${ogImage}` : undefined,
+        type: 'article',
+      }),
+      links: [canonicalLink(`/blog/${params.slug}`)],
+    }
+  },
   component: BlogSlugRouteComponent,
 })
 

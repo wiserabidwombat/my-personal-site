@@ -7,6 +7,7 @@ import {
   getAllPosts,
   getAllTags,
   getPostBySlug,
+  postOgImagePath,
   readingMinutes,
   tagLabel,
 } from './blog'
@@ -223,5 +224,44 @@ describe('formatPostDate', () => {
 
   it('returns unparseable input unchanged', () => {
     expect(formatPostDate('someday')).toBe('someday')
+  })
+})
+
+describe('postOgImagePath', () => {
+  it('prefers ogImage over the card image', () => {
+    expect(postOgImagePath({ image: '/blog/art.svg', ogImage: '/blog/art.png' })).toBe('/blog/art.png')
+  })
+
+  it('uses a raster card image when there is no ogImage', () => {
+    expect(postOgImagePath({ image: '/blog/photo.jpg' })).toBe('/blog/photo.jpg')
+  })
+
+  it('never returns an SVG, falling back to the site default instead', () => {
+    expect(postOgImagePath({ image: '/blog/art.svg' })).toBeUndefined()
+    expect(postOgImagePath({ image: '/blog/a.png', ogImage: '/blog/b.SVG' })).toBeUndefined()
+  })
+})
+
+describe('ogImage frontmatter', () => {
+  it('is parsed when present', () => {
+    const [post] = buildPostsFromRaw({
+      '/content/blog/og.md': `---
+title: OG Post
+slug: og-post
+image: /blog/og.svg
+ogImage: /blog/og.png
+blurb: Has a preview image.
+date: "2026-01-01"
+---
+Body.
+`,
+    })
+    expect(post.ogImage).toBe('/blog/og.png')
+  })
+
+  it('every seed post has its own raster preview image', () => {
+    for (const post of getAllPosts()) {
+      expect(postOgImagePath(post), post.slug).toMatch(/\.(png|jpe?g)$/)
+    }
   })
 })

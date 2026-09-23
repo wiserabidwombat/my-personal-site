@@ -22,6 +22,10 @@ function parsePost(raw: string, filePath: string): BlogPost {
     }
   }
 
+  if (data.ogImage !== undefined && typeof data.ogImage !== 'string') {
+    throw new Error(`Blog post "${filePath}" has an "ogImage" field that isn't a string`)
+  }
+
   if (
     data.tags !== undefined &&
     (!Array.isArray(data.tags) || data.tags.some((tag: unknown) => typeof tag !== 'string'))
@@ -33,6 +37,7 @@ function parsePost(raw: string, filePath: string): BlogPost {
     title: data.title,
     slug: data.slug,
     image: data.image,
+    ogImage: data.ogImage,
     blurb: data.blurb,
     date: data.date,
     author: data.author,
@@ -111,6 +116,16 @@ export function tagLabel(tag: string): string {
       .map((word) => word[0].toUpperCase() + word.slice(1))
       .join(' ')
   )
+}
+
+// Link-preview (og:image / twitter:image) path for a post, or undefined to
+// fall back to the site-wide default image. LinkedIn, Facebook, and X don't
+// render SVG previews, so an SVG is never returned: the card image is used
+// only when it's already raster, and an SVG-illustrated post needs a raster
+// `ogImage` in its frontmatter (1200x630) to get its own preview.
+export function postOgImagePath(post: Pick<BlogPost, 'image' | 'ogImage'>): string | undefined {
+  const candidate = post.ogImage ?? post.image
+  return /\.svg$/i.test(candidate) ? undefined : candidate
 }
 
 const WORDS_PER_MINUTE = 225

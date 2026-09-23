@@ -55,7 +55,7 @@ const server = await createServer({
 // runtime -- <HeadContent/> keeps rendering normally there.
 globalThis.__PRERENDERING__ = true
 
-let seoMeta, SITE_URL, canonicalLink, getAllPosts, createAppRouter, staticPages
+let seoMeta, SITE_URL, canonicalLink, getAllPosts, postOgImagePath, createAppRouter, staticPages
 
 // staticPages itself is loaded below, inside the try block, from
 // src/routes/routeMeta.ts -- the same module each static route file (see
@@ -140,18 +140,25 @@ try {
   canonicalLink = metaMod.canonicalLink
   const blogMod = await server.ssrLoadModule('/src/lib/blog.ts')
   getAllPosts = blogMod.getAllPosts
+  postOgImagePath = blogMod.postOgImagePath
   const routerMod = await server.ssrLoadModule('/src/router.ts')
   createAppRouter = routerMod.createAppRouter
   const routeMetaMod = await server.ssrLoadModule('/src/routes/routeMeta.ts')
   staticPages = routeMetaMod.routeMetaList
 
-  const postPages = getAllPosts().map((post) => ({
-    path: `/blog/${post.slug}`,
-    title: post.title,
-    description: post.blurb,
-    image: `${SITE_URL}${post.image}`,
-    type: 'article',
-  }))
+  // Same postOgImagePath() the /blog/$slug route's head() uses, so the
+  // static HTML and the client-rendered tags agree; undefined falls back to
+  // seoMeta()'s site-wide default image.
+  const postPages = getAllPosts().map((post) => {
+    const ogImage = postOgImagePath(post)
+    return {
+      path: `/blog/${post.slug}`,
+      title: post.title,
+      description: post.blurb,
+      image: ogImage ? `${SITE_URL}${ogImage}` : undefined,
+      type: 'article',
+    }
+  })
 
   const pages = [...staticPages, ...postPages]
   pageCount = pages.length

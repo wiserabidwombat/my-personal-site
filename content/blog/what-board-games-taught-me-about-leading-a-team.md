@@ -2,6 +2,7 @@
 title: "What Board Games Taught Me About Leading a Team"
 slug: what-board-games-taught-me-about-leading-a-team
 image: /blog/board-games-leadership.svg
+ogImage: /blog/board-games-leadership.png
 blurb: "Turn order, hidden information, and why the best engineering teams play more like co-op games."
 date: "2026-07-02"
 tags: ["leadership", "teams", "boardgames"]
