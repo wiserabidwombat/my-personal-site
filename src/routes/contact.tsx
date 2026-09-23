@@ -1,7 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Mail01Icon, Linkedin01Icon } from '@hugeicons/core-free-icons'
+import { cn } from 'cn'
+import { Download04Icon, Github01Icon, Linkedin01Icon, Mail01Icon, Target01Icon } from '@hugeicons/core-free-icons'
+import { ContactCard } from '../components/contact/ContactCard'
+import { CopyButton } from '../components/contact/CopyButton'
+import { SectionHeading } from '../components/SectionHeading'
+import { bodyText, proseWidth } from '../components/about/typography'
+import { useResumePdfDownload } from '../hooks/useResumePdfDownload'
+import { contact, fullName } from '../lib/resume-data'
 import { seoMeta, canonicalLink } from '../lib/meta'
+import { compactHero, pageContainer } from '../lib/styles'
 import { contactMeta } from './routeMeta'
 
 export const Route = createFileRoute('/contact')({
@@ -12,98 +19,86 @@ export const Route = createFileRoute('/contact')({
   component: ContactRouteComponent,
 })
 
-type Glow = 'pink' | 'cyan'
-
-const glowStyles: Record<Glow, { ring: string; iconRing: string; icon: string; text: string }> = {
-  cyan: {
-    ring: 'hover:border-[var(--laser-cyan)]/60 hover:shadow-glow-cyan',
-    iconRing: 'ring-[var(--laser-cyan)]/40',
-    icon: 'text-[var(--laser-cyan)]',
-    text: 'group-hover:text-[var(--laser-cyan)]',
-  },
-  pink: {
-    ring: 'hover:border-[var(--neon-pink)]/60 hover:shadow-glow-pink',
-    iconRing: 'ring-[var(--neon-pink)]/40',
-    icon: 'text-[var(--neon-pink)]',
-    text: 'group-hover:text-[var(--neon-pink)]',
-  },
-}
-
-const contactLinks: {
-  label: string
-  display: string
-  href: string
-  icon: typeof Mail01Icon
-  external?: boolean
-  glow: Glow
-}[] = [
-  {
-    label: 'Email',
-    display: 'aaronltilley1@gmail.com',
-    href: 'mailto:aaronltilley1@gmail.com',
-    icon: Mail01Icon,
-    glow: 'cyan',
-  },
-  {
-    label: 'LinkedIn',
-    display: 'linkedin.com/in/aaron-tilley-46b16112',
-    href: 'https://www.linkedin.com/in/aaron-tilley-46b16112/',
-    icon: Linkedin01Icon,
-    external: true,
-    glow: 'pink',
-  },
+// Placeholder copy for the "What I'm open to" section -- replace with real
+// text. Each string renders as its own paragraph.
+const openTo = [
+  'TODO: Describe the kinds of roles, projects, or collaborations you are open to (for example, role types, full-time vs. contract, remote vs. on-site).',
+  'TODO: Add anything a person should include in a first message, or how quickly you usually reply.',
 ]
 
+const sectionClass = cn(pageContainer, 'py-8 sm:py-10')
+
+// "github.com/octocat/" -> "@octocat"; falls back to a generic label.
+function githubHandle(url: string) {
+  const user = url.replace(/^https?:\/\/(www\.)?github\.com\/?/i, '').split('/')[0]
+  return user ? `@${user}` : 'View profile'
+}
+
 function ContactRouteComponent() {
+  const resume = useResumePdfDownload()
+  const githubUrl = contact.githubUrl?.trim()
+  // Resume is the last card; it spans both columns only when the card count
+  // is odd (no GitHub card), so the grid never leaves an empty cell.
+  const cardCount = githubUrl ? 4 : 3
+
   return (
     <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
-      <section className="bg-synth-grid px-6 py-20 text-center">
+      <section className={compactHero}>
         <div className="relative z-10">
-          <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
-            Contact
-          </p>
-          <h1 className="mx-auto mt-4 max-w-3xl text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
+          <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">Contact</p>
+          <h1 className="mx-auto mt-3 max-w-3xl text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
             Let's Connect
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">
+          <p className="mx-auto mt-3 max-w-2xl text-lg leading-relaxed text-slate-300">
             Interested in working together or just want to say hi? Reach out.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-2xl px-6 py-16">
-        <div className="grid gap-6 sm:grid-cols-2">
-          {contactLinks.map((link) => {
-            const style = glowStyles[link.glow]
-            return (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.external ? '_blank' : undefined}
-                rel={link.external ? 'noopener noreferrer' : undefined}
-                className={`group flex min-w-0 items-center gap-4 rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/50 px-6 py-5 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 ${style.ring}`}
-              >
-                <span
-                  className={`flex size-12 shrink-0 items-center justify-center rounded-full bg-[var(--deep-space-black)] ring-1 ${style.iconRing}`}
-                >
-                  <HugeiconsIcon
-                    icon={link.icon}
-                    strokeWidth={2}
-                    className={`size-6 ${style.icon}`}
-                    aria-hidden="true"
-                  />
-                </span>
-                <span className="flex min-w-0 flex-col">
-                  <span className="text-base font-bold text-slate-50">{link.label}</span>
-                  <span
-                    className={`truncate text-sm text-slate-400 transition-colors duration-300 ${style.text}`}
-                  >
-                    {link.display}
-                  </span>
-                </span>
-              </a>
-            )
-          })}
+      {/* Email and LinkedIn come from resume-data.ts's `contact`, the same
+          values the resume PDF header uses, so the two can't drift. */}
+      <section className={sectionClass}>
+        <div className="grid gap-6 md:grid-cols-2">
+          <ContactCard
+            icon={Mail01Icon}
+            title="Email"
+            subtitle={contact.email}
+            href={`mailto:${contact.email}`}
+            action={<CopyButton text={contact.email} label="Copy email address" />}
+          />
+          <ContactCard
+            icon={Linkedin01Icon}
+            title={fullName}
+            subtitle="Connect on LinkedIn"
+            href={contact.linkedInUrl}
+            external
+          />
+          {githubUrl && (
+            <ContactCard
+              icon={Github01Icon}
+              title="GitHub"
+              subtitle={githubHandle(githubUrl)}
+              href={githubUrl}
+              external
+            />
+          )}
+          <ContactCard
+            icon={Download04Icon}
+            title="Resume"
+            subtitle={resume.generating ? 'Preparing…' : 'Download PDF'}
+            onClick={resume.download}
+            busy={resume.generating}
+            className={cn(cardCount % 2 === 1 && 'md:col-span-2')}
+          />
+        </div>
+      </section>
+
+      <section className={sectionClass}>
+        <SectionHeading icon={Target01Icon}>What I'm open to</SectionHeading>
+        <div className={cn('mt-4 flex flex-col gap-4', bodyText, proseWidth)}>
+          {openTo.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
         </div>
       </section>
     </div>
