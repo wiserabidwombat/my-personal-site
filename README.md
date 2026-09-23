@@ -4,17 +4,14 @@ Aaron Tilley's personal site — about/resume, a blog, a board game collection b
 
 Live at [aarontilley.me](https://aarontilley.me).
 
-![Screenshot](docs/screenshot.png)
-
-> **TODO:** Add a screenshot of the site at `docs/screenshot.png`.
+![Screenshot of the About page hero](docs/screenshot.png)
 
 ## Architecture decisions
 
 Each data source uses the strategy that fits how often it changes and where it lives.
 
 - **Board games: live Notion API with a snapshot fallback.** `api/games.ts` reads Notion on each request behind a short edge cache, so edits show up without a redeploy. If that call fails, the page falls back to a checked-in snapshot (`npm run fetch:games`), so it never breaks.
-- **Minerals & fossils: Neon Postgres.** `api/fossils.ts` queries the catalog table on each request behind a short edge cache, and the schema is versioned in `db/migrations`.
-  > **TODO:** Add a sentence on why this catalog lives in Postgres rather than Notion.
+- **Minerals & fossils: Neon Postgres.** The database is hosted through Vercel alongside the site itself, and it shows a different way of storing and retrieving data than the Notion-backed board games. `api/fossils.ts` queries the catalog table on each request behind a short edge cache, and the schema is versioned in `db/migrations`.
 - **Books: live Hardcover GraphQL, no build step or database.** `api/books.ts` and `api/currently-reading.ts` query Hardcover on each request behind a short edge cache, so a newly finished or starred book appears without a redeploy or manual sync.
 - **Blog: markdown files, with one parser shared by the site and the RSS feed.** Posts live in `content/blog` and are parsed by `src/lib/blog.ts`. `scripts/generate-rss.mjs` builds `public/rss.xml` from that same module (loaded through Vite's SSR loader, since `blog.ts` reads posts via `import.meta.glob`), so the feed can't drift from what's rendered on the blog.
 - **Meta tag prerendering for link previews.** Link-preview crawlers don't run JavaScript, so after `vite build`, `scripts/prerender-meta.mjs` writes a static HTML page for every route and blog post with its title, OpenGraph/Twitter tags, and canonical link baked in. Any other path falls back to the SPA shell (`app-shell.html`) via `vercel.json`.
@@ -23,7 +20,7 @@ Each data source uses the strategy that fits how often it changes and where it l
 
 This site is developed with [Claude Code](https://claude.com/claude-code) in VS Code. Multi-part tasks go through an orchestrator agent (`.claude/agents/orchestrator.md`) that delegates to specialized agents in `.claude/agents/`, and a custom `synthwave-ui` design skill (`.claude/skills/synthwave-ui/SKILL.md`) keeps styling consistent across pages.
 
-> **TODO:** Add a sentence or two in your own words about how you use these tools.
+I generate a thorough prompt that is specific and has details, but allows the orchestrator and subagents leeway to implement.
 
 ## Tech stack
 
@@ -92,7 +89,7 @@ api/              Vercel serverless functions: games, fossils, books, currently-
                   (_*.test.ts files are tests; the _ prefix keeps Vercel from deploying them)
 content/blog/     Blog posts as markdown
 db/migrations/    SQL migrations for the minerals & fossils Postgres table
-docs/             Design specs and implementation plans
+docs/             Design specs, implementation plans, and the README screenshot
 public/           Static assets (blog images, headshot, OG image), generated rss.xml
 scripts/          Build-time Node scripts (Notion fetch, DB migrate, RSS, meta prerender)
 src/
