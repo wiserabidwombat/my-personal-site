@@ -1,6 +1,24 @@
 export const fullName = 'Aaron Tilley'
 export const heroTitle = 'Senior Developer'
 
+// Contact line for the generated PDF's header (not shown on the page).
+// Email and LinkedIn are placeholders -- replace them with real values.
+// `phone` only appears in the PDF once it's filled in.
+export type ContactInfo = {
+  location: string
+  email: string
+  linkedInUrl: string
+  websiteUrl: string
+  phone?: string
+}
+
+export const contact: ContactInfo = {
+  location: 'Allen, TX',
+  email: 'you@example.com',
+  linkedInUrl: 'https://www.linkedin.com/in/your-profile',
+  websiteUrl: 'https://aarontilley.me',
+}
+
 export const summary =
   'Senior Developer with 18 years of experience across banking, healthcare, and security software. Progressed from technical support and quality assurance into software engineering and team leadership. Currently building React components inside Microsoft Dynamics 365 for a Salesforce-to-Dynamics 365 migration serving 3,000+ clients.'
 
