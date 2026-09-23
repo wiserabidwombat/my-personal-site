@@ -1,14 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { cn } from 'cn'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { RssIcon, Search01Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
-import { Input } from '../../@/components/ui/input'
-import { Badge } from '../../@/components/ui/badge'
+import { RssIcon } from '@hugeicons/core-free-icons'
 import { getAllPosts } from '../lib/blog'
 import { BlogGrid } from '../components/blog/BlogGrid'
-import { MultiSelectFilter } from '../components/games/MultiSelectFilter'
+import { BlogToolbar } from '../components/blog/BlogToolbar'
+import { BlogEmptyState } from '../components/blog/BlogEmptyState'
 import { useBlogFilterState } from '../components/blog/useBlogFilterState'
-import { toggleValue } from '../components/blog/shared'
 import { seoMeta, canonicalLink } from '../lib/meta'
+import { pageContainer } from '../lib/styles'
 import { blogMeta } from './routeMeta'
 
 type BlogSearch = {
@@ -17,7 +17,7 @@ type BlogSearch = {
 
 export const Route = createFileRoute('/blog')({
   validateSearch: (search: Record<string, unknown>): BlogSearch => ({
-    tag: typeof search.tag === 'string' ? search.tag : undefined,
+    tag: typeof search.tag === 'string' && search.tag !== '' ? search.tag : undefined,
   }),
   head: () => ({
     meta: seoMeta(blogMeta),
@@ -26,32 +26,38 @@ export const Route = createFileRoute('/blog')({
   component: BlogRouteComponent,
 })
 
+// Shorter hero than the site default (bg-synth-grid's 26rem min-height and
+// 11rem horizon) so the first post card lands above the fold on a ~800px
+// laptop viewport. Horizon and glow move up with it to stay behind the text.
+const compactHeroClass =
+  '[--synth-grid-min-height:16rem] [--synth-grid-horizon:7.5rem] [--synth-grid-glow-y:7rem] [--synth-grid-glow-height:9rem]'
+
 function BlogRouteComponent() {
   const posts = getAllPosts()
-  // The tag search param is only ever read on mount (as the filter's
-  // initial state, seeded by a post page's clickable tag badge) -- once
-  // the user is on this page, the filter UI itself is the single source of
-  // truth, not the URL, matching how the rest of the filter state works.
+  // ?tag= is the single source of truth for the selected tag, so a filtered
+  // view is shareable and a post page's tag badge can link straight into it.
   const { tag } = Route.useSearch()
-  const {
-    search,
-    setSearch,
-    allTags,
-    selectedTags,
-    setSelectedTags,
-    filteredPosts,
-    hasActiveFilters,
-    clearAllFilters,
-  } = useBlogFilterState(posts, tag ? [tag] : [])
+  const navigate = Route.useNavigate()
+  const { search, setSearch, allTags, filteredPosts, hasActiveFilters } = useBlogFilterState(posts, tag)
+
+  // replace: stepping through chips shouldn't pile up history entries.
+  function selectTag(next: string | undefined) {
+    void navigate({ search: { tag: next }, replace: true })
+  }
+
+  function clearFilters() {
+    setSearch('')
+    selectTag(undefined)
+  }
 
   return (
     <div className="bg-[var(--deep-space-black)] text-slate-200">
-      <section className="bg-synth-grid px-6 py-20 text-center">
+      <section className={cn('bg-synth-grid px-6 py-10 text-center sm:py-12', compactHeroClass)}>
         <div className="relative z-10">
           <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
             Transmission Log
           </p>
-          <div className="mt-4 flex items-center justify-center gap-3">
+          <div className="mt-3 flex items-center justify-center gap-3">
             <h1 className="max-w-3xl text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
               Blog
             </h1>
@@ -64,64 +70,29 @@ function BlogRouteComponent() {
               <HugeiconsIcon icon={RssIcon} strokeWidth={2} className="size-6" aria-hidden="true" />
             </a>
           </div>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">
             Notes on code, teams, and everything in between.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <div className="flex flex-wrap items-center justify-end gap-3">
-          <div className="relative w-full sm:w-64">
-            <HugeiconsIcon
-              icon={Search01Icon}
-              strokeWidth={2}
-              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
-              aria-hidden="true"
-            />
-            <Input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search posts..."
-              className="pl-9"
-            />
-          </div>
-        </div>
-
-        {allTags.length > 0 && (
-          <div className="mt-4 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <MultiSelectFilter label="Tags" options={allTags} selected={selectedTags} onChange={setSelectedTags} />
-              {hasActiveFilters && (
-                <button
-                  type="button"
-                  onClick={clearAllFilters}
-                  className="text-xs font-medium text-[var(--laser-cyan)] underline-offset-4 hover:underline"
-                >
-                  Clear all
-                </button>
-              )}
-            </div>
-
-            {hasActiveFilters && (
-              <div className="flex flex-wrap gap-1.5">
-                {selectedTags.map((selectedTag) => (
-                  <Badge
-                    key={selectedTag}
-                    variant="secondary"
-                    onClick={() => setSelectedTags((prev) => toggleValue(prev, selectedTag))}
-                    className="cursor-pointer gap-1 text-[10px] capitalize select-none"
-                  >
-                    {selectedTag}
-                    <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
+      <section className={cn(pageContainer, 'py-8 sm:py-10')}>
+        <BlogToolbar
+          tags={allTags}
+          selectedTag={tag}
+          onSelectTag={selectTag}
+          search={search}
+          onSearchChange={setSearch}
+        />
+        {filteredPosts.length > 0 ? (
+          <BlogGrid posts={filteredPosts} />
+        ) : (
+          <BlogEmptyState onClear={clearFilters} />
         )}
-
-        <BlogGrid posts={filteredPosts} />
+        {/* Always mounted so screen readers pick up changes to its text. */}
+        <p className="sr-only" role="status">
+          {hasActiveFilters ? `${filteredPosts.length} ${filteredPosts.length === 1 ? 'post' : 'posts'} shown` : ''}
+        </p>
       </section>
     </div>
   )

@@ -93,3 +93,37 @@ export function getPostBySlug(slug: string): BlogPost | undefined {
 export function getAllTags(): string[] {
   return collectTags(loadPosts())
 }
+
+// Display labels for tag slugs. Slugs (frontmatter values, ?tag= URLs) stay
+// as-is; only what's rendered changes. Tags not listed here are title-cased
+// word by word ("design-systems" -> "Design Systems").
+const TAG_LABELS: Record<string, string> = {
+  ai: 'AI',
+  boardgames: 'Board Games',
+}
+
+export function tagLabel(tag: string): string {
+  return (
+    TAG_LABELS[tag] ??
+    tag
+      .split(/[-_\s]+/)
+      .filter(Boolean)
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join(' ')
+  )
+}
+
+const WORDS_PER_MINUTE = 225
+
+export function readingMinutes(body: string): number {
+  const words = body.split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE))
+}
+
+// Fixed en-US locale (not the visitor's) so the prerendered HTML and the
+// client render always agree -- "Aug 14, 2026".
+export function formatPostDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })
+}

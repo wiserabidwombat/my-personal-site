@@ -1,22 +1,29 @@
-import { BlogCard, type Glow } from './BlogCard'
+import { BlogCard } from './BlogCard'
 import type { BlogPost } from '../../types/blog-post'
 
-const GLOW_CYCLE: Glow[] = ['pink', 'cyan', 'purple']
-
 type Props = {
+  // Already filtered, newest first (getAllPosts() sorts by date).
   posts: BlogPost[]
 }
 
+// Newest matching post as a full-width featured card, the rest in a
+// 2-column grid (1 column on mobile). A single match renders only the
+// featured card. The empty state is the route's job, since clearing
+// filters needs the route's search-param navigation.
 export function BlogGrid({ posts }: Props) {
-  if (posts.length === 0) {
-    return <p className="mt-8 text-center text-slate-400">No posts match your search or filters.</p>
-  }
+  const [featured, ...rest] = posts
+  if (!featured) return null
 
   return (
-    <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {posts.map((post, index) => (
-        <BlogCard key={post.slug} post={post} glow={GLOW_CYCLE[index % GLOW_CYCLE.length]} />
-      ))}
+    <div className="mt-8 space-y-6">
+      <BlogCard post={featured} featured />
+      {rest.length > 0 && (
+        <div className="grid gap-6 sm:grid-cols-2">
+          {rest.map((post) => (
+            <BlogCard key={post.slug} post={post} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

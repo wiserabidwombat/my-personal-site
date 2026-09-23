@@ -2,7 +2,7 @@
 title: "Introducing AI Agents Into My Design System"
 slug: introducing-ai-agents-into-my-design-system
 image: /blog/ai-design-system.svg
-blurb: "Notes on introducing prompt-drive workflows into a real site"
+blurb: "Notes on introducing prompt-driven workflows into a real site."
 date: "2026-08-14"
 author: "Aaron Tilley"
 tags: ["coding", "ai"]

@@ -4,6 +4,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '../../../@/components/ui/badge'
 import { buttonVariants } from '../../../@/components/ui/button'
+import { tagLabel } from '../../lib/blog'
 import type { BlogPost } from '../../types/blog-post'
 
 function formatDate(value: string) {
@@ -33,9 +34,9 @@ export function BlogPostView({ post }: Props) {
                   key={tag}
                   variant="secondary"
                   render={<Link to="/blog" search={{ tag }} />}
-                  className="cursor-pointer capitalize"
+                  className="cursor-pointer"
                 >
-                  {tag}
+                  {tagLabel(tag)}
                 </Badge>
               ))}
             </div>
