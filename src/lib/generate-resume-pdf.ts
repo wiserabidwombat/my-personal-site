@@ -7,8 +7,7 @@ import {
   skillGroups,
   experience,
   credentials,
-  type Project,
-  type Role,
+  type Company,
 } from './resume-data'
 
 // Built with jsPDF's native text API (not html2canvas/html2pdf.js) so the
@@ -24,13 +23,19 @@ const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2
 const BOTTOM = PAGE_HEIGHT - MARGIN
 const FONT = 'helvetica' // built into jsPDF, no embedding needed
 
-// Line advances (pt) per text style -- the size hierarchy is unchanged.
-const LINE = { body: 13, company: 15, role: 13, project: 12, bullet: 12.5 }
+// Tuned to fit one page: every line advances ~1.15x its font size, the
+// tightest that stays comfortably readable, and body text (bullets
+// included) is never below 10pt. Font sizes and the heading hierarchy
+// (name 20 / title 12 / section 12 / company 11 / role 10) are unchanged.
+const BULLET_SIZE = 10
+const LINE = { body: 11.5, company: 13, role: 11.5, bullet: 11.5 }
 const BULLET_INDENT = 14
 const BULLET_GAP = 12
 const BULLET_TEXT_WIDTH = CONTENT_WIDTH - BULLET_INDENT - BULLET_GAP
-const SECTION_HEADING_HEIGHT = 21 // 6 above + rule 3 below the baseline + 12 after
-const COMPANY_GAP = 8
+const SECTION_GAP_ABOVE = 4
+const SECTION_GAP_BELOW = 9 // after the rule, which sits 3pt below the heading baseline
+const SECTION_HEADING_HEIGHT = SECTION_GAP_ABOVE + 3 + SECTION_GAP_BELOW
+const COMPANY_GAP = 4
 const ROW_GAP = 12 // minimum space between a row's left text and its right-aligned dates
 
 // Where each heading landed vs. the first line of content under it, so
@@ -41,6 +46,35 @@ export type ResumePdfLayout = {
   // How much of the last page's content area (inside the margins) is used, 0-1.
   lastPageFill: number
   headings: HeadingPlacement[]
+}
+
+// One italic heading line + bullets in the PDF's Experience section. The
+// PDF condenses what the page shows in full, to fit on one page:
+// - a project's name joins its role's line ("Senior Developer · Smart
+//   Select MD") instead of taking a separate "Project:" line; a role's
+//   later projects get their own line in the same style, without dates
+// - a company marked `aboutCombined` (MEDHOST) shows as one entry: its
+//   titles newest first and every role's bullets, under the company's dates
+type PdfEntry = { heading: string; dates?: string; bullets: string[] }
+
+export function pdfEntries(company: Company): PdfEntry[] {
+  if (company.aboutCombined) {
+    return [
+      {
+        heading: company.roles.map((role) => role.title).join(' · '),
+        bullets: company.roles.flatMap((role) => role.bullets ?? []),
+      },
+    ]
+  }
+  return company.roles.flatMap((role): PdfEntry[] =>
+    role.projects?.length
+      ? role.projects.map((project, index) => ({
+          heading: `${role.title} · ${project.name}`,
+          dates: index === 0 ? role.dateRange : undefined,
+          bullets: project.bullets,
+        }))
+      : [{ heading: role.title, dates: role.dateRange, bullets: role.bullets ?? [] }],
+  )
 }
 
 export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
@@ -67,15 +101,13 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
   // --- Measuring (keep-with-next): a heading plus its first line(s) of
   // content must fit together, or the whole block moves to the next page.
   const firstBulletHeight = (bullets: string[] = []) =>
-    bullets.length ? lineCount(bullets[0], 'normal', 9.5, BULLET_TEXT_WIDTH) * LINE.bullet : 0
-  const projectBlock = (project: Project) => LINE.project + firstBulletHeight(project.bullets)
+    bullets.length ? lineCount(bullets[0], 'normal', BULLET_SIZE, BULLET_TEXT_WIDTH) * LINE.bullet : 0
   const rowHeight = (left: string, right: string | undefined, style: 'bold' | 'italic', size: number, lineHeight: number) => {
     font(style, size)
     return rowLines(left, right).length * lineHeight
   }
-  const roleBlock = (role: Role) =>
-    rowHeight(role.title, role.dateRange, 'italic', 10, LINE.role) +
-    (role.projects?.length ? projectBlock(role.projects[0]) : firstBulletHeight(role.bullets))
+  const entryBlock = (entry: PdfEntry) =>
+    rowHeight(entry.heading, entry.dates, 'italic', 10, LINE.role) + firstBulletHeight(entry.bullets)
 
   // Starts a new page if `height` won't fit, then records the heading's page;
   // the caller marks where its first content line landed via `content()`.
@@ -113,7 +145,7 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
     })
   }
   const writeBullets = (bullets: string[]) => {
-    font('normal', 9.5)
+    font('normal', BULLET_SIZE)
     for (const bullet of bullets) {
       const lines = doc.splitTextToSize(bullet, BULLET_TEXT_WIDTH) as string[]
       lines.forEach((line, i) => {
@@ -126,13 +158,13 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
   }
   const writeSectionHeading = (title: string, firstItemHeight: number) => {
     const block = keepTogether(title, SECTION_HEADING_HEIGHT + firstItemHeight)
-    y += 6
+    y += SECTION_GAP_ABOVE
     font('bold', 12)
     doc.text(title.toUpperCase(), MARGIN, y)
     y += 3
     doc.setLineWidth(0.75)
     doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y)
-    y += 12
+    y += SECTION_GAP_BELOW
     return block
   }
 
@@ -164,12 +196,12 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
   // Header
   font('bold', 20)
   doc.text(fullName, PAGE_WIDTH / 2, y, { align: 'center' })
-  y += 20
+  y += 17
   font('normal', 12)
   doc.text(heroTitle, PAGE_WIDTH / 2, y, { align: 'center' })
-  y += 15
+  y += 13
   writeContactLine()
-  y += 18
+  y += 14
   font('normal', 10)
   writeLines(summary, MARGIN, CONTENT_WIDTH, LINE.body)
 
@@ -194,41 +226,28 @@ export function buildResumePdf(): { doc: jsPDF; layout: ResumePdfLayout } {
   }
 
   // Professional Experience
-  const companyLabel = (company: (typeof experience)[number]) =>
-    company.location ? `${company.name} — ${company.location}` : company.name
-  const companyBlock = (index: number) =>
-    rowHeight(companyLabel(experience[index]), experience[index].dateRange, 'bold', 11, LINE.company) +
-    roleBlock(experience[index].roles[0])
-  const experienceSection = writeSectionHeading('Professional Experience', companyBlock(0))
+  const companyLabel = (company: Company) => (company.location ? `${company.name} — ${company.location}` : company.name)
+  const companyBlock = (company: Company) =>
+    rowHeight(companyLabel(company), company.dateRange, 'bold', 11, LINE.company) + entryBlock(pdfEntries(company)[0])
+  const experienceSection = writeSectionHeading('Professional Experience', companyBlock(experience[0]))
   experience.forEach((company, companyIndex) => {
     if (companyIndex > 0) y += COMPANY_GAP
-    const companyHeading = keepTogether(company.name, companyBlock(companyIndex))
+    const companyHeading = keepTogether(company.name, companyBlock(company))
     font('bold', 11)
     writeRow(companyLabel(company), company.dateRange, LINE.company)
     experienceSection.content()
 
-    company.roles.forEach((role) => {
-      const roleHeading = keepTogether(`${company.name}: ${role.title}`, roleBlock(role))
+    for (const entry of pdfEntries(company)) {
+      const entryHeading = keepTogether(`${company.name}: ${entry.heading}`, entryBlock(entry))
       font('italic', 10)
-      writeRow(role.title, role.dateRange, LINE.role)
+      writeRow(entry.heading, entry.dates, LINE.role)
       companyHeading.content()
-
-      if (role.projects) {
-        role.projects.forEach((project) => {
-          const projectHeading = keepTogether(`${role.title}: ${project.name}`, projectBlock(project))
-          font('bold', 9.5)
-          doc.text(`Project: ${project.name}`, MARGIN + BULLET_INDENT, y)
-          y += LINE.project
-          roleHeading.content()
-          projectHeading.content()
-          writeBullets(project.bullets)
-        })
-      } else if (role.bullets) {
+      if (entry.bullets.length) {
         ensureSpace(LINE.bullet)
-        roleHeading.content()
-        writeBullets(role.bullets)
+        entryHeading.content()
+        writeBullets(entry.bullets)
       }
-    })
+    }
   })
 
   // Education and Professional Development

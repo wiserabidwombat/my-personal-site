@@ -14,8 +14,8 @@ export type ContactInfo = {
 
 export const contact: ContactInfo = {
   location: 'Allen, TX',
-  email: 'you@example.com',
-  linkedInUrl: 'https://www.linkedin.com/in/your-profile',
+  email: 'aaronltilley1@gmail.com',
+  linkedInUrl: 'https://www.linkedin.com/in/aaron-tilley-46b16112/',
   websiteUrl: 'https://aarontilley.me',
 }
 
@@ -92,9 +92,9 @@ export const experience: Company[] = [
           {
             name: 'Salesforce-to-Dynamics 365 Migration',
             bullets: [
-              'Building React-based web resource components embedded within Microsoft Dynamics 365 CRM to support the migration off Salesforce',
-              'Leveraging D365 tables, Power Apps, and Power Automate (Cloud Flows) to support end-to-end workflows for client creation, documentation, tracking, and communication',
-              'Updating existing backend services to source and display client data from Dynamics 365 instead of Salesforce, ensuring continuity across the broader platform ecosystem',
+              'Building React-based web resource components embedded within Microsoft Dynamics 365 CRM for the Salesforce migration',
+              'Using D365 tables, Power Apps, and Power Automate for client creation, tracking, and communication workflows',
+              'Updating existing backend services to source and display client data from Dynamics 365 instead of Salesforce, keeping the broader platform in sync',
             ],
           },
         ],
@@ -108,8 +108,8 @@ export const experience: Company[] = [
             name: 'Health Pros Platform',
             bullets: [
               'Led development of a live communication platform connecting clients with health advocates ("Health Pros") for support with provider search, appointment scheduling, and insurance guidance',
-              'Architected a real-time chat system using SignalR, enabling live two-way communication between clients and health advocates',
-              'Built a front-end ticketing interface displaying open requests, conversation history, and document/file upload capabilities',
+              'Architected a real-time chat system using SignalR, enabling live two-way chat between clients and advocates',
+              'Built a front-end ticketing interface displaying open requests, conversation history, and document uploads',
               'Led a development team delivering the platform to 3,000+ clients with 99% uptime',
             ],
           },
@@ -117,7 +117,7 @@ export const experience: Company[] = [
             name: 'Alight Platform Integration',
             bullets: [
               'Led the integration of two previously independent client tools (Smart Select MD and Health Pros) into the unified Alight domain, eliminating standalone URLs and consolidating the user experience',
-              "Migrated features and business logic into Alight's Angular front-end architecture, aligning UI and navigation with the broader platform",
+              "Migrated features and business logic into Alight's Angular front-end architecture, aligning UI and navigation with the platform",
               "Re-engineered backend services to integrate with Alight's existing notification, ticketing, and communication systems",
               'Led the team through the migration while maintaining continuity of service for existing clients',
             ],
@@ -133,7 +133,7 @@ export const experience: Company[] = [
             name: 'Smart Select MD',
             bullets: [
               'Developed a client-facing healthcare navigation tool using Angular, C# services on AWS ECS, SQL, and Elasticsearch, enabling users to search for doctors and facilities by specialty or condition',
-              'Built search functionality that combined member health insurance data with provider cost, rating, and quality information to support informed care decisions',
+              'Built search combining member insurance data with provider cost, rating, and quality information',
             ],
           },
         ],
@@ -160,9 +160,9 @@ export const experience: Company[] = [
         dateRange: 'May 2016 – April 2019',
         aboutDetail: 'Moved into engineering, ensuring quality testing and reliable software.',
         bullets: [
-          'Performed end-to-end web application and API testing',
-          'Tested Linux and Windows applications',
-          'Developed and implemented test plans and test cases, and documented outcomes',
+          'Performed end-to-end testing of the web application, APIs, and Linux and Windows applications across two-week Agile releases',
+          'Drove logging improvements that surfaced errors earlier, so issues were caught before they reached release',
+          'Traced defects to where they were failing in the code, giving developers the exact location and the fix needed',
         ],
       },
     ],
@@ -180,7 +180,6 @@ export const experience: Company[] = [
         dateRange: 'October 2014 – May 2016',
         bullets: [
           'Analyzed and documented root cause related to software, databases, HL7 interfaces, and APIs',
-          'Managed database, including configuration, debugging, modifying, and updating stored procedures',
         ],
       },
       {
@@ -194,7 +193,6 @@ export const experience: Company[] = [
         title: 'Support Technical Analyst II',
         dateRange: 'January 2011 – November 2013',
         bullets: [
-          'Reviewed and resolved escalated issues requiring advanced troubleshooting and provided root cause analysis',
           'Provided leadership, mentoring, training, and instruction to Support Specialists in the Customer Support Group',
         ],
       },
@@ -209,8 +207,7 @@ export const experience: Company[] = [
         title: 'Systems Analyst II / Officer',
         aboutDetail: 'Cut my teeth supporting production systems in a high-stakes financial environment.',
         bullets: [
-          'Monitored bank-wide IT infrastructure to maintain uptime for essential systems, including Online Banking, Bill Pay, and ATM/POS networks',
-          'Administered mainframe, UNIX/Linux, and Windows platforms supporting trading applications and e-commerce software',
+          'Monitored bank-wide IT infrastructure to keep Online Banking, Bill Pay, and ATM/POS networks up',
         ],
       },
     ],
