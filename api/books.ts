@@ -84,20 +84,21 @@ export function joinAuthors(contributions: HardcoverContribution[]): string {
 
 const orNull = (value: string | null | undefined) => (value && value.trim() ? value.trim() : null)
 
-// Book-level data is the default title, cover, and authors for the work;
-// the user's edition is only a fallback for fields the book record lacks
-// (a foreign-language or audio edition would otherwise leak in).
+// The edition chosen on Hardcover comes first -- it's picked deliberately,
+// and the book-level record can carry a stray cover or a translated title.
+// The book is the fallback for any field the edition lacks (some editions
+// have no cover or no contributors).
 export function mapUserBook(raw: HardcoverUserBookRaw): Book {
   const { book, edition } = raw
   const slug = orNull(book.slug)
   return {
     hardcoverBookId: raw.book_id,
-    title: orNull(book.title) ?? orNull(edition?.title) ?? 'Untitled',
-    author: joinAuthors(book.contributions) || joinAuthors(edition?.contributions ?? []),
+    title: orNull(edition?.title) ?? orNull(book.title) ?? 'Untitled',
+    author: joinAuthors(edition?.contributions ?? []) || joinAuthors(book.contributions),
     rating: raw.rating,
-    pageCount: book.pages ?? edition?.pages ?? null,
+    pageCount: edition?.pages ?? book.pages ?? null,
     dateRead: raw.last_read_date,
-    coverImageUrl: orNull(book.image?.url) ?? orNull(edition?.image?.url),
+    coverImageUrl: orNull(edition?.image?.url) ?? orNull(book.image?.url),
     hardcoverUrl: slug ? `https://hardcover.app/books/${slug}` : null,
     rereadCount: Math.max(raw.read_count - 1, 0),
     isFavorite: raw.starred,

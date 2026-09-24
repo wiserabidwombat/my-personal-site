@@ -28,31 +28,44 @@ function makeRaw(overrides: Partial<HardcoverCurrentlyReadingRaw> = {}): Hardcov
   }
 }
 
-const noBookData = { title: null, subtitle: null, slug: null, pages: null, image: null, contributions: [] }
+const noEditionData = {
+  title: null,
+  subtitle: null,
+  pages: null,
+  audio_seconds: null,
+  image: null,
+  contributions: [],
+}
 
 describe('mapCurrentlyReading', () => {
-  it('maps a book being currently read from book-level data', () => {
+  it('maps a book being currently read from the chosen edition', () => {
     expect(mapCurrentlyReading(makeRaw())).toEqual({
       hardcoverBookId: 7,
-      title: 'In Progress',
-      subtitle: 'A Subtitle',
-      author: 'Cur Rent',
-      coverImageUrl: 'https://assets.hardcover.app/in-progress.jpg',
+      title: 'Edition Title',
+      subtitle: 'Edition Subtitle',
+      author: 'Edition Author',
+      coverImageUrl: 'https://assets.hardcover.app/edition.jpg',
       hardcoverUrl: 'https://hardcover.app/books/in-progress',
       progressPercent: null,
     })
   })
 
-  it('falls back to edition-level title, subtitle, cover, and authors', () => {
-    const book = mapCurrentlyReading(makeRaw({ book: noBookData }))
-    expect(book.title).toBe('Edition Title')
-    expect(book.subtitle).toBe('Edition Subtitle')
-    expect(book.coverImageUrl).toBe('https://assets.hardcover.app/edition.jpg')
-    expect(book.author).toBe('Edition Author')
+  it('falls back to book-level title, subtitle, cover, and authors', () => {
+    const book = mapCurrentlyReading(makeRaw({ edition: noEditionData }))
+    expect(book.title).toBe('In Progress')
+    expect(book.subtitle).toBe('A Subtitle')
+    expect(book.coverImageUrl).toBe('https://assets.hardcover.app/in-progress.jpg')
+    expect(book.author).toBe('Cur Rent')
   })
 
-  it('does not mix a book title with an edition subtitle', () => {
-    const raw = makeRaw({ book: { ...makeRaw().book, subtitle: null } })
+  it('falls back to book-level data when there is no edition', () => {
+    const book = mapCurrentlyReading(makeRaw({ edition: null }))
+    expect(book.title).toBe('In Progress')
+    expect(book.author).toBe('Cur Rent')
+  })
+
+  it('does not mix an edition title with a book subtitle', () => {
+    const raw = makeRaw({ edition: { ...makeRaw().edition!, subtitle: null } })
     expect(mapCurrentlyReading(raw).subtitle).toBeNull()
   })
 

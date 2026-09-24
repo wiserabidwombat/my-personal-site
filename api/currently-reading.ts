@@ -110,19 +110,21 @@ export function readingProgress(raw: HardcoverCurrentlyReadingRaw): number | nul
   return percent(read.progress_pages, pages) ?? percent(read.progress_seconds, seconds)
 }
 
-// Book-level data is the default title, cover, and authors for the work;
-// the user's edition is only a fallback for fields the book record lacks.
-// The subtitle follows whichever record supplied the title.
+// The edition chosen on Hardcover comes first -- it's picked deliberately,
+// and the book-level record can carry a stray cover or a translated title.
+// The book is the fallback for any field the edition lacks (some editions
+// have no cover or no contributors). The subtitle follows whichever record
+// supplied the title.
 export function mapCurrentlyReading(raw: HardcoverCurrentlyReadingRaw): CurrentlyReadingBook {
   const { book, edition } = raw
-  const bookTitle = orNull(book.title)
+  const editionTitle = orNull(edition?.title)
   const slug = orNull(book.slug)
   return {
     hardcoverBookId: raw.book_id,
-    title: bookTitle ?? orNull(edition?.title) ?? 'Untitled',
-    subtitle: bookTitle ? orNull(book.subtitle) : orNull(edition?.subtitle),
-    author: joinAuthors(book.contributions) || joinAuthors(edition?.contributions ?? []),
-    coverImageUrl: orNull(book.image?.url) ?? orNull(edition?.image?.url),
+    title: editionTitle ?? orNull(book.title) ?? 'Untitled',
+    subtitle: editionTitle ? orNull(edition?.subtitle) : orNull(book.subtitle),
+    author: joinAuthors(edition?.contributions ?? []) || joinAuthors(book.contributions),
+    coverImageUrl: orNull(edition?.image?.url) ?? orNull(book.image?.url),
     hardcoverUrl: slug ? `https://hardcover.app/books/${slug}` : null,
     progressPercent: readingProgress(raw),
   }
