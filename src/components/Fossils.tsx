@@ -7,11 +7,11 @@ export function Fossils() {
   const loading = status === 'loading'
 
   return (
-    <div className="bg-[var(--deep-space-black)] text-slate-200">
+    <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
       <NeonShowcase specimens={specimens} loading={loading} />
       <CatalogLedger specimens={specimens} loading={loading} status={status} />
       {status === 'error' && (
-        <p className="mx-auto max-w-6xl px-6 pb-16 text-center text-sm text-slate-400">
+        <p className="mx-auto max-w-4xl px-6 pb-16 text-sm text-slate-400">
           Unable to load the collection right now. Please try again later.
         </p>
       )}

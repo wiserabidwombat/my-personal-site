@@ -8,7 +8,7 @@ type Props = {
   onOpenChange: (open: boolean) => void
 }
 
-// Reuses the board games detail modal's Dialog pattern (glow border, dark
+// Reuses the board games detail modal's Dialog pattern (border, dark
 // background, accent typography) via the same DialogContent styling, close
 // behavior (X button / click-outside / Escape are all handled by the
 // shared Dialog primitive already). No p-6/scrollbar-gutter padding on the
