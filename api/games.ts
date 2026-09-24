@@ -33,8 +33,33 @@ export type BoardGame = {
   notionUrl: string
 }
 
+// BGG's descriptions (copied into Notion by an automation) arrive HTML-escaped
+// -- "&mdash;", "&rsquo;", "&#10;" -- so text is decoded here once, for both
+// the live API and the fallback snapshot built from this mapping.
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+  mdash: '—', ndash: '–', hellip: '…', bull: '•', middot: '·',
+  lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', laquo: '«', raquo: '»',
+  times: '×', deg: '°', copy: '©', reg: '®', trade: '™',
+  aacute: 'á', eacute: 'é', iacute: 'í', oacute: 'ó', uacute: 'ú',
+  agrave: 'à', egrave: 'è', ograve: 'ò', acirc: 'â', ecirc: 'ê', ocirc: 'ô',
+  auml: 'ä', euml: 'ë', iuml: 'ï', ouml: 'ö', uuml: 'ü', Auml: 'Ä', Ouml: 'Ö', Uuml: 'Ü',
+  szlig: 'ß', ccedil: 'ç', ntilde: 'ñ', aring: 'å', oslash: 'ø', aelig: 'æ',
+}
+
+export function decodeEntities(text: string): string {
+  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, code: string) => {
+    if (code[0] === '#') {
+      const point = code[1] === 'x' || code[1] === 'X' ? parseInt(code.slice(2), 16) : Number(code.slice(1))
+      return Number.isFinite(point) ? String.fromCodePoint(point) : match
+    }
+    return NAMED_ENTITIES[code] ?? match
+  })
+}
+
 function plainText(richText: { plain_text: string }[] | undefined) {
-  return richText?.map((t) => t.plain_text).join('') || null
+  const text = richText?.map((t) => t.plain_text).join('')
+  return text ? decodeEntities(text) : null
 }
 
 // "Image URL" is a Files & media property holding one external file (so

@@ -3,8 +3,8 @@ import type { ReactNode } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ExternalLinkIcon, ImageNotFound01Icon, Search01Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import type { BoardGame } from '../../types/board-game'
+import { ExpandableText } from './ExpandableText'
 import { formatRange, formatCommaList, extractBggId, formatPlaytime } from './shared'
 
 type Props = {
@@ -44,9 +44,10 @@ export function GameDetailContent({ game }: Props) {
   const showThumbnail = Boolean(game.thumbnailUrl) && !imgError
   const bggId = extractBggId(game.bggLink)
 
-  const notes = [game.notes, game.notes2, game.notes3].filter((note): note is string =>
-    Boolean(note && note.trim())
-  )
+  // BGG's publisher description, split across Notes / Notes 2 / Notes 3
+  // only because Notion caps a rich-text value at 2,000 characters -- the
+  // parts continue mid-word, so they're joined back with no separator.
+  const description = [game.notes, game.notes2, game.notes3].filter(Boolean).join('').trim()
 
   function searchBggForums() {
     const term = forumQuery.trim()
@@ -76,39 +77,9 @@ export function GameDetailContent({ game }: Props) {
             />
           )}
         </div>
-        <h2 className="text-xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]">
+        <h2 className="text-xl font-bold text-[var(--neon-pink)]">
           {game.name}
         </h2>
-      </div>
-
-      <div>
-        <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
-          Search BGG Forums
-        </p>
-        <div className="relative mt-1.5">
-          <Input
-            value={forumQuery}
-            onChange={(event) => setForumQuery(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                event.preventDefault()
-                searchBggForums()
-              }
-            }}
-            disabled={!bggId}
-            placeholder={bggId ? 'Search the forums…' : 'No BGG link for this game'}
-            className="bg-[var(--deep-space-black)] pr-10 focus-visible:border-[var(--laser-cyan)] focus-visible:shadow-glow-cyan focus-visible:ring-[var(--laser-cyan)]/50"
-          />
-          <button
-            type="button"
-            onClick={searchBggForums}
-            disabled={!bggId}
-            aria-label="Search BGG forums"
-            className="absolute top-1/2 right-1 -translate-y-1/2 rounded-full p-1.5 text-slate-400 transition-colors duration-300 hover:text-[var(--laser-cyan)] disabled:pointer-events-none disabled:opacity-50"
-          >
-            <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
-          </button>
-        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -142,6 +113,43 @@ export function GameDetailContent({ game }: Props) {
         <Stat label="Publisher" value={formatCommaList(game.publisher)} />
       </div>
 
+      {/* Secondary tool, so it sits below the details and stays quiet: a
+          compact row with a plain border focus, no glow. */}
+      {bggId && (
+        <div>
+          <label
+            htmlFor={`forum-search-${game.id}`}
+            className="text-[10px] font-semibold tracking-wide text-slate-400 uppercase"
+          >
+            Search BGG forums
+          </label>
+          <div className="relative mt-1 max-w-xs">
+            <input
+              id={`forum-search-${game.id}`}
+              type="search"
+              value={forumQuery}
+              onChange={(event) => setForumQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault()
+                  searchBggForums()
+                }
+              }}
+              placeholder="Search the forums…"
+              className="h-8 w-full rounded-full border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-black)] pr-8 pl-3 text-xs text-slate-200 placeholder:text-slate-500 focus-visible:border-[var(--laser-cyan)]/70 focus-visible:outline-none"
+            />
+            <button
+              type="button"
+              onClick={searchBggForums}
+              aria-label="Search BGG forums"
+              className="absolute top-1/2 right-1 -translate-y-1/2 rounded-full p-1 text-slate-400 transition-colors duration-300 hover:text-[var(--laser-cyan)]"
+            >
+              <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="size-3.5" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {game.categories.length > 0 && (
         <div>
           <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
@@ -172,16 +180,12 @@ export function GameDetailContent({ game }: Props) {
         </div>
       )}
 
-      {notes.length > 0 && (
+      {description && (
         <div>
           <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
-            Notes
+            Description
           </p>
-          <div className="mt-1.5 space-y-2 text-sm leading-relaxed text-slate-300">
-            {notes.map((note, index) => (
-              <p key={index}>{note}</p>
-            ))}
-          </div>
+          <ExpandableText text={description} className="mt-1.5 text-sm leading-relaxed text-slate-300" />
         </div>
       )}
     </div>

@@ -152,7 +152,7 @@ export function RandomGamePicker({ games }: Props) {
             }`}
           >
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]">
+              <DialogTitle className="text-xl font-bold text-[var(--neon-pink)]">
                 🎲 Random Game Picker
               </DialogTitle>
             </DialogHeader>
