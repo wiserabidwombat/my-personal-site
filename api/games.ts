@@ -24,7 +24,7 @@ export type BoardGame = {
   lastPlayed: string | null
   bggLink: string | null
   // BGG's 200x150 thumbnail (Notion "Thumbnail URL") and full-size box art
-  // ("Image URL", filled once by scripts/sync-bgg-images.mjs).
+  // ("Image URL"), filled from BGG by scripts/sync-bgg.mjs.
   thumbnailUrl: string | null
   imageUrl: string | null
   notes: string | null
@@ -73,9 +73,9 @@ export function mapPage(page: PageObjectResponse): BoardGame {
   const playtimeMinutes =
     p['Playtime (min)']?.type === 'number' ? p['Playtime (min)'].number : null
   const minPlaytime =
-    p['Playtime (Min)']?.type === 'number' ? p['Playtime (Min)'].number : null
+    p['Minimum Playtime']?.type === 'number' ? p['Minimum Playtime'].number : null
   const maxPlaytime =
-    p['Playtime (Max)']?.type === 'number' ? p['Playtime (Max)'].number : null
+    p['Maximum Playtime']?.type === 'number' ? p['Maximum Playtime'].number : null
   const weight = p.Weight?.type === 'number' ? p.Weight.number : null
   const designer = p.Designer?.type === 'rich_text' ? plainText(p.Designer.rich_text) : null
   const publisher = p.Publisher?.type === 'rich_text' ? plainText(p.Publisher.rich_text) : null

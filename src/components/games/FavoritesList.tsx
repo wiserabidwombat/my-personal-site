@@ -6,15 +6,16 @@ import { GameDetailTrigger } from './GameDetailTrigger'
 import { GameSection } from './GameSection'
 import { findGameByName } from './shared'
 
-const favorites = ['Eldritch Horror', 'Champions of Midgard', 'Horrified', 'The Quacks of Quedlinburg']
+const favorites = ['Eldritch Horror', 'Champions of Midgard', 'Horrified', 'Quacks: All-In Edition']
 
 type Props = {
   games: BoardGame[]
 }
 
-// Same cards as the inventory (equal height, box art, stats). A favorite
-// that isn't in the Notion data yet (e.g. Quacks) renders as a plain tile
-// with the art placeholder, since there are no details to open.
+// Same cards as the inventory (equal height, box art, stats). Names must
+// match the Notion "Game" title exactly; a favorite that isn't in the data
+// renders as a plain tile with the art placeholder, since there are no
+// details to open.
 export function FavoritesList({ games }: Props) {
   return (
     <GameSection icon={StarIcon} title="Favorites" description="All-time favorite board games.">

@@ -35,12 +35,12 @@ export function GameInventory({ games: boardGames, source }: Props) {
     void navigate({ search: (prev: InventorySearch) => ({ ...prev, ...patch }), replace: true })
   const clearFilters = () => void navigate({ search: (prev: InventorySearch) => ({ sort: prev.sort }), replace: true })
 
-  const allCategories = useMemo(() => uniqueSorted(boardGames.map((game) => game.categories ?? [])), [boardGames])
-  const allMechanics = useMemo(() => uniqueSorted(boardGames.map((game) => game.mechanics ?? [])), [boardGames])
-  const results = useMemo(
-    () => sortInventory(filterInventory(boardGames, search), search.sort),
-    [boardGames, search],
-  )
+  // "Everything currently on the shelf": owned games only. Unowned rows
+  // (e.g. a Want to Play entry) still feed the top sections via Games.tsx.
+  const shelf = useMemo(() => boardGames.filter((game) => game.owned), [boardGames])
+  const allCategories = useMemo(() => uniqueSorted(shelf.map((game) => game.categories ?? [])), [shelf])
+  const allMechanics = useMemo(() => uniqueSorted(shelf.map((game) => game.mechanics ?? [])), [shelf])
+  const results = useMemo(() => sortInventory(filterInventory(shelf, search), search.sort), [shelf, search])
 
   const [pageSize, setPageSize] = useState<number>(24)
   const [currentPage, setCurrentPage] = useState(1)

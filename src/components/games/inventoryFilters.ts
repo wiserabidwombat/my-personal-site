@@ -76,9 +76,9 @@ function matchesPlayers(game: BoardGame, players: PlayerOption): boolean {
   return game.playersMin <= count && count <= game.playersMax
 }
 
-// Uses playtimeMinutes, the only playtime field Notion fills (the separate
-// min/max playtime fields are empty for every game). 0 means "unknown"
-// (common on expansions), so it matches no bucket rather than "Under 30".
+// Buckets on playtimeMinutes, BGG's headline playtime (for a range like
+// 60–90 it's the upper end). 0 means "unknown" (common on expansions), so
+// it matches no bucket rather than "Under 30".
 function matchesTime(game: BoardGame, time: TimeOption): boolean {
   const minutes = game.playtimeMinutes
   if (!minutes) return false

@@ -55,13 +55,15 @@ export function findGameByName(games: BoardGame[], name: string): BoardGame | un
   return games.find((game) => game.name.toLowerCase() === query)
 }
 
-// Notion only fills the single "Playtime (min)" value (the min/max
-// playtime fields are empty for every game), so prefer it and fall back to
-// a range only if one ever gets filled in. A stored 0 (common on
-// expansions) means "unknown", not zero minutes.
+// BGG's playtime range ("60–90 min", from Notion's Minimum/Maximum
+// Playtime) when there is one, else the single "Playtime (min)" value. A
+// stored 0 (common on expansions) means "unknown", not zero minutes.
 export function formatPlaytime(game: Pick<BoardGame, 'playtimeMinutes' | 'minPlaytime' | 'maxPlaytime'>): string {
-  if (game.playtimeMinutes) return `${game.playtimeMinutes} min`
-  return formatRange(game.minPlaytime, game.maxPlaytime, 'min')
+  const min = game.minPlaytime || null
+  const max = game.maxPlaytime || null
+  if (min && max && min !== max) return formatRange(min, max, 'min')
+  const single = game.playtimeMinutes || max || min
+  return single ? `${single} min` : '—'
 }
 
 // The rating is BoardGameGeek's community average (e.g. 7.70167), not a
