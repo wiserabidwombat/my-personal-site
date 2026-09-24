@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { BoardGame } from '../../types/board-game'
 import { GameDetailContent } from './GameDetailContent'
@@ -9,9 +10,17 @@ type Props = {
 }
 
 export function GameDetailModal({ game, open, onOpenChange }: Props) {
+  // Focus the dialog itself on open rather than its first focusable element
+  // (Base UI's default), which would be a text input or link -- on phones a
+  // focused input pops the keyboard up over the dialog.
+  const popupRef = useRef<HTMLDivElement>(null)
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full overflow-visible border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)] p-0 shadow-glow-purple sm:max-w-lg">
+      <DialogContent
+        ref={popupRef}
+        initialFocus={popupRef}
+        className="w-full overflow-visible border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)] p-0 shadow-glow-purple sm:max-w-lg">
         {/*
           The scrolling region is a separate, un-rounded element from the
           outer card so its native scrollbar isn't clipped by rounded-4xl

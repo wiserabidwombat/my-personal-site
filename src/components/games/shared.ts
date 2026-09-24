@@ -1,17 +1,10 @@
+import { cn } from 'cn'
+import type { BoardGame } from '../../types/board-game'
+
+// Glowing section heading still imported by the Books and Minerals & Fossils
+// pages. The Games page itself now uses SectionHeading (icon, no glow) via
+// GameSection.
 export const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]'
-
-export const PLAYER_COUNT_THRESHOLDS = [1, 2, 3, 4, 5, 6, 8]
-export const PLAYTIME_THRESHOLDS = [15, 30, 45, 60, 90, 120, 180]
-
-// Exact player-count options for the Random Game Picker's single-value
-// dropdown (1-8 inclusive) -- distinct from PLAYER_COUNT_THRESHOLDS above,
-// which is a set of "at least N" bucket thresholds (and skips 7) for the
-// inventory page's separate Min/Max Players filters.
-export const PLAYER_COUNT_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8]
-
-export function toggleValue(values: string[], value: string) {
-  return values.includes(value) ? values.filter((v) => v !== value) : [...values, value]
-}
 
 export function uniqueSorted(values: string[][]) {
   return [...new Set(values.flat())].sort((a, b) => a.localeCompare(b))
@@ -43,4 +36,38 @@ export function extractBggId(bggLink: string | null): string | null {
   if (!bggLink) return null
   const match = bggLink.match(/\/boardgame\/(\d+)/)
   return match ? match[1] : null
+}
+
+// Game cards share the Blog cards' look: one border color, h-full so cards
+// in a row are equal height. The interactive half adds a slight lift and
+// brighter border on hover or keyboard focus, and a visible cyan ring.
+export const gameCardBaseClass =
+  'group flex h-full overflow-hidden rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/50 text-left transition duration-300'
+export const gameCardInteractiveClass = cn(
+  'cursor-pointer hover:-translate-y-1 hover:border-[var(--laser-cyan)]/70 motion-reduce:hover:translate-y-0',
+  'focus-visible:-translate-y-1 focus-visible:border-[var(--laser-cyan)]/70 focus-visible:ring-2 focus-visible:ring-[var(--laser-cyan)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--deep-space-black)] focus-visible:outline-none',
+)
+
+// The top sections (Currently Loving, Favorites, Want to Play) list games by
+// name and look them up in the Notion data for art and details.
+export function findGameByName(games: BoardGame[], name: string): BoardGame | undefined {
+  const query = name.toLowerCase()
+  return games.find((game) => game.name.toLowerCase() === query)
+}
+
+// BGG's playtime range ("60–90 min", from Notion's Minimum/Maximum
+// Playtime) when there is one, else the single "Playtime (min)" value. A
+// stored 0 (common on expansions) means "unknown", not zero minutes.
+export function formatPlaytime(game: Pick<BoardGame, 'playtimeMinutes' | 'minPlaytime' | 'maxPlaytime'>): string {
+  const min = game.minPlaytime || null
+  const max = game.maxPlaytime || null
+  if (min && max && min !== max) return formatRange(min, max, 'min')
+  const single = game.playtimeMinutes || max || min
+  return single ? `${single} min` : '—'
+}
+
+// The rating is BoardGameGeek's community average (e.g. 7.70167), not a
+// personal score, so it's always shown labeled "BGG" to one decimal.
+export function formatBggRating(rating: number | null): string {
+  return rating != null ? rating.toFixed(1) : '—'
 }

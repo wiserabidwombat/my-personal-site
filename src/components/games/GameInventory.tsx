@@ -1,82 +1,23 @@
-import { useMemo, useState } from 'react'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Search01Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
+import { useMemo, useRef, useState } from 'react'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import type { BoardGamesSource } from '../../hooks/useBoardGames'
 import type { BoardGame } from '../../types/board-game'
-import { headingClass, formatRange, toggleValue } from './shared'
-import { useGameFilterState } from './useGameFilterState'
-import { MultiSelectFilter } from './MultiSelectFilter'
-import { MinPlayersFilter } from './MinPlayersFilter'
-import { MaxPlayersFilter } from './MaxPlayersFilter'
-import { MinPlaytimeFilter } from './MinPlaytimeFilter'
-import { MaxPlaytimeFilter } from './MaxPlaytimeFilter'
+import { uniqueSorted } from './shared'
+import { filterInventory, sortInventory, type InventorySearch } from './inventoryFilters'
+import { LibraryIcon } from '@hugeicons/core-free-icons'
+import { BggAttribution, SourceIndicator } from './InventoryMeta'
+import { GameSection } from './GameSection'
+import { InventoryToolbar } from './InventoryToolbar'
+import { InventoryPagination } from './InventoryPagination'
+import { InventoryEmptyState } from './InventoryEmptyState'
 import { GameCard } from './GameCard'
 import { GameCardSkeleton } from './GameCardSkeleton'
 import { RandomGamePicker } from './RandomGamePicker'
 
-type InventoryRow = {
-  id: string
-  name: string
-  players: string
-  rating: string
-  status: string
-  bggLink: string | null
-  categories: string[]
-  mechanics: string[]
-  game: BoardGame
-}
-
-const PAGE_SIZE_OPTIONS = [6, 12, 24]
-// Fills out a realistic 3-row grid at the lg breakpoint (sm:grid-cols-2
-// lg:grid-cols-3) -- roughly what would show above the fold -- rather than
-// a sparse handful of skeletons.
-const SKELETON_CARD_COUNT = 9
-
-function toInventoryRow(boardGame: BoardGame): InventoryRow {
-  return {
-    id: boardGame.id,
-    name: boardGame.name,
-    players: formatRange(boardGame.playersMin, boardGame.playersMax),
-    rating: boardGame.rating != null ? `${boardGame.rating.toFixed(2)}/10` : '—',
-    status: boardGame.status ?? '—',
-    bggLink: boardGame.bggLink,
-    categories: boardGame.categories ?? [],
-    mechanics: boardGame.mechanics ?? [],
-    game: boardGame,
-  }
-}
-
-function getPageNumbers(current: number, total: number): (number | 'ellipsis')[] {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
-
-  const pages: (number | 'ellipsis')[] = [1]
-  if (current > 3) pages.push('ellipsis')
-
-  for (let page = Math.max(2, current - 1); page <= Math.min(total - 1, current + 1); page++) {
-    pages.push(page)
-  }
-
-  if (current < total - 2) pages.push('ellipsis')
-  pages.push(total)
-  return pages
-}
-
-const sourceLabel: Record<BoardGamesSource, string> = {
-  loading: 'Loading inventory...',
-  live: 'Live from Notion',
-  cached: 'Showing cached data',
-}
+const PAGE_SIZE_OPTIONS = [12, 24, 48] as const
+// Two full rows of the 4-column desktop grid -- roughly what shows above the
+// fold -- rather than a sparse handful of skeletons.
+const SKELETON_CARD_COUNT = 8
 
 type Props = {
   games: BoardGame[]
@@ -84,293 +25,107 @@ type Props = {
 }
 
 export function GameInventory({ games: boardGames, source }: Props) {
-  const [search, setSearch] = useState('')
-  const {
-    allCategories,
-    allMechanics,
-    selectedCategories,
-    setSelectedCategories,
-    selectedMechanics,
-    setSelectedMechanics,
-    minPlayers,
-    setMinPlayers,
-    maxPlayers,
-    setMaxPlayers,
-    minPlaytime,
-    setMinPlaytime,
-    maxPlaytime,
-    setMaxPlaytime,
-    filteredGames,
-    hasActiveFilters,
-    clearAllFilters,
-  } = useGameFilterState(boardGames)
-  const [pageSize, setPageSize] = useState(12)
+  // Filters, search, and sort are URL search params (see routes/games.tsx),
+  // so any filtered view can be shared. Every such navigation passes:
+  // - resetScroll: false -- TanStack Router scrolls to the top on every
+  //   navigate() by default, which yanked the filters out of view on each
+  //   chip click, sort change, or search;
+  // - replace: true -- so Back leaves the page instead of undoing filters
+  //   one at a time.
+  // Typed explicitly: the route file imports this component, so inference
+  // through useSearch is circular.
+  const search: InventorySearch = useSearch({ from: '/games' })
+  const navigate = useNavigate({ from: '/games' })
+  const update = (patch: Partial<InventorySearch>) =>
+    void navigate({ search: (prev: InventorySearch) => ({ ...prev, ...patch }), replace: true, resetScroll: false })
+  const clearFilters = () =>
+    void navigate({ search: (prev: InventorySearch) => ({ sort: prev.sort }), replace: true, resetScroll: false })
+
+  // "Everything currently on the shelf": owned games only. Unowned rows
+  // (e.g. a Want to Play entry) still feed the top sections via Games.tsx.
+  const shelf = useMemo(() => boardGames.filter((game) => game.owned), [boardGames])
+  const allCategories = useMemo(() => uniqueSorted(shelf.map((game) => game.categories ?? [])), [shelf])
+  const allMechanics = useMemo(() => uniqueSorted(shelf.map((game) => game.mechanics ?? [])), [shelf])
+  const results = useMemo(() => sortInventory(filterInventory(shelf, search), search.sort), [shelf, search])
+
+  const [pageSize, setPageSize] = useState<number>(24)
   const [currentPage, setCurrentPage] = useState(1)
-
-  const filtered: InventoryRow[] = useMemo(() => {
-    const query = search.trim().toLowerCase()
-    return filteredGames
-      .filter((game) => query === '' || game.name.toLowerCase().includes(query))
-      .map(toInventoryRow)
-  }, [filteredGames, search])
-
-  // Reset to page 1 whenever the result set or page size changes, so a stale
-  // page number never silently shows unrelated results. Adjusted during
-  // render (React's documented pattern for this) rather than in an effect,
-  // which would cost an extra render pass.
-  const filterSignature = JSON.stringify([
-    search,
-    selectedCategories,
-    selectedMechanics,
-    minPlayers,
-    maxPlayers,
-    minPlaytime,
-    maxPlaytime,
-    pageSize,
-  ])
-  const [prevFilterSignature, setPrevFilterSignature] = useState(filterSignature)
-  if (filterSignature !== prevFilterSignature) {
-    setPrevFilterSignature(filterSignature)
+  // Back to page 1 whenever the filters, sort, or page size change, so a
+  // stale page number never shows unrelated results. Adjusted during render
+  // (React's documented pattern) rather than in an effect -- and it never
+  // scrolls, so a filter that shrinks the results doesn't move the page.
+  const resetSignature = JSON.stringify([search, pageSize])
+  const [prevResetSignature, setPrevResetSignature] = useState(resetSignature)
+  if (resetSignature !== prevResetSignature) {
+    setPrevResetSignature(resetSignature)
     setCurrentPage(1)
   }
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
-  const safePage = Math.min(currentPage, totalPages)
-  const pageNumbers = useMemo(() => getPageNumbers(safePage, totalPages), [safePage, totalPages])
+  const totalPages = Math.max(1, Math.ceil(results.length / pageSize))
+  const page = Math.min(currentPage, totalPages)
+  const firstIndex = (page - 1) * pageSize
+  const paginated = results.slice(firstIndex, firstIndex + pageSize)
 
-  const paginated = useMemo(
-    () => filtered.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [filtered, safePage, pageSize]
-  )
+  // Paging (local state, not a navigation) brings the top of the new page
+  // into view: the "Showing X–Y" line lands just below the sticky header.
+  // Instant instead of smooth when the visitor prefers reduced motion.
+  const resultsTopRef = useRef<HTMLParagraphElement>(null)
+  function goToPage(next: number) {
+    setCurrentPage(next)
+    const target = resultsTopRef.current
+    if (!target) return
+    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 0
+    const top = target.getBoundingClientRect().top + window.scrollY - headerHeight - 12
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? 'auto' : 'smooth' })
+  }
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className={headingClass}>Game Inventory</h2>
-        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
-          <span
-            className={`size-1.5 rounded-full ${
-              source === 'live'
-                ? 'bg-[var(--laser-cyan)] shadow-glow-cyan'
-                : source === 'loading'
-                  ? 'animate-pulse bg-slate-500'
-                  : 'bg-slate-500'
-            }`}
-          />
-          {sourceLabel[source]}
-        </span>
-      </div>
-      <p className="mt-2 text-slate-300">Everything currently on the shelf.</p>
+    <GameSection
+      icon={LibraryIcon}
+      title="Game Inventory"
+      description="Everything currently on the shelf."
+      aside={<SourceIndicator source={source} />}
+    >
+      <BggAttribution />
 
-      <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
-        <RandomGamePicker games={boardGames} />
-        <div className="relative w-full sm:w-64">
-          <HugeiconsIcon
-            icon={Search01Icon}
-            strokeWidth={2}
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
-            aria-hidden="true"
-          />
-          <Input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search games..."
-            className="pl-9"
-          />
-        </div>
-      </div>
+      <InventoryToolbar
+        search={search}
+        update={update}
+        clearFilters={clearFilters}
+        allCategories={allCategories}
+        allMechanics={allMechanics}
+        picker={<RandomGamePicker games={results} />}
+      />
 
-      <div className="mt-4 flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {allCategories.length > 0 && (
-            <MultiSelectFilter
-              label="Categories"
-              options={allCategories}
-              selected={selectedCategories}
-              onChange={setSelectedCategories}
-            />
-          )}
-          {allMechanics.length > 0 && (
-            <MultiSelectFilter
-              label="Mechanics"
-              options={allMechanics}
-              selected={selectedMechanics}
-              onChange={setSelectedMechanics}
-            />
-          )}
-          <MinPlayersFilter value={minPlayers} onChange={setMinPlayers} />
-          <MaxPlayersFilter value={maxPlayers} onChange={setMaxPlayers} />
-          <MinPlaytimeFilter value={minPlaytime} onChange={setMinPlaytime} />
-          <MaxPlaytimeFilter value={maxPlaytime} onChange={setMaxPlaytime} />
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={clearAllFilters}
-              className="text-xs font-medium text-[var(--laser-cyan)] underline-offset-4 hover:underline"
-            >
-              Clear all
-            </button>
-          )}
-        </div>
+      {source !== 'loading' && results.length > 0 && (
+        <p ref={resultsTopRef} className="mt-6 text-sm text-slate-400" aria-live="polite">
+          Showing {firstIndex + 1}–{firstIndex + paginated.length} of {results.length} games
+        </p>
+      )}
 
-        {hasActiveFilters && (
-          <div className="flex flex-wrap gap-1.5">
-            {selectedCategories.map((tag) => (
-              <Badge
-                key={`cat-${tag}`}
-                variant="secondary"
-                onClick={() => setSelectedCategories((prev) => toggleValue(prev, tag))}
-                className="cursor-pointer gap-1 text-[10px] select-none"
-              >
-                {tag}
-                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-              </Badge>
-            ))}
-            {selectedMechanics.map((tag) => (
-              <Badge
-                key={`mech-${tag}`}
-                variant="secondary"
-                onClick={() => setSelectedMechanics((prev) => toggleValue(prev, tag))}
-                className="cursor-pointer gap-1 text-[10px] select-none"
-              >
-                {tag}
-                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-              </Badge>
-            ))}
-            {minPlayers !== null && (
-              <Badge
-                variant="secondary"
-                onClick={() => setMinPlayers(null)}
-                className="cursor-pointer gap-1 text-[10px] select-none"
-              >
-                {minPlayers}+ Players
-                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-              </Badge>
-            )}
-            {maxPlayers !== null && (
-              <Badge
-                variant="secondary"
-                onClick={() => setMaxPlayers(null)}
-                className="cursor-pointer gap-1 text-[10px] select-none"
-              >
-                Up to {maxPlayers} Players
-                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-              </Badge>
-            )}
-            {minPlaytime !== null && (
-              <Badge
-                variant="secondary"
-                onClick={() => setMinPlaytime(null)}
-                className="cursor-pointer gap-1 text-[10px] select-none"
-              >
-                {minPlaytime}+ min
-                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-              </Badge>
-            )}
-            {maxPlaytime !== null && (
-              <Badge
-                variant="secondary"
-                onClick={() => setMaxPlaytime(null)}
-                className="cursor-pointer gap-1 text-[10px] select-none"
-              >
-                Up to {maxPlaytime} min
-                <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-              </Badge>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
         {source === 'loading' ? (
           Array.from({ length: SKELETON_CARD_COUNT }, (_, i) => <GameCardSkeleton key={i} />)
+        ) : results.length === 0 ? (
+          <InventoryEmptyState onClear={clearFilters} />
         ) : (
-          <>
-            {paginated.map((game) => (
-              <GameCard
-                key={game.id}
-                game={game.game}
-                name={game.name}
-                players={game.players}
-                rating={game.rating}
-                status={game.status}
-                bggLink={game.bggLink}
-                categories={game.categories}
-                mechanics={game.mechanics}
-                onCategoryTagClick={(tag) => setSelectedCategories((prev) => toggleValue(prev, tag))}
-                onMechanicTagClick={(tag) => setSelectedMechanics((prev) => toggleValue(prev, tag))}
-              />
-            ))}
-            {filtered.length === 0 && (
-              <p className="col-span-full text-center text-slate-400">No games match your search.</p>
-            )}
-          </>
+          paginated.map((game) => (
+            <GameCard key={game.id} game={game} />
+          ))
         )}
       </div>
 
-      <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <span>Show</span>
-          {PAGE_SIZE_OPTIONS.map((size) => (
-            <Badge
-              key={size}
-              variant={pageSize === size ? 'secondary' : 'outline'}
-              onClick={() => setPageSize(size)}
-              className="cursor-pointer select-none"
-            >
-              {size}
-            </Badge>
-          ))}
-          <span>per page</span>
-        </div>
-
-        {totalPages > 1 && (
-          <Pagination className="mx-0 w-auto">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(event) => {
-                    event.preventDefault()
-                    setCurrentPage((page) => Math.max(1, page - 1))
-                  }}
-                  className={safePage === 1 ? 'pointer-events-none opacity-50' : ''}
-                />
-              </PaginationItem>
-              {pageNumbers.map((page, index) =>
-                page === 'ellipsis' ? (
-                  <PaginationItem key={`ellipsis-${index}`}>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                ) : (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      href="#"
-                      isActive={page === safePage}
-                      onClick={(event) => {
-                        event.preventDefault()
-                        setCurrentPage(page)
-                      }}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                )
-              )}
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(event) => {
-                    event.preventDefault()
-                    setCurrentPage((page) => Math.min(totalPages, page + 1))
-                  }}
-                  className={safePage === totalPages ? 'pointer-events-none opacity-50' : ''}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
-      </div>
-    </section>
+      {results.length > 0 && (
+        <InventoryPagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={goToPage}
+          pageSize={pageSize}
+          pageSizeOptions={PAGE_SIZE_OPTIONS}
+          onPageSizeChange={setPageSize}
+        />
+      )}
+    </GameSection>
   )
 }

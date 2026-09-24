@@ -20,6 +20,7 @@ export type BoardGame = {
   lastPlayed: string | null
   bggLink: string | null
   thumbnailUrl: string | null
+  imageUrl: string | null
   notes: string | null
   notes2: string | null
   notes3: string | null

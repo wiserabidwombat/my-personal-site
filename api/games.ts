@@ -23,18 +23,60 @@ export type BoardGame = {
   yearPublished: number | null
   lastPlayed: string | null
   bggLink: string | null
+  // BGG's 200x150 thumbnail (Notion "Thumbnail URL") and full-size box art
+  // ("Image URL"), filled from BGG by scripts/sync-bgg.mjs.
   thumbnailUrl: string | null
+  imageUrl: string | null
   notes: string | null
   notes2: string | null
   notes3: string | null
   notionUrl: string
 }
 
-function plainText(richText: { plain_text: string }[] | undefined) {
-  return richText?.map((t) => t.plain_text).join('') || null
+// BGG's descriptions (copied into Notion by an automation) arrive HTML-escaped
+// -- "&mdash;", "&rsquo;", "&#10;" -- so text is decoded here once, for both
+// the live API and the fallback snapshot built from this mapping.
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+  mdash: '—', ndash: '–', hellip: '…', bull: '•', middot: '·',
+  lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', laquo: '«', raquo: '»',
+  times: '×', deg: '°', copy: '©', reg: '®', trade: '™',
+  aacute: 'á', eacute: 'é', iacute: 'í', oacute: 'ó', uacute: 'ú',
+  agrave: 'à', egrave: 'è', ograve: 'ò', acirc: 'â', ecirc: 'ê', ocirc: 'ô',
+  auml: 'ä', euml: 'ë', iuml: 'ï', ouml: 'ö', uuml: 'ü', Auml: 'Ä', Ouml: 'Ö', Uuml: 'Ü',
+  szlig: 'ß', ccedil: 'ç', ntilde: 'ñ', aring: 'å', oslash: 'ø', aelig: 'æ',
 }
 
-function mapPage(page: PageObjectResponse): BoardGame {
+export function decodeEntities(text: string): string {
+  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, code: string) => {
+    if (code[0] === '#') {
+      const point = code[1] === 'x' || code[1] === 'X' ? parseInt(code.slice(2), 16) : Number(code.slice(1))
+      return Number.isFinite(point) ? String.fromCodePoint(point) : match
+    }
+    return NAMED_ENTITIES[code] ?? match
+  })
+}
+
+function plainText(richText: { plain_text: string }[] | undefined) {
+  const text = richText?.map((t) => t.plain_text).join('')
+  return text ? decodeEntities(text) : null
+}
+
+// "Image URL" is a Files & media property holding one external file (so
+// Notion previews the box art), but a plain URL property works too.
+function fileOrUrl(property: PageObjectResponse['properties'][string] | undefined): string | null {
+  if (property?.type === 'url') return property.url
+  if (property?.type === 'files') {
+    const file = property.files[0]
+    if (file?.type === 'external') return file.external.url
+    if (file?.type === 'file') return file.file.url
+  }
+  return null
+}
+
+// Exported so scripts/fetch-games.mjs builds the fallback snapshot with the
+// exact same mapping (loaded through Vite's SSR loader).
+export function mapPage(page: PageObjectResponse): BoardGame {
   const p = page.properties
 
   const title = p.Game?.type === 'title' ? p.Game.title : []
@@ -56,9 +98,9 @@ function mapPage(page: PageObjectResponse): BoardGame {
   const playtimeMinutes =
     p['Playtime (min)']?.type === 'number' ? p['Playtime (min)'].number : null
   const minPlaytime =
-    p['Playtime (Min)']?.type === 'number' ? p['Playtime (Min)'].number : null
+    p['Minimum Playtime']?.type === 'number' ? p['Minimum Playtime'].number : null
   const maxPlaytime =
-    p['Playtime (Max)']?.type === 'number' ? p['Playtime (Max)'].number : null
+    p['Maximum Playtime']?.type === 'number' ? p['Maximum Playtime'].number : null
   const weight = p.Weight?.type === 'number' ? p.Weight.number : null
   const designer = p.Designer?.type === 'rich_text' ? plainText(p.Designer.rich_text) : null
   const publisher = p.Publisher?.type === 'rich_text' ? plainText(p.Publisher.rich_text) : null
@@ -68,6 +110,7 @@ function mapPage(page: PageObjectResponse): BoardGame {
     p['Last Played']?.type === 'date' ? (p['Last Played'].date?.start ?? null) : null
   const bggLink = p['BGG Link']?.type === 'url' ? p['BGG Link'].url : null
   const thumbnailUrl = p['Thumbnail URL']?.type === 'url' ? p['Thumbnail URL'].url : null
+  const imageUrl = fileOrUrl(p['Image URL'])
   const notes = p.Notes?.type === 'rich_text' ? plainText(p.Notes.rich_text) : null
   const notes2 = p['Notes 2']?.type === 'rich_text' ? plainText(p['Notes 2'].rich_text) : null
   const notes3 = p['Notes 3']?.type === 'rich_text' ? plainText(p['Notes 3'].rich_text) : null
@@ -94,6 +137,7 @@ function mapPage(page: PageObjectResponse): BoardGame {
     lastPlayed,
     bggLink,
     thumbnailUrl,
+    imageUrl,
     notes,
     notes2,
     notes3,

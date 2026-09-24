@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "fetch:games": "node --env-file=.env.local scripts/fetch-games.mjs",
+    "sync:bgg": "node --env-file=.env.local scripts/sync-bgg.mjs",
     "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
     "test": "vitest run"
   },

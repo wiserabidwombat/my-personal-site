@@ -1,20 +1,51 @@
-import { headingClass } from './shared'
+import { Bookmark01Icon } from '@hugeicons/core-free-icons'
+import type { BoardGame } from '../../types/board-game'
+import { GameArt } from './GameArt'
+import { GameDetailTrigger } from './GameDetailTrigger'
+import { GameSection } from './GameSection'
+import { findGameByName, formatPlaytime, formatRange } from './shared'
 
-const wantToPlay = ['Ark Nova', 'Perseverance: Cast Away Chronicles Ep. 1 & 2', 'The Crew: Mission Deep Sea', 'The Lord of the Rings: Fellowship of the Ring - Trick-Taking Game ']
+const wantToPlay = [
+  'Ark Nova',
+  'Perseverance: Castaway Chronicles – Episodes 1 & 2',
+  'The Crew: Mission Deep Sea',
+  'The Lord of the Rings: The Fellowship of the Ring – Trick-Taking Game',
+]
 
-export function WantToPlay() {
+type Props = {
+  games: BoardGame[]
+}
+
+// Small horizontal cards (thumbnail + name), replacing the old
+// slash-separated list whose wrapped line started with a stray slash.
+export function WantToPlay({ games }: Props) {
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16">
-      <h2 className={headingClass}>Want to Play</h2>
-      <p className="mt-2 text-slate-300">On my immediate radar.</p>
-      <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/30 px-6 py-4">
-        {wantToPlay.map((name, i) => (
-          <span key={name} className="flex items-center gap-4 text-sm font-medium text-slate-200">
-            {i > 0 && <span className="text-[var(--cyber-purple)]">/</span>}
-            {name}
-          </span>
-        ))}
-      </div>
-    </section>
+    <GameSection icon={Bookmark01Icon} title="Want to Play" description="On my immediate radar.">
+      <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+        {wantToPlay.map((name) => {
+          const game = findGameByName(games, name)
+          return (
+            <li key={name}>
+              <GameDetailTrigger game={game} className="items-center gap-3 p-2">
+                <GameArt
+                  name={name}
+                  src={game?.thumbnailUrl ?? game?.imageUrl}
+                  padded={false}
+                  className="w-24 shrink-0 rounded-lg"
+                />
+                <div className="min-w-0 py-1 pr-2">
+                  <p className="text-sm font-semibold text-slate-50">{name}</p>
+                  {game && (
+                    <p className="mt-1 text-xs text-slate-400">
+                      {formatRange(game.playersMin, game.playersMax)} players · {formatPlaytime(game)}
+                    </p>
+                  )}
+                </div>
+              </GameDetailTrigger>
+            </li>
+          )
+        })}
+      </ul>
+    </GameSection>
   )
 }

@@ -10,7 +10,7 @@ Live at [aarontilley.me](https://aarontilley.me).
 
 Each data source uses the strategy that fits how often it changes and where it lives.
 
-- **Board games: live Notion API with a snapshot fallback.** `api/games.ts` reads Notion on each request behind a short edge cache, so edits show up without a redeploy. If that call fails, the page falls back to a checked-in snapshot (`npm run fetch:games`), so it never breaks.
+- **Board games: live Notion API with a snapshot fallback.** `api/games.ts` reads Notion on each request behind a short edge cache, so edits show up without a redeploy. If that call fails, the page falls back to a checked-in snapshot (`npm run fetch:games`), so it never breaks. BoardGameGeek details (box art, players, playtime, rating, and so on) are copied into Notion by `npm run sync:bgg`, so the site never calls BoardGameGeek's API at request time.
 - **Minerals & fossils: Neon Postgres.** The database is hosted through Vercel alongside the site itself, and it shows a different way of storing and retrieving data than the Notion-backed board games. `api/fossils.ts` queries the catalog table on each request behind a short edge cache, and the schema is versioned in `db/migrations`.
 - **Books: live Hardcover GraphQL, no build step or database.** `api/books.ts` and `api/currently-reading.ts` query Hardcover on each request behind a short edge cache, so a newly finished or starred book appears without a redeploy or manual sync.
 - **Blog: markdown files, with one parser shared by the site and the RSS feed.** Posts live in `content/blog` and are parsed by `src/lib/blog.ts`. `scripts/generate-rss.mjs` builds `public/rss.xml` from that same module (loaded through Vite's SSR loader, since `blog.ts` reads posts via `import.meta.glob`), so the feed can't drift from what's rendered on the blog.
@@ -61,9 +61,9 @@ Copy `.env.example` to `.env.local` (already gitignored) and fill in:
 
 | Variable | Used by | Notes |
 | --- | --- | --- |
-| `NOTION_TOKEN` | `scripts/fetch-games.mjs`, `api/games.ts` | Notion integration token for the board games database. Only read server-side; it never reaches client code |
-| `NOTION_DATABASE_ID` | `scripts/fetch-games.mjs`, `api/games.ts` | ID of the Notion database holding the board game collection |
-| `NOTION_DATA_SOURCE_ID` | `api/games.ts` | Notion data source ID |
+| `NOTION_TOKEN` | `scripts/fetch-games.mjs`, `scripts/sync-bgg.mjs`, `api/games.ts` | Notion integration token for the board games database. Only read server-side; it never reaches client code |
+| `NOTION_DATA_SOURCE_ID` | `scripts/fetch-games.mjs`, `scripts/sync-bgg.mjs`, `api/games.ts` | ID of the Notion data source holding the board game collection |
+| `BGG_API_TOKEN` | `scripts/sync-bgg.mjs` | BoardGameGeek XML API application token (BGG requires registration). Local only; not needed in Vercel |
 | `DATABASE_URL` | `scripts/migrate.mjs`, `api/fossils.ts` | Neon Postgres connection string. In production this is auto-injected by the Vercel Marketplace Neon integration |
 | `HARDCOVER_API_TOKEN` | `api/books.ts`, `api/currently-reading.ts` | Hardcover Personal Access Token. Expires after 1 year with no programmatic renewal — regenerate manually at hardcover.app account settings when it does |
 | `HARDCOVER_USER_ID` | `api/books.ts`, `api/currently-reading.ts` | Numeric Hardcover user ID (not a secret) — get it by querying `{ me { id } }` against the Hardcover API with your token |
@@ -79,7 +79,8 @@ These same variables must also be set in the Vercel dashboard for the deployed `
 | `npm run preview` | Serve the production build locally |
 | `npm run lint` | Run ESLint |
 | `npm test` | Run the Vitest test suite once |
-| `npm run fetch:games` | Pull the board game collection from Notion into `src/data/board-games.json`, the fallback snapshot used when `/api/games` is unavailable (run manually, not part of `build`; requires `NOTION_TOKEN`/`NOTION_DATABASE_ID`) |
+| `npm run fetch:games` | Pull the board game collection from Notion into `src/data/board-games.json`, the fallback snapshot used when `/api/games` is unavailable (run manually, not part of `build`; requires `NOTION_TOKEN`/`NOTION_DATA_SOURCE_ID`) |
+| `npm run sync:bgg` | Fill any empty BoardGameGeek-sourced fields on the Notion games rows (box art, players, playtimes, year, BGG rating, weight, designer, publisher, categories, mechanics) from BGG. Never overwrites filled fields or touches personal ones. A new row only needs its name and "BGG Link". Dry run by default; add `-- --write` to apply |
 | `npm run db:migrate` | Apply every `.sql` file in `db/migrations`, in filename order, against `DATABASE_URL` |
 
 ## Project structure
