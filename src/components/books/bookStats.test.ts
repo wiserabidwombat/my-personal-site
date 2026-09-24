@@ -11,6 +11,7 @@ function makeBook(overrides: Partial<Book> = {}): Book {
     pageCount: null,
     dateRead: null,
     coverImageUrl: null,
+    hardcoverUrl: null,
     rereadCount: 0,
     isFavorite: false,
     ...overrides,
@@ -23,6 +24,7 @@ describe('computeBookStats', () => {
       totalRead: 0,
       readThisYear: 0,
       averageRating: null,
+      ratedCount: 0,
       mostReadAuthor: null,
     })
   })
@@ -43,9 +45,23 @@ describe('computeBookStats', () => {
     const books = [
       makeBook({ hardcoverBookId: 1, rating: 5 }),
       makeBook({ hardcoverBookId: 2, rating: 3 }),
+      makeBook({ hardcoverBookId: 3, rating: 4 }),
+      makeBook({ hardcoverBookId: 4, rating: null }),
+    ]
+    const stats = computeBookStats(books)
+    expect(stats.averageRating).toBe(4)
+    expect(stats.ratedCount).toBe(3)
+  })
+
+  it('leaves the average null when fewer than 3 books are rated', () => {
+    const books = [
+      makeBook({ hardcoverBookId: 1, rating: 5 }),
+      makeBook({ hardcoverBookId: 2, rating: 3 }),
       makeBook({ hardcoverBookId: 3, rating: null }),
     ]
-    expect(computeBookStats(books).averageRating).toBe(4)
+    const stats = computeBookStats(books)
+    expect(stats.averageRating).toBeNull()
+    expect(stats.ratedCount).toBe(2)
   })
 
   it('finds the most-read author when one has strictly more books', () => {

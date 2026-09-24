@@ -24,11 +24,21 @@ export function sortBooks(books: Book[], key: BookSortKey): Book[] {
   }
 }
 
-export function formatDateRead(dateRead: string | null): string {
-  if (!dateRead) return '—'
-  // Construct the Date from local y/m/d components directly rather than
+// "Read Mar 2026" for the library cards, or null when no date is logged.
+export function formatDateRead(dateRead: string | null): string | null {
+  if (!dateRead) return null
+  // Construct the Date from local y/m components directly rather than
   // `new Date(dateRead)`, which parses 'YYYY-MM-DD' as UTC midnight and then
-  // renders one day early in any negative-UTC-offset timezone (all of the US).
-  const [year, month, day] = dateRead.split('-').map(Number)
-  return new Date(year, month - 1, day).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  // renders one day early in any negative-UTC-offset timezone (all of the US)
+  // -- on the 1st of a month, that's the previous month.
+  const [year, month] = dateRead.split('-').map(Number)
+  return `Read ${new Date(year, month - 1, 1).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}`
+}
+
+// Splits "Title: Subtitle" into a main title and a subtitle for display.
+// A title with no colon keeps Hardcover's separate subtitle, if any.
+export function splitTitle(title: string, subtitle: string | null = null): { main: string; sub: string | null } {
+  const index = title.indexOf(': ')
+  if (index > 0) return { main: title.slice(0, index), sub: title.slice(index + 2) }
+  return { main: title, sub: subtitle }
 }

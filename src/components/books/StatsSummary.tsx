@@ -1,44 +1,58 @@
+import { cn } from 'cn'
+import { ChartHistogramIcon } from '@hugeicons/core-free-icons'
 import type { Book } from '../../types/book'
 import type { BooksStatus } from '../../hooks/useBooks'
+import { SectionHeading } from '../SectionHeading'
+import { pageContainer } from '../../lib/styles'
 import { computeBookStats } from './bookStats'
-import { headingClass } from '../games/shared'
 
 type Props = {
   books: Book[]
   status: BooksStatus
 }
 
+type Tile = { label: string; value: string }
+
+// Left-aligned stat tiles with the site's restrained card border. The
+// average-rating tile appears only once enough books are rated (see
+// computeBookStats), and then carries its sample size.
 export function StatsSummary({ books, status }: Props) {
   const stats = status === 'live' ? computeBookStats(books) : null
 
-  const tiles: { label: string; value: string }[] = [
-    { label: 'Books Read', value: stats ? String(stats.totalRead) : '—' },
-    { label: 'Read This Year', value: stats ? String(stats.readThisYear) : '—' },
-    {
-      label: 'Average Rating',
-      value: stats?.averageRating != null ? `${stats.averageRating.toFixed(1)}/5` : '—',
-    },
-    { label: 'Most-Read Author', value: stats?.mostReadAuthor ?? '—' },
+  const tiles: Tile[] = [
+    { label: 'Books read', value: stats ? String(stats.totalRead) : '—' },
+    { label: 'Read this year', value: stats ? String(stats.readThisYear) : '—' },
+    ...(stats?.averageRating != null
+      ? [{ label: `Avg rating · ${stats.ratedCount} rated`, value: stats.averageRating.toFixed(1) }]
+      : []),
+    { label: 'Most-read author', value: stats?.mostReadAuthor ?? '—' },
   ]
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16">
-      <h2 className={headingClass}>Reading Stats</h2>
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {tiles.map((tile) => (
+    <section className={cn(pageContainer, 'py-8 sm:py-10')}>
+      <SectionHeading icon={ChartHistogramIcon}>Reading Stats</SectionHeading>
+      <dl className={cn('mt-6 grid grid-cols-2 gap-3 sm:gap-4', tiles.length === 4 ? 'sm:grid-cols-4' : 'sm:grid-cols-3')}>
+        {tiles.map((tile, index) => (
           <div
             key={tile.label}
-            className="rounded-2xl border-2 border-[var(--cyber-purple)] bg-[var(--deep-space-purple)]/40 p-4 text-center shadow-glow-purple backdrop-blur-md"
-          >
-            {status === 'loading' ? (
-              <div className="mx-auto h-8 w-12 skeleton-shimmer rounded-md" aria-hidden="true" />
-            ) : (
-              <p className="text-2xl font-bold text-slate-100">{tile.value}</p>
+            className={cn(
+              'flex flex-col-reverse justify-end rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/50 p-4',
+              // An odd tile count would leave the last tile alone in the
+              // 2-column phone grid; let it take the full row instead.
+              tiles.length % 2 === 1 && index === tiles.length - 1 && 'col-span-2 sm:col-span-1',
             )}
-            <p className="mt-1 text-xs tracking-wide text-slate-400 uppercase">{tile.label}</p>
+          >
+            <dt className="mt-1 text-xs tracking-wide text-slate-400 uppercase">{tile.label}</dt>
+            <dd className="text-xl font-bold break-words text-slate-100 sm:text-2xl">
+              {status === 'loading' ? (
+                <span className="block h-8 w-12 skeleton-shimmer rounded-md" aria-hidden="true" />
+              ) : (
+                tile.value
+              )}
+            </dd>
           </div>
         ))}
-      </div>
+      </dl>
     </section>
   )
 }

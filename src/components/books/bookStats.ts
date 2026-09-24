@@ -3,9 +3,14 @@ import type { Book } from '../../types/book'
 export type BookStats = {
   totalRead: number
   readThisYear: number
+  // Null until at least MIN_RATED_FOR_AVERAGE books are rated -- an
+  // "average" of one or two ratings says little.
   averageRating: number | null
+  ratedCount: number
   mostReadAuthor: string | null
 }
+
+export const MIN_RATED_FOR_AVERAGE = 3
 
 export function computeBookStats(books: Book[], now: Date = new Date()): BookStats {
   const currentYear = now.getFullYear()
@@ -23,7 +28,7 @@ export function computeBookStats(books: Book[], now: Date = new Date()): BookSta
 
   const ratedBooks = books.filter((book) => book.rating != null)
   const averageRating =
-    ratedBooks.length === 0
+    ratedBooks.length < MIN_RATED_FOR_AVERAGE
       ? null
       : ratedBooks.reduce((sum, book) => sum + (book.rating ?? 0), 0) / ratedBooks.length
 
@@ -41,5 +46,5 @@ export function computeBookStats(books: Book[], now: Date = new Date()): BookSta
     }
   }
 
-  return { totalRead, readThisYear, averageRating, mostReadAuthor }
+  return { totalRead, readThisYear, averageRating, ratedCount: ratedBooks.length, mostReadAuthor }
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { searchBooks, sortBooks, formatDateRead } from './bookFilters'
+import { searchBooks, sortBooks, formatDateRead, splitTitle } from './bookFilters'
 import type { Book } from '../../types/book'
 
 function makeBook(overrides: Partial<Book> = {}): Book {
@@ -11,6 +11,7 @@ function makeBook(overrides: Partial<Book> = {}): Book {
     pageCount: null,
     dateRead: null,
     coverImageUrl: null,
+    hardcoverUrl: null,
     rereadCount: 0,
     isFavorite: false,
     ...overrides,
@@ -80,12 +81,12 @@ describe('sortBooks', () => {
 })
 
 describe('formatDateRead', () => {
-  it('returns an em dash for null', () => {
-    expect(formatDateRead(null)).toBe('—')
+  it('returns null for a missing date', () => {
+    expect(formatDateRead(null)).toBeNull()
   })
 
-  it('formats an ISO date string', () => {
-    expect(formatDateRead('2026-05-08')).toBe('May 8, 2026')
+  it('formats an ISO date string as month and year', () => {
+    expect(formatDateRead('2026-05-08')).toBe('Read May 2026')
   })
 
   // Regression test: new Date('2026-01-01') parses as UTC midnight, which
@@ -94,6 +95,24 @@ describe('formatDateRead', () => {
   // avoids. This test only catches a regression in timezones behind UTC,
   // but that's every timezone this site's owner and most US visitors run in.
   it('does not shift a year-boundary date to the previous year', () => {
-    expect(formatDateRead('2026-01-01')).toBe('Jan 1, 2026')
+    expect(formatDateRead('2026-01-01')).toBe('Read Jan 2026')
+  })
+})
+
+describe('splitTitle', () => {
+  it('splits at the first colon', () => {
+    expect(splitTitle('Four Portraits, One Jesus: A Survey of Jesus and the Gospels')).toEqual({
+      main: 'Four Portraits, One Jesus',
+      sub: 'A Survey of Jesus and the Gospels',
+    })
+    expect(splitTitle('Do Aliens Speak Physics?: And Other Questions')).toEqual({
+      main: 'Do Aliens Speak Physics?',
+      sub: 'And Other Questions',
+    })
+  })
+
+  it('uses the separate subtitle when the title has no colon', () => {
+    expect(splitTitle('Deepsix', 'A Novel')).toEqual({ main: 'Deepsix', sub: 'A Novel' })
+    expect(splitTitle('Deepsix')).toEqual({ main: 'Deepsix', sub: null })
   })
 })
