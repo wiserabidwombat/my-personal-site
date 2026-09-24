@@ -1,21 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Cancel01Icon, ImageNotFound01Icon } from '@hugeicons/core-free-icons'
+import { ImageNotFound01Icon } from '@hugeicons/core-free-icons'
 import { motion, useReducedMotion } from 'motion/react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import type { BoardGame } from '../../types/board-game'
-import { usePickerFilterState } from './usePickerFilterState'
 import { pickRandomGame } from './gameFilters'
 import { SPIN_FRAME_DELAYS, buildSpinSequence, sleep } from './spinAnimation'
-import { SingleSelectFilter } from './SingleSelectFilter'
-import { PlayerCountFilter } from './PlayerCountFilter'
-import { MinPlaytimeFilter } from './MinPlaytimeFilter'
-import { MaxPlaytimeFilter } from './MaxPlaytimeFilter'
 import { GameDetailContent } from './GameDetailContent'
 
 type Props = {
+  // The inventory's currently filtered results: the picker only ever picks
+  // from what the page's own filters (and search) show.
   games: BoardGame[]
 }
 
@@ -70,59 +66,16 @@ export function RandomGamePicker({ games }: Props) {
   const [displayedGame, setDisplayedGame] = useState<BoardGame | null>(null)
   const [spinning, setSpinning] = useState(false)
   const [resultToken, setResultToken] = useState(0)
-  // Invalidates any in-flight spin loop when a newer pick starts, or the
-  // filters/dialog reset underneath it, so a stale async loop never writes
+  // Invalidates any in-flight spin loop when a newer pick starts or the
+  // dialog resets underneath it, so a stale async loop never writes
   // state after the fact.
   const spinTokenRef = useRef(0)
-  const {
-    allCategories,
-    allMechanics,
-    category,
-    setCategory,
-    mechanic,
-    setMechanic,
-    players,
-    setPlayers,
-    minPlaytime,
-    setMinPlaytime,
-    maxPlaytime,
-    setMaxPlaytime,
-    filteredGames,
-    hasActiveFilters,
-    clearAllFilters,
-  } = usePickerFilterState(games)
-
+  const filteredGames = games
   const eligibleCount = filteredGames.length
 
-  // Drop a stale pick the moment the active filters change underneath it,
-  // so the displayed game never contradicts the filters currently shown.
-  // Adjusted during render (same pattern GameInventory uses for its page
-  // reset) rather than in an effect, which would cost an extra render pass.
-  const filterSignature = JSON.stringify([category, mechanic, players, minPlaytime, maxPlaytime])
-  const [prevFilterSignature, setPrevFilterSignature] = useState(filterSignature)
-  if (filterSignature !== prevFilterSignature) {
-    setPrevFilterSignature(filterSignature)
-    setSpinning(false)
-    setDisplayedGame(null)
-  }
-
-  // Invalidating spinTokenRef itself has to live in an effect rather than
-  // the render-phase block above: mutating a ref during render is unsound
-  // in React (even though this ref is a plain cancellation counter that's
-  // never read for rendering). The state resets above already happen
-  // synchronously during render, well before this effect or any pending
-  // spin-loop `await sleep(...)` resumes, so there's no window where a
-  // stale frame could reappear.
-  useEffect(() => {
-    spinTokenRef.current++
-  }, [filterSignature])
-
   function handleOpenChange(nextOpen: boolean) {
-    // Every open starts from a clean slate: no carried-over filters or pick
-    // from a previous session with the picker.
-    if (nextOpen) {
-      clearAllFilters()
-    }
+    // Every open starts from a clean slate: no pick carried over from a
+    // previous session with the picker.
     spinTokenRef.current++
     setSpinning(false)
     setDisplayedGame(null)
@@ -160,9 +113,29 @@ export function RandomGamePicker({ games }: Props) {
 
   return (
     <>
-      <Button type="button" variant="outline" onClick={() => handleOpenChange(true)} className={triggerClass}>
-        🎲 Pick a Random Game
-      </Button>
+      {/* aria-disabled (not disabled) keeps the button focusable so keyboard
+          and screen-reader users still get the reason via the tooltip. */}
+      <span className="group relative inline-flex">
+        <Button
+          type="button"
+          variant="outline"
+          aria-disabled={eligibleCount === 0}
+          aria-describedby={eligibleCount === 0 ? 'random-picker-disabled-reason' : undefined}
+          onClick={() => eligibleCount > 0 && handleOpenChange(true)}
+          className={`${triggerClass} aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
+        >
+          🎲 Pick a Random Game
+        </Button>
+        {eligibleCount === 0 && (
+          <span
+            id="random-picker-disabled-reason"
+            role="tooltip"
+            className="pointer-events-none absolute top-full left-0 z-20 mt-2 w-56 rounded-md text-left border border-[var(--cyber-purple)]/50 bg-[var(--deep-space-black)] px-3 py-2 text-xs text-slate-300 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+          >
+            No games match your current filters, so there's nothing to pick from.
+          </span>
+        )}
+      </span>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="w-full overflow-visible border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)] p-0 shadow-glow-purple sm:max-w-lg">
@@ -184,98 +157,9 @@ export function RandomGamePicker({ games }: Props) {
               </DialogTitle>
             </DialogHeader>
 
-            <div className="flex min-w-0 flex-col gap-3">
-              <div className="flex flex-wrap items-center gap-2">
-                {allCategories.length > 0 && (
-                  <SingleSelectFilter
-                    label="Category"
-                    options={allCategories}
-                    value={category}
-                    onChange={setCategory}
-                  />
-                )}
-                {allMechanics.length > 0 && (
-                  <SingleSelectFilter
-                    label="Mechanic"
-                    options={allMechanics}
-                    value={mechanic}
-                    onChange={setMechanic}
-                  />
-                )}
-                <PlayerCountFilter value={players} onChange={setPlayers} />
-                <MinPlaytimeFilter value={minPlaytime} onChange={setMinPlaytime} />
-                <MaxPlaytimeFilter value={maxPlaytime} onChange={setMaxPlaytime} />
-                <button
-                  type="button"
-                  onClick={clearAllFilters}
-                  disabled={!hasActiveFilters}
-                  className="text-xs font-medium text-[var(--laser-cyan)] underline-offset-4 hover:underline disabled:pointer-events-none disabled:opacity-40"
-                >
-                  Clear filters
-                </button>
-              </div>
-
-              {hasActiveFilters && (
-                <div className="flex flex-wrap gap-1.5">
-                  {category !== null && (
-                    <Badge
-                      variant="secondary"
-                      onClick={() => setCategory(null)}
-                      className="cursor-pointer gap-1 text-[10px] select-none"
-                    >
-                      {category}
-                      <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-                    </Badge>
-                  )}
-                  {mechanic !== null && (
-                    <Badge
-                      variant="secondary"
-                      onClick={() => setMechanic(null)}
-                      className="cursor-pointer gap-1 text-[10px] select-none"
-                    >
-                      {mechanic}
-                      <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-                    </Badge>
-                  )}
-                  {players !== null && (
-                    <Badge
-                      variant="secondary"
-                      onClick={() => setPlayers(null)}
-                      className="cursor-pointer gap-1 text-[10px] select-none"
-                    >
-                      {players} {players === 1 ? 'Player' : 'Players'}
-                      <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-                    </Badge>
-                  )}
-                  {minPlaytime !== null && (
-                    <Badge
-                      variant="secondary"
-                      onClick={() => setMinPlaytime(null)}
-                      className="cursor-pointer gap-1 text-[10px] select-none"
-                    >
-                      {minPlaytime}+ min
-                      <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-                    </Badge>
-                  )}
-                  {maxPlaytime !== null && (
-                    <Badge
-                      variant="secondary"
-                      onClick={() => setMaxPlaytime(null)}
-                      className="cursor-pointer gap-1 text-[10px] select-none"
-                    >
-                      Up to {maxPlaytime} min
-                      <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-2.5" aria-hidden="true" />
-                    </Badge>
-                  )}
-                </div>
-              )}
-
-              <p className="text-xs text-slate-400">
-                {eligibleCount === 0
-                  ? 'No games match those filters — try loosening them up.'
-                  : `${eligibleCount} game${eligibleCount === 1 ? '' : 's'} match${eligibleCount === 1 ? 'es' : ''}.`}
-              </p>
-            </div>
+            <p className="text-xs text-slate-400">
+              Picking from {eligibleCount} game{eligibleCount === 1 ? '' : 's'} matching your current filters.
+            </p>
 
             <Button
               type="button"
