@@ -14,7 +14,7 @@ export function Games() {
     <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
       <CurrentlyLoving games={games} />
       <FavoritesList games={games} />
-      <WantToPlay />
+      <WantToPlay games={games} />
       <GameInventory games={games} source={source} />
     </div>
   )

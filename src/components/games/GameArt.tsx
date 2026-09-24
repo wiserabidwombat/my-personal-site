@@ -9,13 +9,15 @@ type Props = {
   className?: string
   // Above-the-fold featured art loads eagerly; everything else is lazy.
   eager?: boolean
+  // Inner breathing room around the box; small thumbnails turn it off.
+  padded?: boolean
 }
 
 // Box art in a fixed 4:3 frame. Boxes come in every shape (square, portrait,
 // wide), so the image is contained -- never cropped -- on a dark backdrop.
 // A missing URL or a failed load both fall back to a styled dice placeholder,
 // so a card never shows a broken-image icon or collapses in height.
-export function GameArt({ name, src, className, eager = false }: Props) {
+export function GameArt({ name, src, className, eager = false, padded = true }: Props) {
   const [failed, setFailed] = useState(false)
   const showImage = Boolean(src) && !failed
 
@@ -33,7 +35,7 @@ export function GameArt({ name, src, className, eager = false }: Props) {
           loading={eager ? 'eager' : 'lazy'}
           decoding="async"
           onError={() => setFailed(true)}
-          className="size-full object-contain p-2"
+          className={cn('size-full object-contain', padded && 'p-2')}
         />
       ) : (
         <div className="flex size-full flex-col items-center justify-center gap-2 text-[var(--cyber-purple)]">

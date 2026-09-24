@@ -79,6 +79,11 @@ describe('filterInventory', () => {
     expect(names(filterInventory(games, { time: '2h-plus' }))).toEqual(['121'])
   })
 
+  it('treats a playtime of 0 as unknown rather than under 30 minutes', () => {
+    const games = [game({ name: 'Expansion', playtimeMinutes: 0 }), game({ name: 'Quick', playtimeMinutes: 20 })]
+    expect(names(filterInventory(games, { time: 'under-30' }))).toEqual(['Quick'])
+  })
+
   it('combines search, status, and every selected category/mechanic', () => {
     const games = [
       game({ name: 'Horrified', status: 'Played', categories: ['Horror', 'Monsters'], mechanics: ['Co-op'] }),

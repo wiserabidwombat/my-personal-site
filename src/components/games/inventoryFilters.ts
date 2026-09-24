@@ -77,10 +77,11 @@ function matchesPlayers(game: BoardGame, players: PlayerOption): boolean {
 }
 
 // Uses playtimeMinutes, the only playtime field Notion fills (the separate
-// min/max playtime fields are empty for every game).
+// min/max playtime fields are empty for every game). 0 means "unknown"
+// (common on expansions), so it matches no bucket rather than "Under 30".
 function matchesTime(game: BoardGame, time: TimeOption): boolean {
   const minutes = game.playtimeMinutes
-  if (minutes == null) return false
+  if (!minutes) return false
   switch (time) {
     case 'under-30':
       return minutes < 30

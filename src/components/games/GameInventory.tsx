@@ -4,7 +4,9 @@ import type { BoardGamesSource } from '../../hooks/useBoardGames'
 import type { BoardGame } from '../../types/board-game'
 import { uniqueSorted } from './shared'
 import { filterInventory, sortInventory, type InventorySearch } from './inventoryFilters'
-import { InventoryHeader } from './InventoryHeader'
+import { LibraryIcon } from '@hugeicons/core-free-icons'
+import { BggAttribution, SourceIndicator } from './InventoryMeta'
+import { GameSection } from './GameSection'
 import { InventoryToolbar } from './InventoryToolbar'
 import { InventoryPagination } from './InventoryPagination'
 import { InventoryEmptyState } from './InventoryEmptyState'
@@ -58,8 +60,13 @@ export function GameInventory({ games: boardGames, source }: Props) {
   const paginated = results.slice(firstIndex, firstIndex + pageSize)
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16">
-      <InventoryHeader source={source} />
+    <GameSection
+      icon={LibraryIcon}
+      title="Game Inventory"
+      description="Everything currently on the shelf."
+      aside={<SourceIndicator source={source} />}
+    >
+      <BggAttribution />
 
       <InventoryToolbar
         search={search}
@@ -76,7 +83,7 @@ export function GameInventory({ games: boardGames, source }: Props) {
         </p>
       )}
 
-      <div className="mt-3 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
         {source === 'loading' ? (
           Array.from({ length: SKELETON_CARD_COUNT }, (_, i) => <GameCardSkeleton key={i} />)
         ) : results.length === 0 ? (
@@ -98,6 +105,6 @@ export function GameInventory({ games: boardGames, source }: Props) {
           onPageSizeChange={setPageSize}
         />
       )}
-    </section>
+    </GameSection>
   )
 }

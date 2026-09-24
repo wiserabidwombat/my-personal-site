@@ -1,6 +1,9 @@
 import { cn } from 'cn'
 import type { BoardGame } from '../../types/board-game'
 
+// Glowing section heading still imported by the Books and Minerals & Fossils
+// pages. The Games page itself now uses SectionHeading (icon, no glow) via
+// GameSection.
 export const headingClass = 'text-2xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]'
 
 export function uniqueSorted(values: string[][]) {
@@ -35,21 +38,29 @@ export function extractBggId(bggLink: string | null): string | null {
   return match ? match[1] : null
 }
 
-// Game cards (inventory and Favorites) share the Blog cards' hover/focus
-// language: one border color, a slight lift and brighter border on hover or
-// keyboard focus, and a visible cyan ring for keyboard users. h-full + flex
-// keeps cards in a row equal height.
-export const gameCardClass = cn(
-  'group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/50 text-left transition duration-300',
-  'hover:-translate-y-1 hover:border-[var(--laser-cyan)]/70 motion-reduce:hover:translate-y-0',
+// Game cards share the Blog cards' look: one border color, h-full so cards
+// in a row are equal height. The interactive half adds a slight lift and
+// brighter border on hover or keyboard focus, and a visible cyan ring.
+export const gameCardBaseClass =
+  'group flex h-full overflow-hidden rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/50 text-left transition duration-300'
+export const gameCardInteractiveClass = cn(
+  'cursor-pointer hover:-translate-y-1 hover:border-[var(--laser-cyan)]/70 motion-reduce:hover:translate-y-0',
   'focus-visible:-translate-y-1 focus-visible:border-[var(--laser-cyan)]/70 focus-visible:ring-2 focus-visible:ring-[var(--laser-cyan)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--deep-space-black)] focus-visible:outline-none',
 )
 
+// The top sections (Currently Loving, Favorites, Want to Play) list games by
+// name and look them up in the Notion data for art and details.
+export function findGameByName(games: BoardGame[], name: string): BoardGame | undefined {
+  const query = name.toLowerCase()
+  return games.find((game) => game.name.toLowerCase() === query)
+}
+
 // Notion only fills the single "Playtime (min)" value (the min/max
 // playtime fields are empty for every game), so prefer it and fall back to
-// a range only if one ever gets filled in.
+// a range only if one ever gets filled in. A stored 0 (common on
+// expansions) means "unknown", not zero minutes.
 export function formatPlaytime(game: Pick<BoardGame, 'playtimeMinutes' | 'minPlaytime' | 'maxPlaytime'>): string {
-  if (game.playtimeMinutes != null) return `${game.playtimeMinutes} min`
+  if (game.playtimeMinutes) return `${game.playtimeMinutes} min`
   return formatRange(game.minPlaytime, game.maxPlaytime, 'min')
 }
 
