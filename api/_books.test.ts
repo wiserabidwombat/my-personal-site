@@ -26,44 +26,59 @@ function makeRaw(overrides: Partial<HardcoverUserBookRaw> = {}): HardcoverUserBo
 }
 
 const noBookData = { title: null, slug: null, pages: null, image: null, contributions: [] }
+const noEditionData = { title: null, pages: null, image: null, contributions: [] }
 
 describe('mapUserBook', () => {
-  it('maps a single-author, single-read book from book-level data', () => {
+  it('maps a single-author, single-read book from the chosen edition', () => {
     expect(mapUserBook(makeRaw())).toEqual({
       hardcoverBookId: 1,
-      title: 'Some Book',
-      author: 'Jane Author',
+      title: 'Ein Buch',
+      author: 'Edition Author',
       rating: 4.5,
-      pageCount: 300,
+      pageCount: 320,
       dateRead: '2026-03-14',
-      coverImageUrl: 'https://assets.hardcover.app/cover.jpg',
+      coverImageUrl: 'https://assets.hardcover.app/edition-cover.jpg',
       hardcoverUrl: 'https://hardcover.app/books/some-book',
       rereadCount: 0,
       isFavorite: false,
     })
   })
 
-  it('prefers book-level title, cover, and authors over the edition', () => {
+  it('prefers edition-level title, cover, authors, and pages over the book', () => {
     const book = mapUserBook(makeRaw())
-    expect(book.title).toBe('Some Book')
-    expect(book.coverImageUrl).toBe('https://assets.hardcover.app/cover.jpg')
-    expect(book.author).toBe('Jane Author')
-  })
-
-  it('falls back to edition-level data when the book lacks it', () => {
-    const book = mapUserBook(makeRaw({ book: noBookData }))
     expect(book.title).toBe('Ein Buch')
     expect(book.coverImageUrl).toBe('https://assets.hardcover.app/edition-cover.jpg')
     expect(book.author).toBe('Edition Author')
     expect(book.pageCount).toBe(320)
   })
 
-  it('falls back per field, treating blank strings as missing', () => {
-    const raw = makeRaw({ book: { ...makeRaw().book, title: '  ', image: { url: '' } } })
-    const book = mapUserBook(raw)
-    expect(book.title).toBe('Ein Buch')
-    expect(book.coverImageUrl).toBe('https://assets.hardcover.app/edition-cover.jpg')
+  it('falls back to book-level data when the edition lacks it', () => {
+    const book = mapUserBook(makeRaw({ edition: noEditionData }))
+    expect(book.title).toBe('Some Book')
+    expect(book.coverImageUrl).toBe('https://assets.hardcover.app/cover.jpg')
     expect(book.author).toBe('Jane Author')
+    expect(book.pageCount).toBe(300)
+  })
+
+  it('falls back to book-level data when there is no edition', () => {
+    const book = mapUserBook(makeRaw({ edition: null }))
+    expect(book.title).toBe('Some Book')
+    expect(book.coverImageUrl).toBe('https://assets.hardcover.app/cover.jpg')
+    expect(book.author).toBe('Jane Author')
+  })
+
+  it('falls back per field, treating blank strings as missing', () => {
+    const raw = makeRaw({ edition: { ...makeRaw().edition!, title: '  ', image: { url: '' } } })
+    const book = mapUserBook(raw)
+    expect(book.title).toBe('Some Book')
+    expect(book.coverImageUrl).toBe('https://assets.hardcover.app/cover.jpg')
+    expect(book.author).toBe('Edition Author')
+  })
+
+  it('uses edition data when the book record is empty, with no Hardcover link', () => {
+    const raw = makeRaw({ book: noBookData })
+    expect(mapUserBook(raw).coverImageUrl).toBe('https://assets.hardcover.app/edition-cover.jpg')
+    expect(mapUserBook(raw).hardcoverUrl).toBeNull()
   })
 
   it('handles a missing edition and missing data everywhere', () => {
