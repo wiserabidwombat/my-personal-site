@@ -25,6 +25,7 @@ function makeGame(id: string): BoardGame {
     lastPlayed: null,
     bggLink: null,
     thumbnailUrl: null,
+    imageUrl: null,
     notes: null,
     notes2: null,
     notes3: null,

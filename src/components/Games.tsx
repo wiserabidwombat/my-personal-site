@@ -12,7 +12,7 @@ export function Games() {
 
   return (
     <div className="bg-[var(--deep-space-black)] text-slate-200">
-      <CurrentlyLoving />
+      <CurrentlyLoving games={games} />
       <FavoritesList games={games} />
       <WantToPlay />
       <GameInventory games={games} source={source} />

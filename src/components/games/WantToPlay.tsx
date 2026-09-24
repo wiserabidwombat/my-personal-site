@@ -1,6 +1,6 @@
 import { headingClass } from './shared'
 
-const wantToPlay = ['Ark Nova', 'Perseverance: Cast Away Chronicles Ep. 1 & 2', 'The Crew: Mission Deep Sea', 'The Lord of the Rings: Fellowship of the Ring - Trick-Taking Game ']
+const wantToPlay = ['Ark Nova', 'Perseverance: Castaway Chronicles – Episodes 1 & 2', 'The Crew: Mission Deep Sea', 'The Lord of the Rings: The Fellowship of the Ring – Trick-Taking Game']
 
 export function WantToPlay() {
   return (

@@ -4,6 +4,7 @@ import { ExternalLinkIcon } from '@hugeicons/core-free-icons'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { TagList } from './TagList'
 import { GameDetailModal } from './GameDetailModal'
+import { GameArt } from './GameArt'
 import type { BoardGame } from '../../types/board-game'
 
 type Props = {
@@ -45,8 +46,11 @@ export function GameCard({
             setDetailOpen(true)
           }
         }}
-        className="cursor-pointer text-left ring-white/10 transition-all duration-300 hover:ring-[var(--laser-cyan)]/60 hover:shadow-glow-cyan"
+        className="cursor-pointer pt-0 text-left ring-white/10 transition-all duration-300 hover:ring-[var(--laser-cyan)]/60 hover:shadow-glow-cyan"
       >
+        {/* Thumbnail (200x150) rather than the full-size image: a page of 24
+            originals would be ~15 MB. */}
+        <GameArt name={name} src={game.thumbnailUrl ?? game.imageUrl} />
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
             <CardTitle className="text-base font-semibold text-slate-100">{name}</CardTitle>

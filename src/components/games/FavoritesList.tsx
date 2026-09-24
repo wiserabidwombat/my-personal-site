@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import type { BoardGame } from '../../types/board-game'
 import { headingClass } from './shared'
 import { GameDetailModal } from './GameDetailModal'
+import { GameArt } from './GameArt'
 
 const favorites = [
   'Eldritch Horror',
@@ -24,7 +25,8 @@ function FavoriteCard({ name, game }: { name: string; game: BoardGame | undefine
 
   if (!game) {
     return (
-      <Card className="text-left ring-white/10">
+      <Card className="h-full pt-0 text-left ring-white/10">
+        <GameArt name={name} src={null} />
         <CardHeader>
           <CardTitle className="text-base font-semibold text-slate-100">{name}</CardTitle>
         </CardHeader>
@@ -44,8 +46,9 @@ function FavoriteCard({ name, game }: { name: string; game: BoardGame | undefine
             setDetailOpen(true)
           }
         }}
-        className="cursor-pointer text-left ring-white/10 transition-all duration-300 hover:ring-[var(--laser-cyan)]/60 hover:shadow-glow-cyan"
+        className="h-full cursor-pointer pt-0 text-left ring-white/10 transition-all duration-300 hover:ring-[var(--laser-cyan)]/60 hover:shadow-glow-cyan"
       >
+        <GameArt name={name} src={game.thumbnailUrl ?? game.imageUrl} />
         <CardHeader>
           <CardTitle className="text-base font-semibold text-slate-100">{name}</CardTitle>
         </CardHeader>

@@ -1,92 +1,37 @@
-// Build-time only. Reads NOTION_TOKEN / NOTION_DATABASE_ID from the environment
-// (see .env.local, gitignored) and writes a plain JSON snapshot to src/data/board-games.json.
-// The token never touches client code -- only this Node script sees it.
+// Run manually (`npm run fetch:games`), not part of `build`. Reads the Notion
+// games data source and writes src/data/board-games.json -- the fallback
+// snapshot src/hooks/useBoardGames.ts shows only when /api/games fails. Reads
+// NOTION_TOKEN / NOTION_DATA_SOURCE_ID from .env.local (gitignored); the
+// token never touches client code -- only this Node script sees it.
+//
+// Rows are mapped with api/games.ts's own mapPage(), loaded through Vite's
+// SSR module loader (like scripts/generate-rss.mjs), so the snapshot always
+// has exactly the fields the live API returns -- the old hand-copied mapping
+// here had drifted and was missing categories, mechanics, and box art.
+import { createServer } from 'vite'
 import { writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { Client, collectAllDataSourceRows, isFullPage } from '@notionhq/client'
 
-const NOTION_TOKEN = process.env.NOTION_TOKEN
-const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID
+const { NOTION_TOKEN, NOTION_DATA_SOURCE_ID } = process.env
 
-if (!NOTION_TOKEN || !NOTION_DATABASE_ID) {
-  console.error(
-    'Missing NOTION_TOKEN or NOTION_DATABASE_ID. Copy .env.example to .env.local and fill them in.'
-  )
+if (!NOTION_TOKEN || !NOTION_DATA_SOURCE_ID) {
+  console.error('Missing NOTION_TOKEN or NOTION_DATA_SOURCE_ID. Copy .env.example to .env.local and fill them in.')
   process.exit(1)
 }
 
-function plainText(richTextArray) {
-  return richTextArray?.map((t) => t.plain_text).join('') || null
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
+const outFile = path.join(root, 'src', 'data', 'board-games.json')
+
+const server = await createServer({ root, server: { middlewareMode: true }, appType: 'custom', logLevel: 'error' })
+try {
+  const { mapPage } = await server.ssrLoadModule('/api/games.ts')
+  const notion = new Client({ auth: NOTION_TOKEN })
+  const rows = await collectAllDataSourceRows(notion, { data_source_id: NOTION_DATA_SOURCE_ID, page_size: 100 })
+  const games = rows.filter(isFullPage).map(mapPage)
+  await writeFile(outFile, JSON.stringify(games, null, 2) + '\n')
+  console.log(`Wrote ${games.length} games to ${path.relative(root, outFile)}`)
+} finally {
+  await server.close()
 }
-
-function mapPage(page) {
-  const p = page.properties
-  return {
-    id: page.id,
-    name: p.Game?.title?.[0]?.plain_text ?? 'Untitled',
-    tags: p.Tags?.multi_select?.map((t) => t.name) ?? [],
-    categories: p.Categories?.multi_select?.map((c) => c.name) ?? [],
-    mechanics: p.Mechanics?.multi_select?.map((m) => m.name) ?? [],
-    rating: p['Rating (1–10)']?.number ?? null,
-    status: p.Status?.status?.name ?? null,
-    condition: p.Condition?.select?.name ?? plainText(p.Condition?.rich_text),
-    owned: p.Owned?.checkbox ?? false,
-    playersMin: p['Players (Min)']?.number ?? null,
-    playersMax: p['Players (Max)']?.number ?? null,
-    playtimeMinutes: p['Playtime (min)']?.number ?? null,
-    minPlaytime: p['Playtime (Min)']?.number ?? null,
-    maxPlaytime: p['Playtime (Max)']?.number ?? null,
-    weight: p.Weight?.number ?? null,
-    designer: plainText(p.Designer?.rich_text),
-    publisher: plainText(p.Publisher?.rich_text),
-    yearPublished: p['Year Published']?.number ?? null,
-    lastPlayed: p['Last Played']?.date?.start ?? null,
-    bggLink: p['BGG Link']?.url ?? null,
-    thumbnailUrl: p['Thumbnail URL']?.url ?? null,
-    notes: plainText(p.Notes?.rich_text),
-    notes2: plainText(p['Notes 2']?.rich_text),
-    notes3: plainText(p['Notes 3']?.rich_text),
-    notionUrl: page.url,
-  }
-}
-
-async function fetchAllPages() {
-  const games = []
-  let cursor = undefined
-
-  do {
-    const response = await fetch(
-      `https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${NOTION_TOKEN}`,
-          'Notion-Version': '2022-06-28',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ page_size: 100, ...(cursor ? { start_cursor: cursor } : {}) }),
-      }
-    )
-
-    if (!response.ok) {
-      throw new Error(`Notion API error ${response.status}: ${await response.text()}`)
-    }
-
-    const data = await response.json()
-    games.push(...data.results.map(mapPage))
-    cursor = data.has_more ? data.next_cursor : undefined
-  } while (cursor)
-
-  return games
-}
-
-const games = await fetchAllPages()
-const outPath = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..',
-  'src',
-  'data',
-  'board-games.json'
-)
-await writeFile(outPath, JSON.stringify(games, null, 2) + '\n')
-console.log(`Wrote ${games.length} games to ${path.relative(process.cwd(), outPath)}`)

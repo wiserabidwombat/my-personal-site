@@ -23,7 +23,10 @@ export type BoardGame = {
   yearPublished: number | null
   lastPlayed: string | null
   bggLink: string | null
+  // BGG's 200x150 thumbnail (Notion "Thumbnail URL") and full-size box art
+  // ("Image URL", filled once by scripts/sync-bgg-images.mjs).
   thumbnailUrl: string | null
+  imageUrl: string | null
   notes: string | null
   notes2: string | null
   notes3: string | null
@@ -34,7 +37,21 @@ function plainText(richText: { plain_text: string }[] | undefined) {
   return richText?.map((t) => t.plain_text).join('') || null
 }
 
-function mapPage(page: PageObjectResponse): BoardGame {
+// "Image URL" is a Files & media property holding one external file (so
+// Notion previews the box art), but a plain URL property works too.
+function fileOrUrl(property: PageObjectResponse['properties'][string] | undefined): string | null {
+  if (property?.type === 'url') return property.url
+  if (property?.type === 'files') {
+    const file = property.files[0]
+    if (file?.type === 'external') return file.external.url
+    if (file?.type === 'file') return file.file.url
+  }
+  return null
+}
+
+// Exported so scripts/fetch-games.mjs builds the fallback snapshot with the
+// exact same mapping (loaded through Vite's SSR loader).
+export function mapPage(page: PageObjectResponse): BoardGame {
   const p = page.properties
 
   const title = p.Game?.type === 'title' ? p.Game.title : []
@@ -68,6 +85,7 @@ function mapPage(page: PageObjectResponse): BoardGame {
     p['Last Played']?.type === 'date' ? (p['Last Played'].date?.start ?? null) : null
   const bggLink = p['BGG Link']?.type === 'url' ? p['BGG Link'].url : null
   const thumbnailUrl = p['Thumbnail URL']?.type === 'url' ? p['Thumbnail URL'].url : null
+  const imageUrl = fileOrUrl(p['Image URL'])
   const notes = p.Notes?.type === 'rich_text' ? plainText(p.Notes.rich_text) : null
   const notes2 = p['Notes 2']?.type === 'rich_text' ? plainText(p['Notes 2'].rich_text) : null
   const notes3 = p['Notes 3']?.type === 'rich_text' ? plainText(p['Notes 3'].rich_text) : null
@@ -94,6 +112,7 @@ function mapPage(page: PageObjectResponse): BoardGame {
     lastPlayed,
     bggLink,
     thumbnailUrl,
+    imageUrl,
     notes,
     notes2,
     notes3,

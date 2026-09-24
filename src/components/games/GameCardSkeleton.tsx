@@ -4,13 +4,14 @@ function Bar({ className }: { className: string }) {
   return <div className={`skeleton-shimmer rounded-md ${className}`} aria-hidden="true" />
 }
 
-// Mirrors GameCard's exact structure (Card > CardHeader > title/link row,
+// Mirrors GameCard's exact structure (Card > 4:3 box art > CardHeader > title/link row,
 // players/rating/status row, categories row, mechanics row) and spacing
 // classes, so the loading grid doesn't shift or resize once real cards
 // swap in.
 export function GameCardSkeleton() {
   return (
-    <Card className="ring-white/10">
+    <Card className="pt-0 ring-white/10">
+      <div className="skeleton-shimmer aspect-[4/3] w-full" aria-hidden="true" />
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <Bar className="h-5 w-2/3" />

@@ -161,6 +161,18 @@ export function GameInventory({ games: boardGames, source }: Props) {
         </span>
       </div>
       <p className="mt-2 text-slate-300">Everything currently on the shelf.</p>
+      {/* BGG's XML API terms require attribution on public apps using its data. */}
+      <p className="mt-1 text-xs text-slate-500">
+        Box art and ratings from{' '}
+        <a
+          href="https://boardgamegeek.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-slate-400 underline underline-offset-2 hover:text-[var(--laser-cyan)]"
+        >
+          BoardGameGeek
+        </a>
+      </p>
 
       <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
         <RandomGamePicker games={boardGames} />

@@ -22,6 +22,7 @@ const fallback: BoardGame[] = (boardGamesFallback as Partial<BoardGame>[]).map((
   maxPlaytime: game.maxPlaytime ?? null,
   weight: game.weight ?? null,
   thumbnailUrl: game.thumbnailUrl ?? null,
+  imageUrl: game.imageUrl ?? null,
   notes: game.notes ?? null,
   notes2: game.notes2 ?? null,
   notes3: game.notes3 ?? null,
