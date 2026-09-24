@@ -1,38 +1,28 @@
-import { useState } from 'react'
+import { cn } from 'cn'
+import { StarIcon } from '@hugeicons/core-free-icons'
 import type { Book } from '../../types/book'
 import type { BooksStatus } from '../../hooks/useBooks'
-import { getResizedImageUrl } from '../../lib/image'
-import { headingClass } from '../games/shared'
+import { SectionHeading } from '../SectionHeading'
+import { pageContainer } from '../../lib/styles'
+import { BookCover } from './BookCover'
+import { BookLink } from './BookLink'
 import { FavoriteCardSkeleton } from './FavoriteCardSkeleton'
 
-// Shown when a book has no cover URL at all, or its cover URL 404s/fails to
-// load -- see BookCard.tsx for the full rationale.
-const NO_COVER_IMAGE = '/books/trex-no-cover.jpg'
-
-// Fills one full row of the lg:grid-cols-4 layout below without
+// Fills one full row of the sm:grid-cols-4 layout below without
 // overcommitting to a favorites-list size that isn't known yet.
 const SKELETON_COUNT = 4
 
 function FavoriteCard({ book }: { book: Book }) {
-  const [coverFailed, setCoverFailed] = useState(false)
-  const coverUrl =
-    !coverFailed && book.coverImageUrl ? getResizedImageUrl(book.coverImageUrl, 'large') : NO_COVER_IMAGE
-  const showCover = coverUrl !== NO_COVER_IMAGE
-
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border-2 border-[var(--neon-pink)] bg-[var(--deep-space-purple)]/40 shadow-glow-pink backdrop-blur-md">
-      <img
-        src={coverUrl}
-        alt={showCover ? `Cover of ${book.title}` : `No cover available for ${book.title}`}
-        loading="lazy"
-        onError={() => setCoverFailed(true)}
-        className="aspect-[2/3] w-full object-cover"
-      />
-      <div className="p-4">
-        <p className="font-semibold text-slate-100">{book.title}</p>
-        <p className="text-sm text-slate-400">{book.author}</p>
+    <BookLink href={book.hardcoverUrl} className="flex-col">
+      <BookCover url={book.coverImageUrl} title={book.title} />
+      <div className="p-3">
+        <h3 title={book.title} className="line-clamp-2 text-sm leading-snug font-semibold text-slate-100">
+          {book.title}
+        </h3>
+        {book.author && <p className="mt-1 line-clamp-1 text-xs text-slate-400">{book.author}</p>}
       </div>
-    </div>
+    </BookLink>
   )
 }
 
@@ -51,10 +41,10 @@ export function FavoritesShowcase({ books, status }: Props) {
   if (status !== 'loading' && favorites.length === 0) return null
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16">
-      <h2 className={headingClass}>Favorites</h2>
+    <section className={cn(pageContainer, 'py-8 sm:py-10')}>
+      <SectionHeading icon={StarIcon}>Favorites</SectionHeading>
       <p className="mt-2 text-slate-300">Books starred on Hardcover.</p>
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         {status === 'loading'
           ? Array.from({ length: SKELETON_COUNT }, (_, index) => <FavoriteCardSkeleton key={index} />)
           : favorites.map((book) => <FavoriteCard key={book.hardcoverBookId} book={book} />)}
