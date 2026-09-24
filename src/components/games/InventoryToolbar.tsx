@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Cancel01Icon, Search01Icon } from '@hugeicons/core-free-icons'
-import { Input } from '@/components/ui/input'
+import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '@/components/ui/badge'
 import { ChipGroup } from './ChipGroup'
+import { SearchInput } from './SearchInput'
 import { MultiSelectFilter } from './MultiSelectFilter'
 import {
   PLAYER_OPTIONS,
@@ -42,22 +42,7 @@ export function InventoryToolbar({ search, update, clearFilters, allCategories, 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {picker}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative w-full sm:w-64">
-            <HugeiconsIcon
-              icon={Search01Icon}
-              strokeWidth={2}
-              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
-              aria-hidden="true"
-            />
-            <Input
-              type="search"
-              value={search.q ?? ''}
-              onChange={(event) => update({ q: event.target.value || undefined })}
-              placeholder="Search games..."
-              aria-label="Search games"
-              className="pl-9"
-            />
-          </div>
+          <SearchInput value={search.q ?? ''} onCommit={(q) => update({ q: q || undefined })} />
           <label className="flex items-center gap-2 text-xs font-semibold tracking-wide text-slate-400 uppercase">
             Sort
             <select

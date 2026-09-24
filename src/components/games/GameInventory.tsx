@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import type { BoardGamesSource } from '../../hooks/useBoardGames'
 import type { BoardGame } from '../../types/board-game'
@@ -26,14 +26,20 @@ type Props = {
 
 export function GameInventory({ games: boardGames, source }: Props) {
   // Filters, search, and sort are URL search params (see routes/games.tsx),
-  // so any filtered view can be shared. replace: true keeps typing and chip
-  // toggling from flooding the browser history. Typed explicitly: the route
-  // file imports this component, so inference through useSearch is circular.
+  // so any filtered view can be shared. Every such navigation passes:
+  // - resetScroll: false -- TanStack Router scrolls to the top on every
+  //   navigate() by default, which yanked the filters out of view on each
+  //   chip click, sort change, or search;
+  // - replace: true -- so Back leaves the page instead of undoing filters
+  //   one at a time.
+  // Typed explicitly: the route file imports this component, so inference
+  // through useSearch is circular.
   const search: InventorySearch = useSearch({ from: '/games' })
   const navigate = useNavigate({ from: '/games' })
   const update = (patch: Partial<InventorySearch>) =>
-    void navigate({ search: (prev: InventorySearch) => ({ ...prev, ...patch }), replace: true })
-  const clearFilters = () => void navigate({ search: (prev: InventorySearch) => ({ sort: prev.sort }), replace: true })
+    void navigate({ search: (prev: InventorySearch) => ({ ...prev, ...patch }), replace: true, resetScroll: false })
+  const clearFilters = () =>
+    void navigate({ search: (prev: InventorySearch) => ({ sort: prev.sort }), replace: true, resetScroll: false })
 
   // "Everything currently on the shelf": owned games only. Unowned rows
   // (e.g. a Want to Play entry) still feed the top sections via Games.tsx.
@@ -46,7 +52,8 @@ export function GameInventory({ games: boardGames, source }: Props) {
   const [currentPage, setCurrentPage] = useState(1)
   // Back to page 1 whenever the filters, sort, or page size change, so a
   // stale page number never shows unrelated results. Adjusted during render
-  // (React's documented pattern) rather than in an effect.
+  // (React's documented pattern) rather than in an effect -- and it never
+  // scrolls, so a filter that shrinks the results doesn't move the page.
   const resetSignature = JSON.stringify([search, pageSize])
   const [prevResetSignature, setPrevResetSignature] = useState(resetSignature)
   if (resetSignature !== prevResetSignature) {
@@ -58,6 +65,20 @@ export function GameInventory({ games: boardGames, source }: Props) {
   const page = Math.min(currentPage, totalPages)
   const firstIndex = (page - 1) * pageSize
   const paginated = results.slice(firstIndex, firstIndex + pageSize)
+
+  // Paging (local state, not a navigation) brings the top of the new page
+  // into view: the "Showing X–Y" line lands just below the sticky header.
+  // Instant instead of smooth when the visitor prefers reduced motion.
+  const resultsTopRef = useRef<HTMLParagraphElement>(null)
+  function goToPage(next: number) {
+    setCurrentPage(next)
+    const target = resultsTopRef.current
+    if (!target) return
+    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 0
+    const top = target.getBoundingClientRect().top + window.scrollY - headerHeight - 12
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? 'auto' : 'smooth' })
+  }
 
   return (
     <GameSection
@@ -78,7 +99,7 @@ export function GameInventory({ games: boardGames, source }: Props) {
       />
 
       {source !== 'loading' && results.length > 0 && (
-        <p className="mt-6 text-sm text-slate-400" aria-live="polite">
+        <p ref={resultsTopRef} className="mt-6 text-sm text-slate-400" aria-live="polite">
           Showing {firstIndex + 1}–{firstIndex + paginated.length} of {results.length} games
         </p>
       )}
@@ -99,7 +120,7 @@ export function GameInventory({ games: boardGames, source }: Props) {
         <InventoryPagination
           page={page}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={goToPage}
           pageSize={pageSize}
           pageSizeOptions={PAGE_SIZE_OPTIONS}
           onPageSizeChange={setPageSize}
