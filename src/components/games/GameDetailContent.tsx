@@ -5,7 +5,7 @@ import { ExternalLinkIcon, ImageNotFound01Icon, Search01Icon } from '@hugeicons/
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import type { BoardGame } from '../../types/board-game'
-import { formatRange, formatCommaList, extractBggId } from './shared'
+import { formatRange, formatCommaList, extractBggId, formatPlaytime } from './shared'
 
 type Props = {
   game: BoardGame
@@ -133,10 +133,10 @@ export function GameDetailContent({ game }: Props) {
           }
         />
         <Stat label="Players" value={formatRange(game.playersMin, game.playersMax)} />
-        <Stat label="Playtime" value={formatRange(game.minPlaytime, game.maxPlaytime, 'min')} />
+        <Stat label="Playtime" value={formatPlaytime(game)} />
         <Stat label="Weight" value={game.weight != null ? game.weight.toFixed(2) : '—'} />
         <Stat label="Year Published" value={game.yearPublished ?? '—'} />
-        <Stat label="Rating" value={game.rating != null ? `${game.rating.toFixed(2)}/10` : '—'} />
+        <Stat label="BGG rating" value={game.rating != null ? `${game.rating.toFixed(2)}/10` : '—'} />
         <Stat label="Last Played" value={formatDate(game.lastPlayed) ?? '—'} />
         <Stat label="Designer" value={game.designer ?? '—'} />
         <Stat label="Publisher" value={formatCommaList(game.publisher)} />

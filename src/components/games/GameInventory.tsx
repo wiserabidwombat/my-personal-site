@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import type { BoardGamesSource } from '../../hooks/useBoardGames'
 import type { BoardGame } from '../../types/board-game'
-import { formatRange, uniqueSorted } from './shared'
+import { uniqueSorted } from './shared'
 import { filterInventory, sortInventory, type InventorySearch } from './inventoryFilters'
 import { InventoryHeader } from './InventoryHeader'
 import { InventoryToolbar } from './InventoryToolbar'
@@ -12,11 +12,10 @@ import { GameCard } from './GameCard'
 import { GameCardSkeleton } from './GameCardSkeleton'
 import { RandomGamePicker } from './RandomGamePicker'
 
-const PAGE_SIZE_OPTIONS = [6, 12, 24] as const
-// Fills out a realistic 3-row grid at the lg breakpoint (sm:grid-cols-2
-// lg:grid-cols-3) -- roughly what would show above the fold -- rather than
-// a sparse handful of skeletons.
-const SKELETON_CARD_COUNT = 9
+const PAGE_SIZE_OPTIONS = [12, 24, 48] as const
+// Two full rows of the 4-column desktop grid -- roughly what shows above the
+// fold -- rather than a sparse handful of skeletons.
+const SKELETON_CARD_COUNT = 8
 
 type Props = {
   games: BoardGame[]
@@ -33,11 +32,6 @@ export function GameInventory({ games: boardGames, source }: Props) {
   const update = (patch: Partial<InventorySearch>) =>
     void navigate({ search: (prev: InventorySearch) => ({ ...prev, ...patch }), replace: true })
   const clearFilters = () => void navigate({ search: (prev: InventorySearch) => ({ sort: prev.sort }), replace: true })
-  const toggleTag = (key: 'categories' | 'mechanics', tag: string) => {
-    const current = search[key] ?? []
-    const next = current.includes(tag) ? current.filter((t) => t !== tag) : [...current, tag]
-    update({ [key]: next.length ? next : undefined })
-  }
 
   const allCategories = useMemo(() => uniqueSorted(boardGames.map((game) => game.categories ?? [])), [boardGames])
   const allMechanics = useMemo(() => uniqueSorted(boardGames.map((game) => game.mechanics ?? [])), [boardGames])
@@ -46,7 +40,7 @@ export function GameInventory({ games: boardGames, source }: Props) {
     [boardGames, search],
   )
 
-  const [pageSize, setPageSize] = useState<number>(12)
+  const [pageSize, setPageSize] = useState<number>(24)
   const [currentPage, setCurrentPage] = useState(1)
   // Back to page 1 whenever the filters, sort, or page size change, so a
   // stale page number never shows unrelated results. Adjusted during render
@@ -82,26 +76,14 @@ export function GameInventory({ games: boardGames, source }: Props) {
         </p>
       )}
 
-      <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-3 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {source === 'loading' ? (
           Array.from({ length: SKELETON_CARD_COUNT }, (_, i) => <GameCardSkeleton key={i} />)
         ) : results.length === 0 ? (
           <InventoryEmptyState onClear={clearFilters} />
         ) : (
           paginated.map((game) => (
-            <GameCard
-              key={game.id}
-              game={game}
-              name={game.name}
-              players={formatRange(game.playersMin, game.playersMax)}
-              rating={game.rating != null ? `${game.rating.toFixed(2)}/10` : '—'}
-              status={game.status ?? '—'}
-              bggLink={game.bggLink}
-              categories={game.categories ?? []}
-              mechanics={game.mechanics ?? []}
-              onCategoryTagClick={(tag) => toggleTag('categories', tag)}
-              onMechanicTagClick={(tag) => toggleTag('mechanics', tag)}
-            />
+            <GameCard key={game.id} game={game} />
           ))
         )}
       </div>

@@ -1,44 +1,27 @@
 import { useState } from 'react'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ExternalLinkIcon } from '@hugeicons/core-free-icons'
-import { Card, CardHeader, CardTitle } from '@/components/ui/card'
-import { TagList } from './TagList'
+import { cn } from 'cn'
+import type { BoardGame } from '../../types/board-game'
 import { GameDetailModal } from './GameDetailModal'
 import { GameArt } from './GameArt'
-import type { BoardGame } from '../../types/board-game'
+import { formatBggRating, formatPlaytime, formatRange, gameCardClass } from './shared'
 
 type Props = {
   game: BoardGame
-  name: string
-  players: string
-  rating: string
-  status: string
-  bggLink: string | null
-  categories: string[]
-  mechanics: string[]
-  onCategoryTagClick: (tag: string) => void
-  onMechanicTagClick: (tag: string) => void
 }
 
-export function GameCard({
-  game,
-  name,
-  players,
-  rating,
-  status,
-  bggLink,
-  categories,
-  mechanics,
-  onCategoryTagClick,
-  onMechanicTagClick,
-}: Props) {
+// The whole card is one target that opens the detail dialog (which has the
+// BGG link, notes, and full stats), so nothing interactive is nested inside
+// it. The stats row is pinned to the bottom so cards in a row line up.
+export function GameCard({ game }: Props) {
   const [detailOpen, setDetailOpen] = useState(false)
+  const played = game.status?.toLowerCase() === 'played'
 
   return (
     <>
-      <Card
+      <div
         role="button"
         tabIndex={0}
+        aria-haspopup="dialog"
         onClick={() => setDetailOpen(true)}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
@@ -46,56 +29,49 @@ export function GameCard({
             setDetailOpen(true)
           }
         }}
-        className="cursor-pointer pt-0 text-left ring-white/10 transition-all duration-300 hover:ring-[var(--laser-cyan)]/60 hover:shadow-glow-cyan"
+        className={gameCardClass}
       >
         {/* Thumbnail (200x150) rather than the full-size image: a page of 24
             originals would be ~15 MB. */}
-        <GameArt name={name} src={game.thumbnailUrl ?? game.imageUrl} />
-        <CardHeader>
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-base font-semibold text-slate-100">{name}</CardTitle>
-            {bggLink && (
-              <a
-                href={bggLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${name} on BoardGameGeek`}
-                onClick={(event) => event.stopPropagation()}
-                className="inline-flex shrink-0 text-slate-400 transition-colors duration-300 hover:text-[var(--laser-cyan)]"
-              >
-                <HugeiconsIcon icon={ExternalLinkIcon} strokeWidth={2} className="size-4" aria-hidden="true" />
-              </a>
-            )}
-          </div>
-
-          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300">
-            <span>Players: {players}</span>
-            <span>Rating: {rating}</span>
-            <span>Status: {status}</span>
-          </div>
-
-          {(categories.length > 0 || mechanics.length > 0) && (
-            <div className="mt-3 space-y-2" onClick={(event) => event.stopPropagation()}>
-              {categories.length > 0 && (
-                <div>
-                  <p className="mb-1 text-[10px] font-semibold tracking-wide text-slate-500 uppercase">
-                    Categories
-                  </p>
-                  <TagList tags={categories} onTagClick={onCategoryTagClick} />
-                </div>
+        {/* Status sits on the art's corner so the title gets the card's full
+            width instead of wrapping beside a badge. */}
+        <div className="relative">
+          <GameArt
+            name={game.name}
+            src={game.thumbnailUrl ?? game.imageUrl}
+            className="transition-[filter] duration-300 group-hover:brightness-110"
+          />
+          {game.status && (
+            <span
+              className={cn(
+                'absolute top-2 left-2 rounded-full border bg-[var(--deep-space-black)]/85 px-2 py-0.5 text-[11px] font-medium backdrop-blur-sm',
+                played
+                  ? 'border-[var(--laser-cyan)]/60 text-[var(--laser-cyan)]'
+                  : 'border-slate-500/60 text-slate-300',
               )}
-              {mechanics.length > 0 && (
-                <div>
-                  <p className="mb-1 text-[10px] font-semibold tracking-wide text-slate-500 uppercase">
-                    Mechanics
-                  </p>
-                  <TagList tags={mechanics} onTagClick={onMechanicTagClick} />
-                </div>
-              )}
-            </div>
+            >
+              {game.status}
+            </span>
           )}
-        </CardHeader>
-      </Card>
+        </div>
+        <div className="flex flex-1 flex-col gap-3 p-4">
+          <h3 className="font-semibold text-slate-50">{game.name}</h3>
+          <dl className="mt-auto flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300">
+            <div>
+              <dt className="sr-only">Players</dt>
+              <dd>{formatRange(game.playersMin, game.playersMax)} players</dd>
+            </div>
+            <div>
+              <dt className="sr-only">Playtime</dt>
+              <dd>{formatPlaytime(game)}</dd>
+            </div>
+            <div className="flex gap-1">
+              <dt className="text-slate-500">BGG rating</dt>
+              <dd>{formatBggRating(game.rating)}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
 
       <GameDetailModal game={game} open={detailOpen} onOpenChange={setDetailOpen} />
     </>
