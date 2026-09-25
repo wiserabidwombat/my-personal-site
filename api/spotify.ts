@@ -92,7 +92,9 @@ const API = 'https://api.spotify.com/v1'
 const REQUEST_TIMEOUT_MS = 8000
 // Refresh a little before Spotify's expiry so a token never lapses mid-request.
 const EXPIRY_MARGIN_MS = 60_000
-const TOP_LIMIT = 10
+// Top tracks: a numbered 1-10 list. Top artists: 12, which fills whole rows
+// of the 6/4/3-column artist grid.
+export const TOP_LIMITS = { tracks: 10, artists: 12 } as const
 const MAX_PLAYLIST_PAGES = 4
 // Recently played asks for Spotify's maximum so that, after repeats are
 // collapsed, there are still enough unique tracks to fill the list.
@@ -288,7 +290,7 @@ async function loadRecentlyPlayed(token: string): Promise<RecentTrack[]> {
 
 async function loadTop<T extends 'tracks' | 'artists'>(token: string, type: T, range: 'short_term' | 'medium_term') {
   const page = await spotifyGet<Paged<T extends 'tracks' ? RawTrack : RawItem>>(
-    `/me/top/${type}?time_range=${range}&limit=${TOP_LIMIT}`,
+    `/me/top/${type}?time_range=${range}&limit=${TOP_LIMITS[type]}`,
     token,
   )
   return page?.items ?? []

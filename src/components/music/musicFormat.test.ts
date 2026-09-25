@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { availableRanges, displayTrackName, formatRelativeTime, isEmptyMusic } from './musicFormat'
+import { availableRanges, displayTrackName, evenArtistCount, formatRelativeTime, isEmptyMusic } from './musicFormat'
 
 const now = new Date('2026-09-25T12:00:00Z')
 const ago = (ms: number) => new Date(now.getTime() - ms).toISOString()
@@ -76,5 +76,20 @@ describe('displayTrackName', () => {
 
   it('keeps a remix credit that precedes a remaster tag', () => {
     expect(displayTrackName('Song - Club Remix - Remastered 2010')).toBe('Song - Club Remix')
+  })
+})
+
+describe('evenArtistCount', () => {
+  it('rounds down to whole rows of 6', () => {
+    expect(evenArtistCount(12)).toBe(12)
+    expect(evenArtistCount(11)).toBe(6)
+    expect(evenArtistCount(7)).toBe(6)
+    expect(evenArtistCount(6)).toBe(6)
+  })
+
+  it('shows every artist when there are fewer than one row', () => {
+    expect(evenArtistCount(5)).toBe(5)
+    expect(evenArtistCount(1)).toBe(1)
+    expect(evenArtistCount(0)).toBe(0)
   })
 })

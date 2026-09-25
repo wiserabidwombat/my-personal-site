@@ -42,6 +42,13 @@ export function formatRelativeTime(iso: string, now: Date = new Date()): string 
   return then.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
+// How many top artists to show so the grid's rows fill evenly: whole rows
+// of 6 (the desktop column count) when there are at least 6, otherwise all
+// of them. 12 also divides evenly into the 4- and 3-column layouts.
+export function evenArtistCount(available: number, perRow = 6): number {
+  return available < perRow ? available : Math.floor(available / perRow) * perRow
+}
+
 export type TimeRange = 'shortTerm' | 'mediumTerm'
 
 export const TIME_RANGE_LABELS: Record<TimeRange, string> = {

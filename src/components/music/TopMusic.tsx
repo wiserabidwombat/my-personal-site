@@ -7,7 +7,7 @@ import { outlinePill, outlinePillActive } from '../../lib/styles'
 import { Artwork } from './Artwork'
 import { SpotifyLink } from './SpotifyLink'
 import { TrackRow } from './TrackRow'
-import { TIME_RANGE_LABELS, type TimeRange } from './musicFormat'
+import { evenArtistCount, TIME_RANGE_LABELS, type TimeRange } from './musicFormat'
 
 const chipClass = cn(
   outlinePill,
@@ -68,7 +68,8 @@ type Props = {
 export function TopMusic({ ranges, tracks, artists }: Props) {
   const [selected, setSelected] = useState<TimeRange>(ranges[0])
   const range = ranges.includes(selected) ? selected : ranges[0]
-  const rangeArtists = artists?.[range] ?? []
+  const allArtists = artists?.[range] ?? []
+  const rangeArtists = allArtists.slice(0, evenArtistCount(allArtists.length))
   const rangeTracks = tracks?.[range] ?? []
 
   return (

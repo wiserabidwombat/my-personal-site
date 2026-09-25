@@ -340,6 +340,22 @@ describe('loadMusic', () => {
     expect(music.playlists?.map((entry) => entry.name)).toEqual(['page one', 'page two'])
   })
 
+  it('asks for 10 top tracks and 12 top artists per range', async () => {
+    const fetchMock = mockFetch()
+    await loadMusic(ENV)
+    const limits = fetchMock.mock.calls
+      .map(([url]) => new URL(String(url)))
+      .filter((url) => url.pathname.startsWith('/v1/me/top/'))
+      .map((url) => `${url.pathname.split('/').at(-1)}:${url.searchParams.get('time_range')}:${url.searchParams.get('limit')}`)
+      .sort()
+    expect(limits).toEqual([
+      'artists:medium_term:12',
+      'artists:short_term:12',
+      'tracks:medium_term:10',
+      'tracks:short_term:10',
+    ])
+  })
+
   it('asks for 50 recent plays and returns at most 12 unique tracks', async () => {
     const fetchMock = mockFetch({
       '/v1/me/player/recently-played': () =>
