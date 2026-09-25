@@ -11,6 +11,7 @@
     "fetch:games": "node --env-file=.env.local scripts/fetch-games.mjs",
     "sync:bgg": "node --env-file=.env.local scripts/sync-bgg.mjs",
     "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
+    "spotify:auth": "node --env-file=.env.local scripts/spotify-auth.mjs",
     "test": "vitest run"
   },
   "dependencies": {

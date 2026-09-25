@@ -55,6 +55,7 @@ import {
   stackMeta,
   mineralsFossilsMeta,
   booksMeta,
+  musicMeta,
   routeMetaList,
   type RouteMetaEntry,
 } from './routeMeta'
@@ -76,6 +77,7 @@ const routeFiles: { file: string; metaName: string; meta: RouteMetaEntry }[] = [
   { file: 'stack.tsx', metaName: 'stackMeta', meta: stackMeta },
   { file: 'minerals_fossils.tsx', metaName: 'mineralsFossilsMeta', meta: mineralsFossilsMeta },
   { file: 'books.tsx', metaName: 'booksMeta', meta: booksMeta },
+  { file: 'music.tsx', metaName: 'musicMeta', meta: musicMeta },
 ]
 
 describe('routeMeta wiring (guards against static-page metadata drift)', () => {

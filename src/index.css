@@ -505,3 +505,24 @@ code {
     animation: none;
   }
 }
+
+/* Music "Now Playing" equalizer: bars bounce from the bottom at staggered
+   delays. Under reduced motion they hold still at their own heights. */
+@keyframes equalizer-bounce {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@utility animate-equalizer {
+  transform-origin: bottom;
+  animation: equalizer-bounce 0.9s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
