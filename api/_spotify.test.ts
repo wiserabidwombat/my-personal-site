@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import handler, {
+  excludedPlaylistIds,
   getAccessToken,
   loadMusic,
   normalizeNowPlaying,
@@ -7,7 +8,9 @@ import handler, {
   ownPublicPlaylists,
   pickImage,
   resetSpotifyCache,
+  showablePlaylists,
   SpotifyError,
+  uniqueRecentPlays,
   type RawPlaylist,
   type SpotifyEnv,
 } from './spotify'
@@ -27,7 +30,8 @@ const art = [
   { url: 'https://i.scdn.co/64', width: 64, height: 64 },
 ]
 
-const track = (name: string) => ({
+const track = (name: string, id: string | null = `id-${name}`) => ({
+  id,
   name,
   artists: [{ name: 'Artist A' }, { name: 'Artist B' }],
   album: { images: art },
@@ -40,9 +44,11 @@ const item = (name: string, kind: string) => ({
 })
 const playlist = (name: string, overrides: Partial<RawPlaylist> = {}): RawPlaylist => ({
   ...item(name, 'playlist'),
+  id: `pl-${name}`,
   public: true,
   collaborative: false,
   owner: { id: USER_ID },
+  items: { total: 12 },
   ...overrides,
 })
 
@@ -219,6 +225,69 @@ describe('normalization', () => {
   })
 })
 
+describe('uniqueRecentPlays', () => {
+  const play = (name: string, playedAt: string, id: string | null = `id-${name}`) => ({
+    track: track(name, id),
+    played_at: playedAt,
+  })
+
+  it('keeps only the most recent play of each track, newest first', () => {
+    const plays = [
+      play('b', '2026-09-25T09:00:00Z'),
+      play('a', '2026-09-25T11:00:00Z'),
+      play('a', '2026-09-25T08:00:00Z'),
+      play('b', '2026-09-25T10:00:00Z'),
+    ]
+    expect(uniqueRecentPlays(plays).map((entry) => `${entry.track.name}@${entry.played_at.slice(11, 13)}`)).toEqual([
+      'a@11',
+      'b@10',
+    ])
+  })
+
+  it('matches by track ID, not by name', () => {
+    const plays = [play('Same Name', '2026-09-25T11:00:00Z', 'one'), play('Same Name', '2026-09-25T10:00:00Z', 'two')]
+    expect(uniqueRecentPlays(plays)).toHaveLength(2)
+  })
+
+  it('falls back to the link for local files without an ID', () => {
+    const plays = [play('local', '2026-09-25T11:00:00Z', null), play('local', '2026-09-25T10:00:00Z', null)]
+    expect(uniqueRecentPlays(plays)).toHaveLength(1)
+  })
+
+  it('stops at the limit (12 by default)', () => {
+    const plays = Array.from({ length: 30 }, (_, index) =>
+      play(`t${index}`, `2026-09-25T${String(index % 24).padStart(2, '0')}:00:00Z`),
+    )
+    expect(uniqueRecentPlays(plays)).toHaveLength(12)
+    expect(uniqueRecentPlays(plays, 5)).toHaveLength(5)
+  })
+})
+
+describe('playlist exclusions', () => {
+  it('parses SPOTIFY_EXCLUDED_PLAYLISTS as IDs, URIs, or links', () => {
+    expect(
+      excludedPlaylistIds({
+        SPOTIFY_EXCLUDED_PLAYLISTS: ' abc123 , spotify:playlist:def456,https://open.spotify.com/playlist/ghi789?si=x,, ',
+      }),
+    ).toEqual(new Set(['abc123', 'def456', 'ghi789']))
+    expect(excludedPlaylistIds({})).toEqual(new Set())
+  })
+
+  it('drops excluded and empty playlists, keeping ones with an unknown count', () => {
+    const kept = showablePlaylists(
+      [
+        playlist('keep'),
+        playlist('excluded'),
+        playlist('empty', { items: { total: 0 } }),
+        playlist('empty old field', { items: undefined, tracks: { total: 0 } }),
+        playlist('unknown count', { items: undefined }),
+      ],
+      new Set(['pl-excluded']),
+    )
+    expect(kept.map((entry) => entry.name)).toEqual(['keep', 'unknown count'])
+  })
+})
+
 describe('loadMusic', () => {
   it('returns every section, normalized, with no tokens, ids, or email', async () => {
     mockFetch()
@@ -269,6 +338,35 @@ describe('loadMusic', () => {
     })
     const { music } = await loadMusic(ENV)
     expect(music.playlists?.map((entry) => entry.name)).toEqual(['page one', 'page two'])
+  })
+
+  it('asks for 50 recent plays and returns at most 12 unique tracks', async () => {
+    const fetchMock = mockFetch({
+      '/v1/me/player/recently-played': () =>
+        json({
+          items: Array.from({ length: 50 }, (_, index) => ({
+            track: track(`t${index % 20}`),
+            played_at: new Date(Date.UTC(2026, 8, 25, 12) - index * 60_000).toISOString(),
+          })),
+          next: null,
+        }),
+    })
+    const { music } = await loadMusic(ENV)
+    const call = fetchMock.mock.calls.find(([url]) => String(url).includes('recently-played'))
+    expect(new URL(String(call?.[0])).searchParams.get('limit')).toBe('50')
+    expect(music.recentlyPlayed?.map((entry) => entry.name)).toEqual(Array.from({ length: 12 }, (_, index) => `t${index}`))
+  })
+
+  it('filters playlists from SPOTIFY_EXCLUDED_PLAYLISTS and empty ones', async () => {
+    mockFetch({
+      '/v1/me/playlists': () =>
+        json({
+          items: [playlist('keep'), playlist('hide me'), playlist('no tracks', { items: { total: 0 } })],
+          next: null,
+        }),
+    })
+    const { music } = await loadMusic({ ...ENV, SPOTIFY_EXCLUDED_PLAYLISTS: 'pl-hide me' })
+    expect(music.playlists?.map((entry) => entry.name)).toEqual(['keep'])
   })
 
   it('omits only the failed sections and logs them', async () => {

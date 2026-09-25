@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import type { MusicTrack } from '../../types/music'
 import { Artwork } from './Artwork'
 import { SpotifyLink } from './SpotifyLink'
+import { displayTrackName } from './musicFormat'
 
 type Props = {
   track: MusicTrack
@@ -12,7 +13,8 @@ type Props = {
 }
 
 // Compact track row: small artwork, name, and artists, linked to Spotify.
-// Long names truncate to one line; the full text is in the tooltip.
+// The name drops release-only tags like "- Remastered 2007" and long text
+// truncates to one line; the full original name is in the tooltip.
 export function TrackRow({ track, leading, trailing }: Props) {
   return (
     <SpotifyLink
@@ -23,7 +25,7 @@ export function TrackRow({ track, leading, trailing }: Props) {
       {leading}
       <Artwork url={track.imageUrl} className="w-10 flex-none sm:w-11" />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-slate-100">{track.name}</p>
+        <p className="truncate text-sm font-medium text-slate-100">{displayTrackName(track.name)}</p>
         <p className="truncate text-xs text-slate-400">{track.artists}</p>
       </div>
       {trailing}

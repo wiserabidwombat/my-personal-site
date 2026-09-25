@@ -45,6 +45,8 @@ type ExternalUrls = { spotify?: string } | undefined
 
 type RawTrack = {
   type?: 'track'
+  // null for local files.
+  id?: string | null
   name: string
   artists: { name: string }[]
   album: { images: SpotifyImage[] | null }
@@ -62,9 +64,14 @@ type RawEpisode = {
 type RawItem = { name: string; images: SpotifyImage[] | null; external_urls: ExternalUrls }
 
 export type RawPlaylist = RawItem & {
+  id: string
   public: boolean | null
   collaborative: boolean
   owner: { id: string }
+  // Track count. `items` replaced `tracks` in February 2026; either may be
+  // present depending on the account's API version.
+  items?: { total: number } | null
+  tracks?: { total: number } | null
 }
 
 type Paged<T> = { items: T[]; next: string | null }
@@ -76,6 +83,9 @@ export type SpotifyEnv = {
   SPOTIFY_CLIENT_SECRET?: string
   SPOTIFY_REFRESH_TOKEN?: string
   SPOTIFY_SHOW_NOW_PLAYING?: string
+  // Comma-separated playlist IDs to hide (bare IDs, spotify:playlist: URIs,
+  // or open.spotify.com links all work).
+  SPOTIFY_EXCLUDED_PLAYLISTS?: string
 }
 
 const API = 'https://api.spotify.com/v1'
@@ -84,6 +94,10 @@ const REQUEST_TIMEOUT_MS = 8000
 const EXPIRY_MARGIN_MS = 60_000
 const TOP_LIMIT = 10
 const MAX_PLAYLIST_PAGES = 4
+// Recently played asks for Spotify's maximum so that, after repeats are
+// collapsed, there are still enough unique tracks to fill the list.
+const RECENT_FETCH_LIMIT = 50
+export const RECENT_UNIQUE_LIMIT = 12
 
 // Minimum rendered widths (CSS px, doubled for high-density screens).
 export const LIST_ART_WIDTH = 96
@@ -200,6 +214,45 @@ export function ownPublicPlaylists(playlists: (RawPlaylist | null)[], userId: st
   )
 }
 
+export function excludedPlaylistIds(env: SpotifyEnv): Set<string> {
+  return new Set(
+    (env.SPOTIFY_EXCLUDED_PLAYLISTS ?? '')
+      .split(',')
+      .map((entry) => entry.trim().split(/[/:]/).at(-1)?.split('?')[0] ?? '')
+      .filter(Boolean),
+  )
+}
+
+// Drops playlists listed in SPOTIFY_EXCLUDED_PLAYLISTS and playlists with no
+// tracks. A playlist whose track count is missing is kept.
+export function showablePlaylists(playlists: RawPlaylist[], excluded: Set<string>): RawPlaylist[] {
+  return playlists.filter((playlist) => {
+    if (excluded.has(playlist.id)) return false
+    const total = playlist.items?.total ?? playlist.tracks?.total
+    return total !== 0
+  })
+}
+
+type RawRecentPlay = { track: RawTrack; played_at: string }
+
+// Keeps only the most recent play of each track (matched by track ID, or by
+// link and then name for local files, which have no ID), newest first.
+export function uniqueRecentPlays(plays: RawRecentPlay[], limit = RECENT_UNIQUE_LIMIT): RawRecentPlay[] {
+  const newestFirst = [...plays].sort((a, b) => b.played_at.localeCompare(a.played_at))
+  const seen = new Set<string>()
+  const unique: RawRecentPlay[] = []
+  for (const play of newestFirst) {
+    const { track } = play
+    const key =
+      track.id ?? track.external_urls?.spotify ?? `${track.name}|${track.artists.map((artist) => artist.name).join(',')}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    unique.push(play)
+    if (unique.length === limit) break
+  }
+  return unique
+}
+
 type RawCurrentlyPlaying = {
   is_playing: boolean
   currently_playing_type: 'track' | 'episode' | 'ad' | 'unknown'
@@ -229,8 +282,8 @@ export function normalizeNowPlaying(raw: RawCurrentlyPlaying | null): NowPlaying
 // ---------------------------------------------------------------------------
 
 async function loadRecentlyPlayed(token: string): Promise<RecentTrack[]> {
-  const page = await spotifyGet<Paged<{ track: RawTrack; played_at: string }>>('/me/player/recently-played?limit=20', token)
-  return (page?.items ?? []).map((item) => ({ ...normalizeTrack(item.track), playedAt: item.played_at }))
+  const page = await spotifyGet<Paged<RawRecentPlay>>(`/me/player/recently-played?limit=${RECENT_FETCH_LIMIT}`, token)
+  return uniqueRecentPlays(page?.items ?? []).map((play) => ({ ...normalizeTrack(play.track), playedAt: play.played_at }))
 }
 
 async function loadTop<T extends 'tracks' | 'artists'>(token: string, type: T, range: 'short_term' | 'medium_term') {
@@ -249,7 +302,7 @@ async function loadUserId(token: string): Promise<string> {
   return me.id
 }
 
-async function loadPlaylists(token: string): Promise<MusicItem[]> {
+async function loadPlaylists(token: string, excluded: Set<string>): Promise<MusicItem[]> {
   const [userId, playlists] = await Promise.all([
     loadUserId(token),
     (async () => {
@@ -263,7 +316,7 @@ async function loadPlaylists(token: string): Promise<MusicItem[]> {
       return all
     })(),
   ])
-  return ownPublicPlaylists(playlists, userId).map((playlist) => normalizeItem(playlist))
+  return showablePlaylists(ownPublicPlaylists(playlists, userId), excluded).map((playlist) => normalizeItem(playlist))
 }
 
 async function loadPodcasts(token: string): Promise<MusicItem[]> {
@@ -294,7 +347,7 @@ export async function loadMusic(env: SpotifyEnv): Promise<{ music: MusicResponse
       music.recentlyPlayed = await loadRecentlyPlayed(token)
     },
     playlists: async () => {
-      music.playlists = await loadPlaylists(token)
+      music.playlists = await loadPlaylists(token, excludedPlaylistIds(env))
     },
     podcasts: async () => {
       music.podcasts = await loadPodcasts(token)

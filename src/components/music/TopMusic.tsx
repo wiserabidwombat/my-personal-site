@@ -18,7 +18,7 @@ const subheadingClass = 'text-sm font-semibold tracking-wide text-slate-400 uppe
 
 function ArtistGrid({ artists }: { artists: MusicItem[] }) {
   return (
-    <ul className="mt-3 grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-5">
+    <ul className="mt-3 grid grid-cols-3 gap-x-4 gap-y-5 sm:grid-cols-4 lg:grid-cols-6">
       {artists.map((artist) => (
         <li key={artist.name}>
           <SpotifyLink href={artist.spotifyUrl} title={artist.name} className="group block rounded-lg text-center">

@@ -73,6 +73,7 @@ Copy `.env.example` to `.env.local` (already gitignored) and fill in:
 | `SPOTIFY_CLIENT_SECRET` | `scripts/spotify-auth.mjs`, `api/spotify.ts` | Client secret of the same Spotify app. Only read server-side |
 | `SPOTIFY_REFRESH_TOKEN` | `api/spotify.ts` | Long-lived refresh token for your own Spotify account, printed once by `npm run spotify:auth`. Only read server-side |
 | `SPOTIFY_SHOW_NOW_PLAYING` | `api/spotify.ts` | Optional. Set to `true` to show the currently playing track on the Music page (off by default) |
+| `SPOTIFY_EXCLUDED_PLAYLISTS` | `api/spotify.ts` | Optional. Comma-separated playlist IDs to hide from the Music page (the part after `/playlist/` in a share link). Empty playlists are always hidden |
 
 These same variables must also be set in the Vercel dashboard for the deployed `api/*.ts` functions to work. Never commit real values — `.env.local` is gitignored.
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { availableRanges, formatRelativeTime, isEmptyMusic } from './musicFormat'
+import { availableRanges, displayTrackName, formatRelativeTime, isEmptyMusic } from './musicFormat'
 
 const now = new Date('2026-09-25T12:00:00Z')
 const ago = (ms: number) => new Date(now.getTime() - ms).toISOString()
@@ -38,5 +38,43 @@ describe('isEmptyMusic', () => {
     expect(isEmptyMusic({})).toBe(true)
     expect(isEmptyMusic({ playlists: [], podcasts: [], topTracks: { shortTerm: [] } })).toBe(true)
     expect(isEmptyMusic({ podcasts: [{ name: 'Show', imageUrl: null, spotifyUrl: null }] })).toBe(false)
+  })
+})
+
+describe('displayTrackName', () => {
+  it.each([
+    ['With Or Without You - Remastered 2007', 'With Or Without You'],
+    ['Heroes - 2017 Remaster', 'Heroes'],
+    ["Baba O'Riley - Remastered", "Baba O'Riley"],
+    ['Paint It Black - Remaster', 'Paint It Black'],
+    ['Dreams - 2004 Remastered Version', 'Dreams'],
+    ['Go Your Own Way - Remastered Version', 'Go Your Own Way'],
+    ['Song - Radio Edit', 'Song'],
+    ['Song - Single Version', 'Song'],
+    ['Song - Album Version', 'Song'],
+    ['Song - Mono Version', 'Song'],
+    ['Song (Remastered 2011)', 'Song'],
+    ['Song [2009 Remaster]', 'Song'],
+    ['Song - Radio Edit - Remastered', 'Song'],
+  ])('strips "%s"', (input, expected) => {
+    expect(displayTrackName(input)).toBe(expected)
+  })
+
+  it.each([
+    'Seven Nation Army - The Glitch Mob Remix',
+    'Seven Nation Army - Live',
+    'Hurt - Live at the Troubadour',
+    'Creep - Acoustic',
+    'Hey Jude - Remix',
+    'Song (feat. Someone)',
+    'Pre-Remastered Dreams',
+    'Ocotillo',
+    'A - B',
+  ])('keeps "%s"', (input) => {
+    expect(displayTrackName(input)).toBe(input)
+  })
+
+  it('keeps a remix credit that precedes a remaster tag', () => {
+    expect(displayTrackName('Song - Club Remix - Remastered 2010')).toBe('Song - Club Remix')
   })
 })

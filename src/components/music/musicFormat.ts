@@ -1,5 +1,32 @@
 import type { MusicResponse, TimeRanges } from '../../types/music'
 
+// Version tags that only describe the release, not a different recording:
+// remasters (with or without a year), radio/single/album edits and versions,
+// and mono/stereo versions. Remix, live, acoustic, and similar credits are
+// different recordings and are kept.
+const VERSION_TAGS = [
+  /^(?:\d{4}\s+)?(?:digital(?:ly)?\s+)?remaster(?:ed)?(?:\s+\d{4})?(?:\s+(?:version|edition))?(?:\s+\d{4})?$/i,
+  /^(?:radio|single|album)\s+(?:edit|version)$/i,
+  /^radio\s+mix$/i,
+  /^(?:mono|stereo)(?:\s+version)?$/i,
+]
+
+const isVersionTag = (tag: string) => VERSION_TAGS.some((pattern) => pattern.test(tag.trim()))
+
+// "With Or Without You - Remastered 2007" -> "With Or Without You". Handles
+// a trailing " - Tag" or "(Tag)"/"[Tag]", repeatedly, for display only --
+// the full name stays in the tooltip.
+export function displayTrackName(name: string): string {
+  let current = name.trim()
+  for (;;) {
+    const dash = current.match(/^(.+?)\s+-\s+([^-]+)$/)
+    const bracket = current.match(/^(.+?)\s*[([]([^()[\]]+)[)\]]$/)
+    const match = [dash, bracket].find((candidate) => candidate && isVersionTag(candidate[2]))
+    if (!match) return current
+    current = match[1].trim()
+  }
+}
+
 // "just now", "12 min ago", "3 hr ago", "2 days ago"; older plays show the
 // date ("Sep 12").
 export function formatRelativeTime(iso: string, now: Date = new Date()): string {
