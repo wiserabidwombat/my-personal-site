@@ -13,6 +13,7 @@ Each data source uses the strategy that fits how often it changes and where it l
 - **Board games: live Notion API with a snapshot fallback.** `api/games.ts` reads Notion on each request behind a short edge cache, so edits show up without a redeploy. If that call fails, the page falls back to a checked-in snapshot (`npm run fetch:games`), so it never breaks. BoardGameGeek details (box art, players, playtime, rating, and so on) are copied into Notion by `npm run sync:bgg`, so the site never calls BoardGameGeek's API at request time.
 - **Minerals & fossils: Neon Postgres.** The database is hosted through Vercel alongside the site itself, and it shows a different way of storing and retrieving data than the Notion-backed board games. `api/fossils.ts` queries the catalog table on each request behind a short edge cache, and the schema is versioned in `db/migrations`.
 - **Books: live Hardcover GraphQL, no build step or database.** `api/books.ts` and `api/currently-reading.ts` query Hardcover on each request behind a short edge cache, so a newly finished or starred book appears without a redeploy or manual sync.
+- **Music: live Spotify Web API with a server-held refresh token.** `api/spotify.ts` swaps a refresh token (created once with `npm run spotify:auth`) for an access token, fetches each section in parallel behind a short edge cache, and leaves out any section whose call fails. Visitors never sign in, and no tokens or account ids reach the browser.
 - **Blog: markdown files, with one parser shared by the site and the RSS feed.** Posts live in `content/blog` and are parsed by `src/lib/blog.ts`. `scripts/generate-rss.mjs` builds `public/rss.xml` from that same module (loaded through Vite's SSR loader, since `blog.ts` reads posts via `import.meta.glob`), so the feed can't drift from what's rendered on the blog.
 - **Meta tag prerendering for link previews.** Link-preview crawlers don't run JavaScript, so after `vite build`, `scripts/prerender-meta.mjs` writes a static HTML page for every route and blog post with its title, OpenGraph/Twitter tags, and canonical link baked in. Any other path falls back to the SPA shell (`app-shell.html`) via `vercel.json`.
 
@@ -31,6 +32,7 @@ the orchestrator is needed, all though the orchestrator is thorough, it uses a l
   - Board games sourced from a Notion database (`api/games.ts`, `scripts/fetch-games.mjs`)
   - Minerals & fossils catalog in Neon Postgres (`api/fossils.ts`, `db/migrations`)
   - Books from the Hardcover GraphQL API (`api/books.ts`, `api/currently-reading.ts`)
+  - Listening data from the Spotify Web API (`api/spotify.ts`, `scripts/spotify-auth.mjs`)
   - Blog posts as markdown files in `content/blog`
 - **Hosting:** Vercel (serverless functions in `api/`, static SPA otherwise)
 - **Testing:** Vitest
@@ -67,6 +69,11 @@ Copy `.env.example` to `.env.local` (already gitignored) and fill in:
 | `DATABASE_URL` | `scripts/migrate.mjs`, `api/fossils.ts` | Neon Postgres connection string. In production this is auto-injected by the Vercel Marketplace Neon integration |
 | `HARDCOVER_API_TOKEN` | `api/books.ts`, `api/currently-reading.ts` | Hardcover Personal Access Token. Expires after 1 year with no programmatic renewal — regenerate manually at hardcover.app account settings when it does |
 | `HARDCOVER_USER_ID` | `api/books.ts`, `api/currently-reading.ts` | Numeric Hardcover user ID (not a secret) — get it by querying `{ me { id } }` against the Hardcover API with your token |
+| `SPOTIFY_CLIENT_ID` | `scripts/spotify-auth.mjs`, `api/spotify.ts` | Client ID of your app in the Spotify Developer Dashboard (redirect URI `http://127.0.0.1:8888/callback`) |
+| `SPOTIFY_CLIENT_SECRET` | `scripts/spotify-auth.mjs`, `api/spotify.ts` | Client secret of the same Spotify app. Only read server-side |
+| `SPOTIFY_REFRESH_TOKEN` | `api/spotify.ts` | Long-lived refresh token for your own Spotify account, printed once by `npm run spotify:auth`. Only read server-side |
+| `SPOTIFY_SHOW_NOW_PLAYING` | `api/spotify.ts` | Optional. Set to `true` to show the currently playing track on the Music page (off by default) |
+| `SPOTIFY_EXCLUDED_PLAYLISTS` | `api/spotify.ts` | Optional. Comma-separated playlist IDs to hide from the Music page (the part after `/playlist/` in a share link). Empty playlists are always hidden |
 
 These same variables must also be set in the Vercel dashboard for the deployed `api/*.ts` functions to work. Never commit real values — `.env.local` is gitignored.
 
@@ -82,21 +89,22 @@ These same variables must also be set in the Vercel dashboard for the deployed `
 | `npm run fetch:games` | Pull the board game collection from Notion into `src/data/board-games.json`, the fallback snapshot used when `/api/games` is unavailable (run manually, not part of `build`; requires `NOTION_TOKEN`/`NOTION_DATA_SOURCE_ID`) |
 | `npm run sync:bgg` | Fill any empty BoardGameGeek-sourced fields on the Notion games rows (box art, players, playtimes, year, BGG rating, weight, designer, publisher, categories, mechanics) from BGG. Never overwrites filled fields or touches personal ones. A new row only needs its name and "BGG Link". Dry run by default; add `-- --write` to apply |
 | `npm run db:migrate` | Apply every `.sql` file in `db/migrations`, in filename order, against `DATABASE_URL` |
+| `npm run spotify:auth` | One-time Spotify authorization for the Music page: opens the consent screen, catches the callback on `http://127.0.0.1:8888/callback`, and prints a refresh token to the terminal (never saved to a file). Requires `SPOTIFY_CLIENT_ID`/`SPOTIFY_CLIENT_SECRET` |
 
 ## Project structure
 
 ```
 .claude/          Claude Code agents and the synthwave-ui design skill
-api/              Vercel serverless functions: games, fossils, books, currently-reading
+api/              Vercel serverless functions: games, fossils, books, currently-reading, spotify
                   (_*.test.ts files are tests; the _ prefix keeps Vercel from deploying them)
 content/blog/     Blog posts as markdown
 db/migrations/    SQL migrations for the minerals & fossils Postgres table
 docs/             Design specs, implementation plans, and the README screenshot
 public/           Static assets (blog images, headshot, OG image), generated rss.xml
-scripts/          Build-time Node scripts (Notion fetch, DB migrate, RSS, meta prerender)
+scripts/          Build-time and one-off Node scripts (Notion fetch, DB migrate, RSS, meta prerender, Spotify auth)
 src/
   assets/         Images imported by components
-  components/     UI components (incl. about/, blog/, books/, contact/, fossils/, games/, home/, resume/ subfolders)
+  components/     UI components (incl. about/, blog/, books/, contact/, fossils/, games/, home/, music/, resume/ subfolders)
     ui/           shadcn UI primitives (button, card, dialog, etc.), imported as @/components/ui/...
   data/           Board game fallback snapshot (board-games.json)
   hooks/          React hooks
@@ -119,7 +127,10 @@ Vitest runs in a Node environment (see `vitest.config.ts`), and `npm run build` 
 - Blog, book, and game filters, book stats, and the game picker's spin animation (`src/components/*/*.test.ts`)
 - Per-route meta wiring (`src/routes/routeMeta.test.ts`)
 - The Hardcover API handlers (`api/_books.test.ts`, `api/_currently-reading.test.ts`)
+- The Spotify API handler: token refresh, normalization, playlist filtering, and partial failures (`api/_spotify.test.ts`)
 
 ## Deployment
 
 The site deploys to Vercel. `npm run build` is the build command Vercel runs; it produces a static `dist/` output plus the prerendered per-route HTML, and `api/*.ts` files deploy as serverless functions. Ensure the environment variables above are set in the Vercel project settings before deploying.
+
+Vercel reads environment variables when a deployment is built, so changing one in the project settings doesn't affect deployments that already exist. After adding or changing a variable, redeploy (from the deployment's menu in the Vercel dashboard, or by pushing a new commit), and set it for each environment that needs it (Production and Preview are separate). For example, a new `SPOTIFY_REFRESH_TOKEN` only takes effect on the next deployment.

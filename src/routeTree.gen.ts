@@ -16,6 +16,7 @@ import { Route as BooksRouteImport } from './routes/books'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as GamesRouteImport } from './routes/games'
 import { Route as Minerals_fossilsRouteImport } from './routes/minerals_fossils'
+import { Route as MusicRouteImport } from './routes/music'
 import { Route as ResumeRouteImport } from './routes/resume'
 import { Route as StackRouteImport } from './routes/stack'
 import { Route as BlogSlugRouteImport } from './routes/blog_.$slug'
@@ -55,6 +56,11 @@ const Minerals_fossilsRoute = Minerals_fossilsRouteImport.update({
   path: '/minerals_fossils',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MusicRoute = MusicRouteImport.update({
+  id: '/music',
+  path: '/music',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumeRoute = ResumeRouteImport.update({
   id: '/resume',
   path: '/resume',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/games': typeof GamesRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
+  '/music': typeof MusicRoute
   '/resume': typeof ResumeRoute
   '/stack': typeof StackRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/games': typeof GamesRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
+  '/music': typeof MusicRoute
   '/resume': typeof ResumeRoute
   '/stack': typeof StackRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/games': typeof GamesRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
+  '/music': typeof MusicRoute
   '/resume': typeof ResumeRoute
   '/stack': typeof StackRoute
   '/blog_/$slug': typeof BlogSlugRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/games'
     | '/minerals_fossils'
+    | '/music'
     | '/resume'
     | '/stack'
     | '/blog/$slug'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/games'
     | '/minerals_fossils'
+    | '/music'
     | '/resume'
     | '/stack'
     | '/blog/$slug'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/games'
     | '/minerals_fossils'
+    | '/music'
     | '/resume'
     | '/stack'
     | '/blog_/$slug'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   GamesRoute: typeof GamesRoute
   Minerals_fossilsRoute: typeof Minerals_fossilsRoute
+  MusicRoute: typeof MusicRoute
   ResumeRoute: typeof ResumeRoute
   StackRoute: typeof StackRoute
   BlogSlugRoute: typeof BlogSlugRoute
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Minerals_fossilsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/music': {
+      id: '/music'
+      path: '/music'
+      fullPath: '/music'
+      preLoaderRoute: typeof MusicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resume': {
       id: '/resume'
       path: '/resume'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   GamesRoute: GamesRoute,
   Minerals_fossilsRoute: Minerals_fossilsRoute,
+  MusicRoute: MusicRoute,
   ResumeRoute: ResumeRoute,
   StackRoute: StackRoute,
   BlogSlugRoute: BlogSlugRoute,

@@ -69,6 +69,12 @@ export const mineralsFossilsMeta: RouteMetaEntry = {
   description: "Browse Aaron's minerals and fossil collection.",
 }
 
+export const musicMeta: RouteMetaEntry = {
+  path: '/music',
+  title: 'Music',
+  description: "What Aaron's listening to lately -- top artists and tracks, playlists, and podcasts, live from Spotify.",
+}
+
 export const booksMeta: RouteMetaEntry = {
   path: '/books',
   title: "Books I've Read",
@@ -89,4 +95,5 @@ export const routeMetaList: readonly RouteMetaEntry[] = [
   stackMeta,
   mineralsFossilsMeta,
   booksMeta,
+  musicMeta,
 ]

@@ -109,11 +109,11 @@ function renderHead(page) {
 // loader (only blog_.$slug.tsx has one) has actually resolved, so
 // renderToString never races an unresolved loader.
 //
-// /games, /minerals_fossils, and /books have no route loader -- their data
-// hooks (useBoardGames, useSpecimens, useBooks) are useEffect-gated, which
-// never runs during renderToString, so those three pages simply render
+// /games, /minerals_fossils, /books, and /music have no route loader -- their
+// data hooks (useBoardGames, useSpecimens, useBooks, useMusic) are
+// useEffect-gated, which never runs during renderToString, so those pages render
 // their initial loading-skeleton state here (a "shell" prerender) rather
-// than live data. The live Notion/Neon/Hardcover fetch still happens
+// than live data. The live Notion/Neon/Hardcover/Spotify fetch still happens
 // client-side after hydration exactly as before -- nothing about those
 // hooks changes.
 async function renderBody(page) {

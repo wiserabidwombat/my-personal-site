@@ -24,6 +24,7 @@ const hobbyItems = [
   { to: '/games', label: 'Games' },
   { to: '/minerals_fossils', label: 'Minerals & Fossils' },
   { to: '/books', label: 'Books' },
+  { to: '/music', label: 'Music' },
 ]
 
 const navLinkClass =
