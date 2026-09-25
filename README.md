@@ -131,3 +131,5 @@ Vitest runs in a Node environment (see `vitest.config.ts`), and `npm run build` 
 ## Deployment
 
 The site deploys to Vercel. `npm run build` is the build command Vercel runs; it produces a static `dist/` output plus the prerendered per-route HTML, and `api/*.ts` files deploy as serverless functions. Ensure the environment variables above are set in the Vercel project settings before deploying.
+
+Vercel reads environment variables when a deployment is built, so changing one in the project settings doesn't affect deployments that already exist. After adding or changing a variable, redeploy (from the deployment's menu in the Vercel dashboard, or by pushing a new commit), and set it for each environment that needs it (Production and Preview are separate). For example, a new `SPOTIFY_REFRESH_TOKEN` only takes effect on the next deployment.
