@@ -136,8 +136,68 @@
   }
 }
 
+/* Flight path: `top` (percent of the skyline image's height) is keyed to the
+   same timeline as the horizontal drift, so each keyframe matches a point
+   across the image. Measured on the night skyline: the creature on the
+   skyscraper spans ~54-66% across and 13-40% down; the sky brightens below
+   ~40%. While crossing the creature's columns a bat stays at 42% or lower --
+   under the creature, never over it. Mobile crops the image from the left
+   (the creature sits at the right edge, ~96%), so it has its own path. */
+@keyframes halloween-bat-path {
+  0% {
+    top: calc(34% + var(--bat-offset, 0%));
+  }
+  30% {
+    top: calc(40% + var(--bat-offset, 0%));
+  }
+  70%,
+  100% {
+    top: calc(45% + var(--bat-offset, 0%));
+  }
+}
+@keyframes halloween-bat-path-wide {
+  0% {
+    top: calc(30% + var(--bat-offset, 0%));
+  }
+  25%,
+  45% {
+    top: calc(44% + var(--bat-offset, 0%));
+  }
+  70% {
+    top: calc(46% + var(--bat-offset, 0%));
+  }
+  85% {
+    top: calc(38% + var(--bat-offset, 0%));
+  }
+  100% {
+    top: calc(30% + var(--bat-offset, 0%));
+  }
+}
+
 .halloween-bat {
+  top: calc(44% + var(--bat-offset, 0%));
+  animation:
+    halloween-bat-drift var(--bat-duration, 45s) linear var(--bat-delay, 0s) infinite,
+    halloween-bat-path var(--bat-duration, 45s) ease-in-out var(--bat-delay, 0s) infinite;
+}
+@media (min-width: 640px) {
+  .halloween-bat {
+    animation-name: halloween-bat-drift, halloween-bat-path-wide;
+  }
+}
+
+/* Light mode keeps the original flight: a straight, high pass. */
+[data-theme='light'] .halloween-bat {
+  top: var(--bat-light-top, 8%);
   animation: halloween-bat-drift var(--bat-duration, 45s) linear var(--bat-delay, 0s) infinite;
+}
+
+/* Dark mode: a soft purple and orange glow separates each bat from the
+   night sky (the sprites' rim light and eyes do the rest). Light mode's
+   bats already read against the pale sky and are unchanged. */
+[data-season='halloween']:not([data-theme='light']) .halloween-bat svg {
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--cyber-purple) 75%, transparent))
+    drop-shadow(0 0 5px color-mix(in oklab, var(--neon-pink) 30%, transparent));
 }
 .halloween-bat-bob {
   animation: halloween-bob 2.6s ease-in-out infinite;
@@ -156,6 +216,15 @@
   .halloween-bat {
     animation: none;
     transform: translateX(var(--bat-rest, 50vw));
+  }
+  @media (min-width: 640px) {
+    .halloween-bat {
+      transform: translateX(var(--bat-rest-sm, 50vw));
+    }
+  }
+  [data-theme='light'] .halloween-bat {
+    animation: none;
+    transform: translateX(var(--bat-light-rest, 50vw));
   }
   .halloween-bat-bob,
   .halloween-flap-a,

@@ -8,6 +8,16 @@ const GHOST = '#f1ecfa'
 const BONE = '#efe6d8'
 const EYE = '#ff7a1a'
 
+// Adds a 1-pixel rim light along the top edge of a sprite's body: every
+// body pixel with nothing above it becomes the rim color. Used for the dark
+// theme, where a dark bat would otherwise vanish against the night sky.
+function withTopRim(art: SpriteArt, body: string, rimColor: string, extraColors: Record<string, string> = {}): SpriteArt {
+  const rows = art.rows.map((row, y) =>
+    [...row].map((char, x) => (char === body && (y === 0 || art.rows[y - 1][x] === '.') ? 'L' : char)).join(''),
+  )
+  return { ...art, rows, colors: { ...art.colors, L: rimColor, ...extraColors } }
+}
+
 // Bat, two frames (wings up / wings down) for the flap.
 export const batUp: SpriteArt = {
   rows: [
@@ -34,6 +44,12 @@ export const batDown: SpriteArt = {
   ],
   colors: { X: NIGHT, O: EYE },
 }
+
+// Dark-theme bats: a rim light in the Halloween purple along the wings and
+// head, and eyes in the orange token at full strength.
+const nightBat = (art: SpriteArt) => withTopRim(art, 'X', 'var(--cyber-purple)', { O: 'var(--neon-pink)' })
+export const batUpNight = nightBat(batUp)
+export const batDownNight = nightBat(batDown)
 
 export const ghost: SpriteArt = {
   rows: [

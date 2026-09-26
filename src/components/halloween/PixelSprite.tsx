@@ -3,7 +3,7 @@ import { cn } from 'cn'
 export type SpriteArt = {
   // One string per row, one character per pixel; '.' is transparent.
   rows: string[]
-  // Fill color for each character used in `rows`.
+  // Fill color for each character used in `rows` (hex or a CSS variable).
   colors: Record<string, string>
   // Optional 1px outline drawn around every filled pixel, so pale sprites
   // (a ghost, a skeleton) stay visible on the light background too.
@@ -56,10 +56,10 @@ export function PixelSprite({ art, className }: Props) {
     >
       {[...outlinePixels].map((key) => {
         const [x, y] = key.split(',').map(Number)
-        return <rect key={`o${key}`} x={x} y={y} width={1} height={1} fill={outline} />
+        return <rect key={`o${key}`} x={x} y={y} width={1} height={1} style={{ fill: outline }} />
       })}
       {filled.map(([x, y, fill]) => (
-        <rect key={`${x},${y}`} x={x} y={y} width={1} height={1} fill={fill} />
+        <rect key={`${x},${y}`} x={x} y={y} width={1} height={1} style={{ fill }} />
       ))}
     </svg>
   )
