@@ -1,79 +1,170 @@
-import { ReactFlow, Position, Handle, type Node, type Edge, type NodeProps } from '@xyflow/react'
+import { useEffect, useRef, type RefObject } from 'react'
+import { ReactFlow, Position, Handle, useReactFlow, type Node, type Edge, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/base.css'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Card, CardHeader, CardTitle } from '@/components/ui/card'
-import { glowStyles, type StackNodeData } from './stackFlowTheme'
+import { accentStyles, type StackNodeData } from './stackFlowTheme'
 
-// A real React component per node -- unlike Mermaid's text-based nodes,
-// this can reuse the exact same Card + glow-token styling used everywhere
-// else on the site, so the diagram never drifts from the actual palette.
-// Four handles (rather than just top/bottom) let a diagram route an edge
-// out the side -- e.g. a review-loop's "send it back" arrow -- without
-// overlapping the main top-to-bottom flow.
+const hiddenHandle = '!size-1 !min-w-0 !min-h-0 !border-0 !bg-transparent'
+
+// Extra source handles spread along the bottom and right edges, so several
+// arrows leaving one box each start from their own point instead of sharing
+// a trunk. Ids are `out-bottom-<percent>` / `out-right-<percent>`.
+const BOTTOM_FAN = [
+  { id: 'out-bottom-10', className: '!left-[10%]' },
+  { id: 'out-bottom-20', className: '!left-[20%]' },
+  { id: 'out-bottom-30', className: '!left-[30%]' },
+  { id: 'out-bottom-40', className: '!left-[40%]' },
+  { id: 'out-bottom-60', className: '!left-[60%]' },
+  { id: 'out-bottom-70', className: '!left-[70%]' },
+  { id: 'out-bottom-80', className: '!left-[80%]' },
+]
+const RIGHT_FAN = [
+  { id: 'out-right-30', className: '!top-[30%]' },
+  { id: 'out-right-70', className: '!top-[70%]' },
+]
+
+// One box per node, with the site's restrained card border. Every side has
+// a target (`in-*`) and a source (`out-*`) handle, so a diagram can route
+// arrows in any direction -- left to right on desktop, top to bottom on
+// mobile, and a review loop out the side or bottom.
 function StackNode({ data }: NodeProps<Node<StackNodeData>>) {
-  const style = glowStyles[data.glow]
+  const accent = accentStyles[data.accent]
   return (
     <>
-      <Handle type="target" position={Position.Top} id="top" className="!bg-transparent !border-0" />
-      <Handle type="target" position={Position.Right} id="right-target" className="!bg-transparent !border-0" />
-      <Card className={`w-44 gap-1 p-3 text-center ${style.ring} ${style.shadow} bg-[var(--deep-space-purple)]/70 backdrop-blur-md`}>
-        <CardHeader className="items-center gap-1.5 p-0">
-          <HugeiconsIcon icon={data.icon} strokeWidth={2} className={`size-6 ${style.icon}`} aria-hidden="true" />
-          <CardTitle className="text-sm font-semibold text-slate-100">{data.label}</CardTitle>
-        </CardHeader>
-      </Card>
-      <Handle type="source" position={Position.Bottom} id="bottom" className="!bg-transparent !border-0" />
-      <Handle type="source" position={Position.Right} id="right-source" className="!bg-transparent !border-0" />
+      <Handle type="target" position={Position.Top} id="in-top" className={hiddenHandle} />
+      <Handle type="target" position={Position.Left} id="in-left" className={hiddenHandle} />
+      <Handle type="target" position={Position.Right} id="in-right" className={hiddenHandle} />
+      <Handle type="target" position={Position.Bottom} id="in-bottom" className={hiddenHandle} />
+      <div
+        className={`flex h-full w-full flex-col items-center justify-center rounded-xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)] text-center ${data.compact ? 'gap-1 px-2 py-1.5' : 'gap-1.5 px-3 py-2'}`}
+      >
+        <HugeiconsIcon
+          icon={data.icon}
+          strokeWidth={2}
+          className={`flex-none ${data.compact ? 'size-4' : 'size-5'} ${accent.icon}`}
+          aria-hidden="true"
+        />
+        <p className={`leading-tight font-semibold text-slate-100 ${data.compact ? 'text-xs' : 'text-sm'}`}>{data.label}</p>
+        {data.steps && (
+          <ol className="mt-1 w-full space-y-0.5 text-left text-xs text-slate-300">
+            {data.steps.map((step, index) => (
+              <li key={step} className="flex gap-1.5">
+                <span className={`flex-none font-semibold tabular-nums ${accent.icon}`}>{index + 1}.</span>
+                {step}
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+      <Handle type="source" position={Position.Bottom} id="out-bottom" className={hiddenHandle} />
+      <Handle type="source" position={Position.Right} id="out-right" className={hiddenHandle} />
+      <Handle type="source" position={Position.Top} id="out-top" className={hiddenHandle} />
+      <Handle type="source" position={Position.Left} id="out-left" className={hiddenHandle} />
+      {BOTTOM_FAN.map((handle) => (
+        <Handle
+          key={handle.id}
+          type="source"
+          position={Position.Bottom}
+          id={handle.id}
+          className={`${hiddenHandle} ${handle.className}`}
+        />
+      ))}
+      {RIGHT_FAN.map((handle) => (
+        <Handle
+          key={handle.id}
+          type="source"
+          position={Position.Right}
+          id={handle.id}
+          className={`${hiddenHandle} ${handle.className}`}
+        />
+      ))}
     </>
   )
 }
 
 const nodeTypes = { stackNode: StackNode }
 
-// Matches the StackNode Card's `w-44`. Used to figure out how wide a
-// diagram's content actually is, so a viewport too narrow for fitView to
-// reach MIN_ZOOM gets a wider (scrollable) container instead of a silently
-// clipped one -- ReactFlow's pane is `overflow: hidden` and panning is off,
-// so today, on mobile, whatever doesn't fit is just gone.
-const NODE_WIDTH = 176
-// The library's own default -- kept explicit so the width math below can't
-// drift from the value actually governing fitView's zoom floor.
+// fitView's zoom floor. A layout wider than the container can show at this
+// zoom gets a wider, horizontally scrollable container instead of being
+// clipped (the pane is overflow: hidden and panning is off).
 const MIN_ZOOM = 0.5
+// Never enlarge a diagram past its natural size.
+const MAX_ZOOM = 1
+const FIT_PADDING = 0.04
+const FIT_OPTIONS = { padding: FIT_PADDING, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM }
 
-type StackFlowDiagramProps = {
+// fitView only runs when ReactFlow mounts. Refit whenever the container
+// resizes (a window or phone rotation) -- otherwise a diagram that loaded
+// wide keeps its desktop zoom after the window narrows and its boxes spill
+// past the right edge.
+function FitOnResize({ container }: { container: RefObject<HTMLDivElement | null> }) {
+  const { fitView } = useReactFlow()
+  useEffect(() => {
+    const element = container.current
+    if (!element) return
+    const observer = new ResizeObserver(() => {
+      void fitView(FIT_OPTIONS)
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [container, fitView])
+  return null
+}
+
+export type StackLayout = {
   nodes: Node<StackNodeData>[]
   edges: Edge[]
-  height?: number
+  // Space beyond the boxes for arrows and labels that route outside them
+  // (a review loop, an edge label), so they aren't cut off.
+  margin?: { x: number; y: number }
+}
+
+type StackFlowDiagramProps = {
+  layout: StackLayout
   ariaLabel: string
 }
 
-// Static picture, not an editor: dragging/connecting/selecting are all off.
-// fitView frames the whole graph on mount so it never needs an initial pan
-// to be readable.
-export function StackFlowDiagram({ nodes, edges, height = 650, ariaLabel }: StackFlowDiagramProps) {
-  const xs = nodes.map((node) => node.position.x)
-  const contentWidth = Math.max(...xs) - Math.min(...xs) + NODE_WIDTH
-  // fitView only clips when even MIN_ZOOM is too much zoom for the container
-  // to hold the content (contentWidth * MIN_ZOOM > container width) -- a
-  // narrower container just gets less than its requested 0.15 padding,
-  // which isn't a bug worth avoiding. A small buffer covers the gap between
-  // this estimate and ReactFlow's own measured node width.
-  const minContainerWidth = Math.ceil(contentWidth * MIN_ZOOM) + 8
+function bounds({ nodes, margin = { x: 0, y: 0 } }: StackLayout) {
+  const right = Math.max(...nodes.map((node) => node.position.x + (node.width ?? 0)))
+  const bottom = Math.max(...nodes.map((node) => node.position.y + (node.height ?? 0)))
+  const left = Math.min(...nodes.map((node) => node.position.x))
+  const top = Math.min(...nodes.map((node) => node.position.y))
+  return { width: right - left + margin.x * 2, height: bottom - top + margin.y * 2 }
+}
+
+// Static picture, not an editor: dragging, connecting, selecting, and
+// panning are all off. The container takes the layout's aspect ratio and is
+// never wider than the layout's natural size, so fitView fills it without
+// stretching boxes or leaving empty bands above and below.
+export function StackFlowDiagram({ layout, ariaLabel }: StackFlowDiagramProps) {
+  const container = useRef<HTMLDivElement>(null)
+  const { width, height } = bounds(layout)
+  // Remount on a layout switch (desktop <-> mobile) so the new layout gets
+  // its own initial fit rather than the old layout's viewport.
+  const layoutKey = layout.nodes.map((node) => `${node.id}@${node.position.x},${node.position.y}`).join('|')
+  const padded = { width: width * (1 + FIT_PADDING * 2), height: height * (1 + FIT_PADDING * 2) }
+  const minWidth = Math.ceil(padded.width * MIN_ZOOM)
 
   return (
     <div
-      className="w-full"
-      style={{ height, width: `max(100%, ${minContainerWidth}px)` }}
+      ref={container}
+      className="mx-auto"
+      style={{
+        aspectRatio: `${padded.width} / ${padded.height}`,
+        width: `max(${minWidth}px, min(100%, ${Math.ceil(padded.width)}px))`,
+      }}
       role="img"
       aria-label={ariaLabel}
     >
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        key={layoutKey}
+        nodes={layout.nodes}
+        edges={layout.edges}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.15 }}
+        fitViewOptions={FIT_OPTIONS}
         minZoom={MIN_ZOOM}
+        maxZoom={MAX_ZOOM}
         proOptions={{ hideAttribution: true }}
         nodesDraggable={false}
         nodesConnectable={false}
@@ -83,7 +174,9 @@ export function StackFlowDiagram({ nodes, edges, height = 650, ariaLabel }: Stac
         zoomOnPinch={false}
         zoomOnDoubleClick={false}
         preventScrolling={false}
-      />
+      >
+        <FitOnResize container={container} />
+      </ReactFlow>
     </div>
   )
 }
