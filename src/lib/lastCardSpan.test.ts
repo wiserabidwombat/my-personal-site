@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { lastCardSpan } from './stackGrid'
+import { lastCardSpan } from './lastCardSpan'
 
 describe('lastCardSpan', () => {
   it('adds no span when every row is full', () => {

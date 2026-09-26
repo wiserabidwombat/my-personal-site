@@ -18,7 +18,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { cn } from 'cn'
 import { gameCardBaseClass } from '../games/shared'
-import { lastCardSpan } from './stackGrid'
+import { lastCardSpan } from '../../lib/lastCardSpan'
 
 type Tech = { name: string; role: string; icon: IconSvgElement }
 // `wideColumns` is the column count from lg up; tablet is always 2 and

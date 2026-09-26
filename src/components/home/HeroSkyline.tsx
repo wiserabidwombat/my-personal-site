@@ -2,6 +2,8 @@ import { Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowRight02Icon } from '@hugeicons/core-free-icons'
 import { useTheme } from '../../hooks/useTheme'
+import { heroTitle } from '../../lib/resume-data'
+import { neonOutlineButton } from '../../lib/styles'
 import dallasSkylineDark from '../../assets/dallas-skyline.webp'
 import dallasSkylineLight from '../../assets/dallas-skyline-light.webp'
 
@@ -20,7 +22,7 @@ function HeroText() {
   return (
     <div className="relative z-10 mx-auto max-w-3xl px-6 pt-24 pb-12 sm:pt-28 sm:pb-16">
       <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
-        Full-stack engineer &middot; Gamer &middot; Outdoorsman &middot; Dallas, TX
+        {heroTitle} &middot; Gamer &middot; Outdoorsman &middot; Dallas, TX
       </p>
       <h1 className="mt-4 text-4xl font-extrabold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-5xl">
         Hi, I'm Aaron Tilley.
@@ -29,13 +31,25 @@ function HeroText() {
         Full-stack engineer by day, gamer, fly fisherman, and lifelong learner by night. Welcome
         to my digital workspace.
       </p>
-      <Link
-        to="/about"
-        className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-[var(--laser-cyan)] px-6 py-3 text-sm font-semibold text-[var(--laser-cyan)] shadow-glow-cyan transition-colors duration-300 hover:bg-[var(--laser-cyan)] hover:text-[var(--deep-space-black)]"
-      >
-        Learn More About Me
-        <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
-      </Link>
+      {/* Primary button, then the Resume and Blog outline links beside it
+          (stacked under it on mobile). */}
+      <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <Link
+          to="/about"
+          className="inline-flex items-center gap-2 rounded-full border-2 border-[var(--laser-cyan)] px-6 py-3 text-sm font-semibold text-[var(--laser-cyan)] shadow-glow-cyan transition-colors duration-300 hover:bg-[var(--laser-cyan)] hover:text-[var(--deep-space-black)]"
+        >
+          Learn More About Me
+          <HugeiconsIcon icon={ArrowRight02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
+        </Link>
+        <div className="flex gap-3">
+          <Link to="/resume" className={neonOutlineButton}>
+            Resume
+          </Link>
+          <Link to="/blog" className={neonOutlineButton}>
+            Blog
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }

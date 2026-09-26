@@ -1,4 +1,5 @@
 import { compactHero } from '../../lib/styles'
+import { SpotifyLogo } from './SpotifyLogo'
 
 // Page heading with the Spotify credit, then the Spotify logo on its own
 // line below it. Spotify's branding guidelines require content from Spotify
@@ -32,8 +33,7 @@ export function MusicHero() {
           </a>
         </p>
         <div className="mt-4 mb-4 flex justify-center">
-          <img src="/music/spotify-logo-white.svg" alt="Spotify" className="theme-dark-only h-6 w-auto" />
-          <img src="/music/spotify-logo-black.svg" alt="Spotify" className="theme-light-only h-6 w-auto" />
+          <SpotifyLogo className="h-6" />
         </div>
       </div>
     </section>
