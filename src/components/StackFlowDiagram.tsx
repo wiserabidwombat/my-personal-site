@@ -1,4 +1,5 @@
-import { ReactFlow, Position, Handle, type Node, type Edge, type NodeProps } from '@xyflow/react'
+import { useEffect, useRef, type RefObject } from 'react'
+import { ReactFlow, Position, Handle, useReactFlow, type Node, type Edge, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/base.css'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { accentStyles, type StackNodeData } from './stackFlowTheme'
@@ -9,6 +10,7 @@ const hiddenHandle = '!size-1 !min-w-0 !min-h-0 !border-0 !bg-transparent'
 // arrows leaving one box each start from their own point instead of sharing
 // a trunk. Ids are `out-bottom-<percent>` / `out-right-<percent>`.
 const BOTTOM_FAN = [
+  { id: 'out-bottom-10', className: '!left-[10%]' },
   { id: 'out-bottom-20', className: '!left-[20%]' },
   { id: 'out-bottom-30', className: '!left-[30%]' },
   { id: 'out-bottom-40', className: '!left-[40%]' },
@@ -33,9 +35,16 @@ function StackNode({ data }: NodeProps<Node<StackNodeData>>) {
       <Handle type="target" position={Position.Left} id="in-left" className={hiddenHandle} />
       <Handle type="target" position={Position.Right} id="in-right" className={hiddenHandle} />
       <Handle type="target" position={Position.Bottom} id="in-bottom" className={hiddenHandle} />
-      <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)] px-3 py-2 text-center">
-        <HugeiconsIcon icon={data.icon} strokeWidth={2} className={`size-5 flex-none ${accent.icon}`} aria-hidden="true" />
-        <p className="text-sm leading-tight font-semibold text-slate-100">{data.label}</p>
+      <div
+        className={`flex h-full w-full flex-col items-center justify-center rounded-xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)] text-center ${data.compact ? 'gap-1 px-2 py-1.5' : 'gap-1.5 px-3 py-2'}`}
+      >
+        <HugeiconsIcon
+          icon={data.icon}
+          strokeWidth={2}
+          className={`flex-none ${data.compact ? 'size-4' : 'size-5'} ${accent.icon}`}
+          aria-hidden="true"
+        />
+        <p className={`leading-tight font-semibold text-slate-100 ${data.compact ? 'text-xs' : 'text-sm'}`}>{data.label}</p>
         {data.steps && (
           <ol className="mt-1 w-full space-y-0.5 text-left text-xs text-slate-300">
             {data.steps.map((step, index) => (
@@ -82,6 +91,25 @@ const MIN_ZOOM = 0.5
 // Never enlarge a diagram past its natural size.
 const MAX_ZOOM = 1
 const FIT_PADDING = 0.04
+const FIT_OPTIONS = { padding: FIT_PADDING, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM }
+
+// fitView only runs when ReactFlow mounts. Refit whenever the container
+// resizes (a window or phone rotation) -- otherwise a diagram that loaded
+// wide keeps its desktop zoom after the window narrows and its boxes spill
+// past the right edge.
+function FitOnResize({ container }: { container: RefObject<HTMLDivElement | null> }) {
+  const { fitView } = useReactFlow()
+  useEffect(() => {
+    const element = container.current
+    if (!element) return
+    const observer = new ResizeObserver(() => {
+      void fitView(FIT_OPTIONS)
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [container, fitView])
+  return null
+}
 
 export type StackLayout = {
   nodes: Node<StackNodeData>[]
@@ -109,12 +137,17 @@ function bounds({ nodes, margin = { x: 0, y: 0 } }: StackLayout) {
 // never wider than the layout's natural size, so fitView fills it without
 // stretching boxes or leaving empty bands above and below.
 export function StackFlowDiagram({ layout, ariaLabel }: StackFlowDiagramProps) {
+  const container = useRef<HTMLDivElement>(null)
   const { width, height } = bounds(layout)
+  // Remount on a layout switch (desktop <-> mobile) so the new layout gets
+  // its own initial fit rather than the old layout's viewport.
+  const layoutKey = layout.nodes.map((node) => `${node.id}@${node.position.x},${node.position.y}`).join('|')
   const padded = { width: width * (1 + FIT_PADDING * 2), height: height * (1 + FIT_PADDING * 2) }
   const minWidth = Math.ceil(padded.width * MIN_ZOOM)
 
   return (
     <div
+      ref={container}
       className="mx-auto"
       style={{
         aspectRatio: `${padded.width} / ${padded.height}`,
@@ -124,11 +157,12 @@ export function StackFlowDiagram({ layout, ariaLabel }: StackFlowDiagramProps) {
       aria-label={ariaLabel}
     >
       <ReactFlow
+        key={layoutKey}
         nodes={layout.nodes}
         edges={layout.edges}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: FIT_PADDING, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM }}
+        fitViewOptions={FIT_OPTIONS}
         minZoom={MIN_ZOOM}
         maxZoom={MAX_ZOOM}
         proOptions={{ hideAttribution: true }}
@@ -140,7 +174,9 @@ export function StackFlowDiagram({ layout, ariaLabel }: StackFlowDiagramProps) {
         zoomOnPinch={false}
         zoomOnDoubleClick={false}
         preventScrolling={false}
-      />
+      >
+        <FitOnResize container={container} />
+      </ReactFlow>
     </div>
   )
 }

@@ -16,16 +16,21 @@ import {
   Pdf02Icon,
   AiBrain02Icon,
 } from '@hugeicons/core-free-icons'
+import { cn } from 'cn'
 import { gameCardBaseClass } from '../games/shared'
+import { lastCardSpan } from './stackGrid'
 
 type Tech = { name: string; role: string; icon: IconSvgElement }
-type Group = { title: string; items: Tech[] }
+// `wideColumns` is the column count from lg up; tablet is always 2 and
+// mobile 1.
+type Group = { title: string; wideColumns: 3 | 4; items: Tech[] }
 
 // Every description is checked against the code it describes (api/,
 // scripts/, package.json, vercel.json) -- keep it that way when editing.
 const groups: Group[] = [
   {
     title: 'Frontend',
+    wideColumns: 4,
     items: [
       {
         name: 'React',
@@ -51,6 +56,7 @@ const groups: Group[] = [
   },
   {
     title: 'Data Sources',
+    wideColumns: 3,
     items: [
       {
         name: 'Notion',
@@ -81,6 +87,7 @@ const groups: Group[] = [
   },
   {
     title: 'Infrastructure & Tooling',
+    wideColumns: 3,
     items: [
       {
         name: 'Vercel',
@@ -116,15 +123,26 @@ const groups: Group[] = [
   },
 ]
 
+const gridColumns: Record<Group['wideColumns'], string> = {
+  3: 'sm:grid-cols-2 lg:grid-cols-3',
+  4: 'sm:grid-cols-2 lg:grid-cols-4',
+}
 export function StackGroups() {
   return (
     <div className="mt-6 space-y-8">
       {groups.map((group) => (
         <div key={group.title}>
           <h3 className="text-sm font-semibold tracking-wide text-slate-400 uppercase">{group.title}</h3>
-          <ul className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {group.items.map((tech) => (
-              <li key={tech.name} className={`${gameCardBaseClass} flex-col p-5`}>
+          <ul className={cn('mt-3 grid gap-4', gridColumns[group.wideColumns])}>
+            {group.items.map((tech, index) => (
+              <li
+                key={tech.name}
+                className={cn(
+                  gameCardBaseClass,
+                  'flex-col p-5',
+                  index === group.items.length - 1 && lastCardSpan(group.items.length, group.wideColumns),
+                )}
+              >
                 <HugeiconsIcon
                   icon={tech.icon}
                   strokeWidth={2}

@@ -16,4 +16,6 @@ export type StackNodeData = {
   accent: Accent
   // Optional ordered sub-steps listed inside the box (the build pipeline).
   steps?: string[]
+  // Smaller text and icon, for narrow mobile boxes and sub-rows.
+  compact?: boolean
 }

@@ -34,7 +34,7 @@ function node(
   id: string,
   x: number,
   y: number,
-  data: { label: string; icon: IconSvgElement; accent: Accent; steps?: string[] },
+  data: { label: string; icon: IconSvgElement; accent: Accent; steps?: string[]; compact?: boolean },
   size: { width?: number; height?: number } = {},
 ): Node<StackNodeData> {
   return { id, type: 'stackNode', position: { x, y }, width: size.width ?? W, height: size.height ?? H, data }
@@ -114,12 +114,18 @@ const sharedDataEdges = [
   edge('blob-wsrv', 'blob', 'wsrv'),
 ]
 
-// Mobile: the app chain runs down the left, the sources down a column on
-// the right. Each branch drops on its own vertical line and turns right into
-// its source; the first source takes the rightmost line and each later one
-// the next line left, so a branch never crosses another's line.
-const SRC_X = W + 40
-const srcY = (row: number) => 432 + row * 144
+// Mobile: a tree. The app chain sits on top; the four sources stack in one
+// column below, each fed by a short connector off a single line that runs
+// down the left edge. BoardGameGeek (under Notion) and Neon's image chain
+// (under Neon) are compact sub-rows beneath their parent.
+const MW = 208 // mobile box width
+const MH = 64 // mobile box height
+const SUB = { width: 168, height: 56 } // sub-row box
+const SRC_X = 44 // sources sit right of the connector line
+const srcCenter = SRC_X + MW / 2
+const subX = srcCenter - SUB.width / 2
+const mobileSize = { width: MW, height: MH }
+const compact = <T extends object>(data: T) => ({ ...data, compact: true })
 
 export const dataFlowLayouts: { desktop: StackLayout; mobile: StackLayout } = {
   desktop: {
@@ -146,24 +152,23 @@ export const dataFlowLayouts: { desktop: StackLayout; mobile: StackLayout } = {
   },
   mobile: {
     nodes: [
-      node('browser', 0, 0, dataNodes.browser),
-      node('app', 0, 144, dataNodes.app),
-      node('vercel', 0, 288, dataNodes.vercel),
-      node('bgg', SRC_X, 288, dataNodes.bgg),
-      node('notion', SRC_X, srcY(0), dataNodes.notion),
-      node('hardcover', SRC_X, srcY(1), dataNodes.hardcover),
-      node('spotify', SRC_X, srcY(2), dataNodes.spotify),
-      node('neon', SRC_X, srcY(3), dataNodes.neon),
-      node('blob', SRC_X, srcY(4), dataNodes.blob),
-      node('wsrv', SRC_X, srcY(5), dataNodes.wsrv),
+      node('browser', 0, 0, dataNodes.browser, mobileSize),
+      node('app', 0, 104, dataNodes.app, mobileSize),
+      node('vercel', 0, 208, dataNodes.vercel, mobileSize),
+      node('notion', SRC_X, 312, dataNodes.notion, mobileSize),
+      node('bgg', subX, 420, compact(dataNodes.bgg), SUB),
+      node('hardcover', SRC_X, 516, dataNodes.hardcover, mobileSize),
+      node('spotify', SRC_X, 620, dataNodes.spotify, mobileSize),
+      node('neon', SRC_X, 724, dataNodes.neon, mobileSize),
+      node('blob', subX, 828, compact(dataNodes.blob), SUB),
+      node('wsrv', subX, 924, compact(dataNodes.wsrv), SUB),
     ],
     edges: [
       ...sharedDataEdges,
-      edge('vercel-notion', 'vercel', 'notion', { from: 'out-bottom-80', to: 'in-left' }),
-      edge('vercel-hardcover', 'vercel', 'hardcover', { from: 'out-bottom-60', to: 'in-left' }),
-      edge('vercel-spotify', 'vercel', 'spotify', { from: 'out-bottom-40', to: 'in-left' }),
-      edge('vercel-neon', 'vercel', 'neon', { from: 'out-bottom-20', to: 'in-left' }),
-      syncEdge('out-bottom', 'in-top'),
+      ...(['notion', 'hardcover', 'spotify', 'neon'] as const).map((source) =>
+        edge(`vercel-${source}`, 'vercel', source, { from: 'out-bottom-10', to: 'in-left', offset: 0 }),
+      ),
+      syncEdge('out-top', 'in-bottom'),
     ],
   },
 }
@@ -189,6 +194,10 @@ const previewData = { label: 'Preview Deployment', icon: GitPullRequestIcon, acc
 const productionData = { label: 'Production (aarontilley.me)', icon: Rocket01Icon, accent: 'pink' as const }
 
 const buildMidY = BUILD.height / 2
+// Mobile: narrower build box and half-width end boxes, so Preview and
+// Production fit side by side at phone width.
+const MOBILE_BUILD = { width: 264, height: 176 }
+const MOBILE_END = { width: 126, height: 64 }
 
 export const buildDeployLayouts: { desktop: StackLayout; mobile: StackLayout } = {
   desktop: {
@@ -208,13 +217,13 @@ export const buildDeployLayouts: { desktop: StackLayout; mobile: StackLayout } =
   },
   mobile: {
     nodes: [
-      node('local', 40 + BUILD.width / 2 - W / 2, 0, localData),
-      node('github', 40 + BUILD.width / 2 - W / 2, 144, githubData),
-      node('build', 40, 288, buildData, BUILD),
-      // Preview and production sit outside the two branch lines (30% and
-      // 70% across the build box) so each branch turns away from the other.
-      node('preview', 0, 288 + BUILD.height + 72, previewData),
-      node('production', W + 16, 288 + BUILD.height + 72, productionData),
+      node('local', (MOBILE_BUILD.width - MW) / 2, 0, localData, mobileSize),
+      node('github', (MOBILE_BUILD.width - MW) / 2, 104, githubData, mobileSize),
+      node('build', 0, 208, buildData, MOBILE_BUILD),
+      // Side by side under the build box, each outside its branch line (30%
+      // and 70% across the box) so the two branches turn away from each other.
+      node('preview', 0, 208 + MOBILE_BUILD.height + 44, compact(previewData), MOBILE_END),
+      node('production', MOBILE_BUILD.width - MOBILE_END.width, 208 + MOBILE_BUILD.height + 44, compact(productionData), MOBILE_END),
     ],
     edges: [
       edge('local-github', 'local', 'github'),

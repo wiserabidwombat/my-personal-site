@@ -11,6 +11,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { SectionHeading } from './SectionHeading'
 import { StackFlowDiagram, type StackLayout } from './StackFlowDiagram'
+import { CodeChip } from './stack/CodeChip'
 import { StackGroups } from './stack/StackGroups'
 import { aiWorkflowLayouts, buildDeployLayouts, dataFlowLayouts } from './stackDiagrams'
 import { useMediaQuery } from '../hooks/useMediaQuery'
@@ -20,7 +21,8 @@ const SOURCE_REPO_URL = 'https://github.com/wiserabidwombat/my-personal-site'
 
 // Why I work this way, in my own words. Renders as its own paragraph in
 // "How I Build With AI" (and nothing renders if it's ever left empty).
-const WHY_I_WORK_THIS_WAY = 'The goal with making this site was to learn and understand how to build a site using AI, skills, MCPs, and other tools. I wanted to see how far I could get without writing code and instead focusing on having an understanding of agentic workflow. And to see how effective I could be building a site.'
+const WHY_I_WORK_THIS_WAY =
+  'I built this site to learn how to work with AI, skills, MCPs, and other tools. I wanted to see how far I could get without writing the code myself, focusing instead on understanding agentic workflows, and to find out how effective I could be building a site this way.'
 
 // Build & Deploy and How I Build With AI run left to right from md up, and
 // top to bottom below it.
@@ -95,19 +97,21 @@ export function Stack() {
       </Section>
 
       <Section icon={AiBrain02Icon} title="How I Build With AI">
-        <p className="mt-2 text-slate-300">
-          This site, and most of what's on it, is built with Claude Code. Work gets scoped and planned up front, then
-          handed to subagents that implement and review in a loop until it holds up, before a PR ever opens.
-        </p>
-        <p className="mt-3 text-slate-300">
-          Larger features go through an orchestrator agent (<code className="text-sm">.claude/agents/orchestrator.md</code>)
-          that breaks the work into steps and hands them one at a time to specialized subagents for architecture,
-          implementation, and design, with a review agent checking each step's changes and sending fixes back until
-          they pass. A custom design skill,{' '}
-          <code className="text-sm">synthwave-ui</code> (<code className="text-sm">.claude/skills/synthwave-ui/SKILL.md</code>),
-          keeps the palette and styling consistent from page to page.
-        </p>
-        {WHY_I_WORK_THIS_WAY && <p className="mt-3 text-slate-300">{WHY_I_WORK_THIS_WAY}</p>}
+        <div className="mt-2 flex flex-col gap-4 leading-relaxed text-slate-300">
+          <p>
+            This site, and most of what's on it, is built with Claude Code. Work gets scoped and planned up front, then
+            handed to subagents that implement and review in a loop until it holds up, before a PR ever opens.
+          </p>
+          <p>
+            Larger features go through an orchestrator agent (<CodeChip>.claude/agents/orchestrator.md</CodeChip>) that
+            breaks the work into steps and hands them one at a time to specialized subagents for architecture,
+            implementation, and design, with a review agent checking each step's changes and sending fixes back until
+            they pass. A custom design skill, <CodeChip>synthwave-ui</CodeChip>{' '}
+            (<CodeChip>.claude/skills/synthwave-ui/SKILL.md</CodeChip>), keeps the palette and styling consistent
+            from page to page.
+          </p>
+          {WHY_I_WORK_THIS_WAY && <p>{WHY_I_WORK_THIS_WAY}</p>}
+        </div>
         <Diagram layout={layoutFor(aiWorkflowLayouts)} label="AI-assisted development workflow diagram" />
       </Section>
     </div>
