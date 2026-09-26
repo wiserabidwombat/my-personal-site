@@ -6,11 +6,11 @@ import { useCurrentlyReading } from '../../hooks/useCurrentlyReading'
 import { useMusic } from '../../hooks/useMusic'
 import { currentlyLoving } from '../../data/currently-loving'
 import { liveStatusFallbacks, manualStatus } from '../../data/home-status'
-import { lastCardSpan } from '../../lib/lastCardSpan'
 import { pageContainer } from '../../lib/styles'
 import { SectionHeading } from '../SectionHeading'
 import { NowListening } from './NowListening'
 import { StatusCard } from './StatusCard'
+import { statusCardClass, statusGridClass } from './statusGrid'
 
 type Card = {
   key: string
@@ -21,8 +21,6 @@ type Card = {
   loading?: boolean
   content: ReactNode
 }
-
-const COLUMNS = 3
 
 function Value({ children, title }: { children: ReactNode; title?: string }) {
   return (
@@ -35,8 +33,8 @@ function Value({ children, title }: { children: ReactNode; title?: string }) {
 // Now Playing, Now Reading, and Now Listening come from live data (with a
 // fallback from src/data/home-status.ts, or hidden, if it can't load); Now
 // Casting and Now Learning are manual text from that same file. A card
-// whose value is empty is left out, and the grid's last card stretches to
-// fill an incomplete row.
+// whose value is empty is left out, and the grid adapts to how many cards
+// remain (see statusGrid.ts).
 export function CurrentStatus() {
   const reading = useCurrentlyReading()
   const music = useMusic()
@@ -113,7 +111,7 @@ export function CurrentStatus() {
   return (
     <section className={cn(pageContainer, 'py-8 sm:py-10')}>
       <SectionHeading icon={Activity01Icon}>Current Status</SectionHeading>
-      <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className={cn('mt-6 grid gap-4', statusGridClass(cards.length))}>
         {cards.map((card, index) => (
           <StatusCard
             key={card.key}
@@ -122,7 +120,7 @@ export function CurrentStatus() {
             href={card.href}
             linkLabel={card.linkLabel}
             loading={card.loading}
-            className={index === cards.length - 1 ? lastCardSpan(cards.length, COLUMNS) : undefined}
+            className={statusCardClass(cards.length, index)}
           >
             {card.content}
           </StatusCard>

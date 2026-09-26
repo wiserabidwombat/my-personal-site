@@ -18,18 +18,29 @@ import dallasSkylineLight from '../../assets/dallas-skyline-light.webp'
 const skylineImgClass =
   'block h-56 w-full object-cover [object-position:left_bottom] select-none [image-rendering:pixelated] [mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] sm:h-auto'
 
+const eyebrow = [heroTitle, 'Board Gamer', 'Outdoorsman', 'Dallas, TX']
+
 function HeroText() {
   return (
     <div className="relative z-10 mx-auto max-w-3xl px-6 pt-24 pb-12 sm:pt-28 sm:pb-16">
       <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
-        {heroTitle} &middot; Gamer &middot; Outdoorsman &middot; Dallas, TX
+        {eyebrow.map((item, index) => (
+          <span key={item}>
+            {/* Each item stays whole (no "Board / Gamer" split on mobile);
+                lines only break between items, after a separator. */}
+            <span className="whitespace-nowrap">
+              {item}
+              {index < eyebrow.length - 1 && ' ·'}
+            </span>{' '}
+          </span>
+        ))}
       </p>
       <h1 className="mt-4 text-4xl font-extrabold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-5xl">
         Hi, I'm Aaron Tilley.
       </h1>
       <p className="mx-auto mt-6 max-w-xl text-center text-lg leading-relaxed text-slate-200">
-        Full-stack engineer by day, gamer, fly fisherman, and lifelong learner by night. Welcome
-        to my digital workspace.
+        Full-stack engineer at work, board gamer, fly fisherman, and lifelong learner at not-work. Welcome to my
+        site.
       </p>
       {/* Primary button, then the Resume and Blog outline links beside it
           (stacked under it on mobile). */}
