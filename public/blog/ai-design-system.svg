@@ -1,16 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" preserveAspectRatio="xMidYMid slice">
+  <!-- Colors are the site's theme tokens (with the default palette as the
+       fallback), so the art follows light/dark mode and the Halloween theme
+       when the site renders it inline. -->
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#150a24"/>
-      <stop offset="100%" stop-color="#0a0612"/>
+      <stop offset="0%" style="stop-color: var(--deep-space-purple, #150a24)"/>
+      <stop offset="100%" style="stop-color: var(--deep-space-black, #0a0612)"/>
     </linearGradient>
     <linearGradient id="glow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#ff2bd6"/>
-      <stop offset="100%" stop-color="#00f0ff"/>
+      <stop offset="0%" style="stop-color: var(--neon-pink, #ff2bd6)"/>
+      <stop offset="100%" style="stop-color: var(--laser-cyan, #00f0ff)"/>
     </linearGradient>
   </defs>
   <rect width="640" height="360" fill="url(#bg)"/>
-  <g stroke="#00f0ff" stroke-opacity="0.35" stroke-width="1">
+  <g style="stroke: var(--laser-cyan, #00f0ff)" stroke-opacity="0.35" stroke-width="1">
     <line x1="0" y1="60" x2="640" y2="60"/>
     <line x1="0" y1="120" x2="640" y2="120"/>
     <line x1="0" y1="180" x2="640" y2="180"/>

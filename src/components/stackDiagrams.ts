@@ -70,7 +70,7 @@ function edge(id: string, source: string, target: string, options: EdgeOptions =
     ...(options.label
       ? {
           label: options.label,
-          labelStyle: { fill: '#cbd5e1', fontSize: 11 },
+          labelStyle: { fill: 'var(--muted-foreground)', fontSize: 11 },
           labelBgStyle: { fill: 'var(--deep-space-black)' },
           labelBgPadding: [6, 3] as [number, number],
         }

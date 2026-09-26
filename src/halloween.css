@@ -1,0 +1,252 @@
+/*
+ * October-only Halloween palette. Applied when <html data-season="halloween">
+ * (set before first paint by index.html's season script; see
+ * src/lib/season.ts). Overrides the same synthwave tokens as the light theme
+ * in index.css, so every glow, grid, chip, and button follows automatically:
+ *   magenta -> pumpkin orange, cyan -> toxic green, purple secondary,
+ *   near-black background with a purple tint (warm off-white in light mode).
+ *
+ * Specificity: dark uses [data-season]:not([data-theme='light']) and light
+ * uses [data-season][data-theme='light'] -- both (0,2,0) -- so they beat the
+ * base (0,1,0) light-theme overrides regardless of file order.
+ *
+ * Contrast (WCAG, checked with the palette below):
+ *   dark  -- body text 13.4-19:1, muted text 5.0-5.4:1, headings (orange)
+ *            7.1-7.6:1, green chips/buttons 14.3-15.4:1, active chip 15.4:1
+ *   light -- body text 8.2-16.7:1, muted text 4.6-6.2:1, headings 5.2-6.0:1,
+ *            green chips/buttons 5.7-6.5:1, active chip 7.0:1
+ */
+
+[data-season='halloween']:not([data-theme='light']) {
+  --deep-space-black: #0c0710;
+  --deep-space-purple: #1a0f22;
+
+  --neon-pink: #ff7a1a; /* pumpkin orange */
+  --laser-cyan: #7dff3a; /* toxic green */
+  --cyber-purple: #a45ee8;
+
+  --glow-pink: 0 0 10px rgba(255, 122, 26, 0.7), 0 0 30px rgba(255, 122, 26, 0.4);
+  --glow-purple: 0 0 10px rgba(164, 94, 232, 0.7), 0 0 30px rgba(164, 94, 232, 0.4);
+  --glow-cyan: 0 0 10px rgba(125, 255, 58, 0.6), 0 0 30px rgba(125, 255, 58, 0.3);
+
+  --shadow-glow-pink: 0 0 10px rgba(255, 122, 26, 0.7), 0 0 30px rgba(255, 122, 26, 0.4);
+  --shadow-glow-purple: 0 0 10px rgba(164, 94, 232, 0.7), 0 0 30px rgba(164, 94, 232, 0.4);
+  --shadow-glow-cyan: 0 0 10px rgba(125, 255, 58, 0.6), 0 0 30px rgba(125, 255, 58, 0.3);
+
+  --selection-bg: color-mix(in oklab, var(--neon-pink) 40%, transparent);
+  --selection-fg: #fff7ed;
+
+  /* shadcn/ui surfaces (App.css hard-codes the dark card color). */
+  --card: #1a0f22;
+  --popover: #1a0f22;
+  --muted: #22142c;
+  --muted-foreground: #b3a6c4;
+  --border: #3a2240;
+  --input: #4a2a52;
+  --sidebar: #120a18;
+  --sidebar-border: #3a2240;
+}
+
+[data-season='halloween'][data-theme='light'] {
+  --deep-space-black: #fbf5ec; /* warm off-white */
+  --deep-space-purple: #f2e5d3;
+
+  --neon-pink: #a53c05; /* burnt pumpkin, dark enough for text */
+  --laser-cyan: #2e6512; /* deep toxic green */
+  --cyber-purple: #6a2bb0;
+
+  --glow-pink: 0 1px 3px rgba(165, 60, 5, 0.25);
+  --glow-purple: 0 1px 3px rgba(106, 43, 176, 0.25);
+  --glow-cyan: 0 1px 3px rgba(46, 101, 18, 0.25);
+
+  --shadow-glow-pink: 0 4px 14px rgba(165, 60, 5, 0.22);
+  --shadow-glow-purple: 0 4px 14px rgba(106, 43, 176, 0.22);
+  --shadow-glow-cyan: 0 4px 14px rgba(46, 101, 18, 0.22);
+
+  --selection-bg: color-mix(in oklab, var(--neon-pink) 22%, transparent);
+  --selection-fg: #1c1208;
+
+  --muted: #f0e4d2;
+  --border: #e3d2bb;
+  --input: #e3d2bb;
+  --sidebar-border: #e3d2bb;
+}
+
+/* Dark mode's most muted text (slate-500) is 4.2:1 on the background --
+   brightened here so the Halloween palette clears AA (5.0:1 on cards). */
+[data-season='halloween']:not([data-theme='light']) .text-slate-500 {
+  color: #8a8198;
+}
+
+/* Home hero sky: midnight purple warming toward a dusky orange horizon. */
+[data-season='halloween']:not([data-theme='light']) .hero-sky {
+  background-image: linear-gradient(to bottom, #07040a, #150a1c, #2c1426);
+}
+
+/* Seasonal markup: .season-only shows only in October (or a preview),
+   .season-hidden hides its content then. Pure CSS off data-season, so
+   prerendered pages paint the right variant before any JS runs. */
+.season-only {
+  display: none;
+}
+[data-season='halloween'] .season-only {
+  display: block;
+}
+[data-season='halloween'] .season-hidden {
+  display: none;
+}
+
+/* Pixel-art sprites (src/components/halloween). Bats drift across the hero
+   sky and flap; the ghost bobs. All of it holds still under
+   prefers-reduced-motion. */
+/* Left to right across exactly the skyline's width (a percent of the bat
+   layer), not the viewport: the hero can be narrower than the window, and
+   a bat flying out to 100vw spent part of every crossing out of sight.
+   Bats enter from just off the left edge (--bat-enter: 2rem on phones,
+   4rem wider), so little of each cycle is spent off screen. */
+@keyframes halloween-bat-drift {
+  from {
+    left: var(--bat-enter, -4rem);
+  }
+  to {
+    left: 100%;
+  }
+}
+@keyframes halloween-bob {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 6px;
+  }
+}
+@keyframes halloween-flap {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes halloween-peek {
+  0%,
+  100% {
+    translate: 0 30%;
+  }
+  50% {
+    translate: 0 8%;
+  }
+}
+
+/* Flight path: `top` (percent of the skyline image's height) is keyed to the
+   same timeline as the horizontal drift, so each keyframe matches a point
+   across the image. Measured on the night skyline: the creature on the
+   skyscraper spans ~54-66% across and 13-40% down; the sky brightens below
+   ~40%. While crossing the creature's columns a bat stays at 42% or lower --
+   under the creature, never over it. Mobile crops the image from the left
+   (the creature sits at the right edge, ~96%), so it has its own path. */
+@keyframes halloween-bat-path {
+  0% {
+    top: calc(34% + var(--bat-offset, 0%));
+  }
+  30% {
+    top: calc(40% + var(--bat-offset, 0%));
+  }
+  70%,
+  100% {
+    top: calc(45% + var(--bat-offset, 0%));
+  }
+}
+@keyframes halloween-bat-path-wide {
+  0% {
+    top: calc(30% + var(--bat-offset, 0%));
+  }
+  25%,
+  45% {
+    top: calc(44% + var(--bat-offset, 0%));
+  }
+  70% {
+    top: calc(46% + var(--bat-offset, 0%));
+  }
+  85% {
+    top: calc(38% + var(--bat-offset, 0%));
+  }
+  100% {
+    top: calc(30% + var(--bat-offset, 0%));
+  }
+}
+
+.halloween-bat {
+  --bat-enter: -2rem;
+  top: calc(44% + var(--bat-offset, 0%));
+  animation:
+    halloween-bat-drift var(--bat-duration, 45s) linear var(--bat-delay, 0s) infinite,
+    halloween-bat-path var(--bat-duration, 45s) ease-in-out var(--bat-delay, 0s) infinite;
+}
+@media (min-width: 640px) {
+  .halloween-bat {
+    --bat-enter: -4rem;
+    animation-name: halloween-bat-drift, halloween-bat-path-wide;
+  }
+}
+
+/* Light mode keeps the original flight: a straight, high pass. */
+[data-theme='light'] .halloween-bat {
+  top: var(--bat-light-top, 8%);
+  animation: halloween-bat-drift var(--bat-duration, 45s) linear var(--bat-delay, 0s) infinite;
+}
+
+/* Dark mode: a soft purple and orange glow separates each bat from the
+   night sky (the sprites' rim light and eyes do the rest). Light mode's
+   bats already read against the pale sky and are unchanged. */
+[data-season='halloween']:not([data-theme='light']) .halloween-bat svg {
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--cyber-purple) 75%, transparent))
+    drop-shadow(0 0 5px color-mix(in oklab, var(--neon-pink) 30%, transparent));
+}
+.halloween-bat-bob {
+  animation: halloween-bob 2.6s ease-in-out infinite;
+}
+.halloween-flap-a {
+  animation: halloween-flap 0.5s steps(1) infinite;
+}
+.halloween-flap-b {
+  animation: halloween-flap 0.5s steps(1) -0.25s infinite;
+}
+.halloween-ghost {
+  animation: halloween-peek 3.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .halloween-bat {
+    animation: none;
+    left: var(--bat-rest, 50%);
+  }
+  @media (min-width: 640px) {
+    .halloween-bat {
+      left: var(--bat-rest-sm, 50%);
+    }
+  }
+  [data-theme='light'] .halloween-bat {
+    animation: none;
+    left: var(--bat-light-rest, 50%);
+  }
+  /* Three bats rest in place; the extra desktop ones sit out. */
+  .halloween-bat-extra {
+    display: none !important;
+  }
+  .halloween-bat-bob,
+  .halloween-flap-a,
+  .halloween-ghost {
+    animation: none;
+  }
+  .halloween-flap-b {
+    animation: none;
+    opacity: 0;
+  }
+  .halloween-ghost {
+    translate: 0 12%;
+  }
+}

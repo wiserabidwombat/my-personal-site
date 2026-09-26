@@ -3,6 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import './index.css'
 import './App.css'
+import './halloween.css'
 import App from './App.tsx'
 
 declare global {

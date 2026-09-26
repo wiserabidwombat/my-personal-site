@@ -181,16 +181,11 @@ export function RandomGamePicker({ games }: Props) {
               <motion.div
                 key={`result-${displayedGame.id}-${resultToken}`}
                 initial={shouldReduceMotion ? false : { scale: 0.94 }}
-                animate={{
-                  scale: 1,
-                  boxShadow: [
-                    '0 0 0px rgba(0, 240, 255, 0)',
-                    '0 0 26px rgba(0, 240, 255, 0.55)',
-                    '0 0 0px rgba(0, 240, 255, 0)',
-                  ],
-                }}
+                animate={{ scale: 1 }}
                 transition={{ duration: 0.7, ease: 'easeOut' }}
-                className="min-w-0 rounded-3xl border-t border-[var(--cyber-purple)]/30 pt-6"
+                // The reveal glow is a CSS animation (index.css) so its color
+                // follows the theme tokens; the key remount restarts it.
+                className="animate-result-glow min-w-0 rounded-3xl border-t border-[var(--cyber-purple)]/30 pt-6"
               >
                 <GameDetailContent game={displayedGame} />
               </motion.div>

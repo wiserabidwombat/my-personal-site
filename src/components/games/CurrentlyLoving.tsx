@@ -4,6 +4,7 @@ import { currentlyLoving } from '../../data/currently-loving'
 import { GameArt } from './GameArt'
 import { GameDetailTrigger } from './GameDetailTrigger'
 import { GameSection } from './GameSection'
+import { Seasonal } from '../halloween/Seasonal'
 import { findGameByName, formatBggRating, formatPlaytime, formatRange } from './shared'
 
 type Props = {
@@ -18,7 +19,7 @@ export function CurrentlyLoving({ games }: Props) {
   const game = findGameByName(games, currentlyLoving.name)
 
   return (
-    <GameSection icon={FireIcon} title="Currently Loving">
+    <GameSection icon={FireIcon} title="Currently Loving" aside={<Seasonal sprite="headingSkeleton" />}>
       <GameDetailTrigger game={game} className="mt-6 flex-col md:grid md:grid-cols-2">
         <GameArt name={currentlyLoving.name} src={game?.imageUrl ?? game?.thumbnailUrl} eager className="md:h-full" />
         <div className="flex flex-col justify-center gap-3 p-5 md:p-8">

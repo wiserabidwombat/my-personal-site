@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { cn } from 'cn'
+import { Seasonal } from '../components/halloween/Seasonal'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { HistoryIcon, Wrench01Icon, GamepadIcon } from '@hugeicons/core-free-icons'
 import { JourneyTimeline } from '../components/about/JourneyTimeline'
@@ -108,6 +109,7 @@ function AboutRouteComponent() {
         <h2 className={headingClass}>
           <HugeiconsIcon icon={GamepadIcon} strokeWidth={2} className="size-6 text-[var(--neon-pink)]" aria-hidden="true" />
           Beyond the Code
+          <Seasonal sprite="peekingGhost" />
         </h2>
         <p className={cn('mt-3', proseClass)}>
           When I'm not playing with code or AIs, I like to unplug and stay active. You can usually find me:
