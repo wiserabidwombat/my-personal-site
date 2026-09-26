@@ -7,27 +7,35 @@ import { batDown, batDownNight, batUp, batUpNight, ghost, jackOLantern, skeleton
 // aria-hidden and pointer-events-none, placed clear of text and controls,
 // and static under prefers-reduced-motion (see halloween.css).
 
-// Each bat drifts across the skyline on the same flight path (halloween.css),
-// staggered by `--bat-delay` and nudged up or down by `--bat-offset`. The
+// Five bats on the same flight path (halloween.css), each with its own
+// duration and a height nudge (`--bat-offset`), so crossings overlap instead
+// of bunching up. Delays start each bat at an evenly spread point in its own
+// cycle (10%, 30%, 50%, 70%, 90%), so they're mid-flight on page load. The
 // path dips into the bright band near the horizon and the moon, and stays
-// below the creature on the skyscraper while crossing its columns.
-// `--bat-rest` / `--bat-rest-sm` place each bat when motion is reduced.
-// Light mode keeps its original straight, high flight (`--bat-light-top`,
-// `--bat-light-rest`): the bats already read against the pale sky there.
+// below the creature on the skyscraper while crossing its columns (every
+// offset keeps a bat at 42% or lower there).
+//
+// Phones show three of them (`desktopOnly` hides the rest), and under
+// reduced motion the same three rest in place (`rest` / `restSm`, as a
+// percent across the skyline). Light mode keeps its straight, high flight
+// (`lightTop`, `lightRest`).
 type Bat = {
   size: string
   duration: string
   delay: string
   offset: string
-  rest: string
-  restSm: string
+  desktopOnly?: boolean
+  rest?: string
+  restSm?: string
   lightTop: string
-  lightRest: string
+  lightRest?: string
 }
 const bats: Bat[] = [
-  { size: 'w-8 sm:w-11', duration: '38s', delay: '-4s', offset: '0%', rest: '6vw', restSm: '12vw', lightTop: '6%', lightRest: '14vw' },
-  { size: 'w-7 sm:w-9', duration: '52s', delay: '-30s', offset: '3%', rest: '38vw', restSm: '36vw', lightTop: '16%', lightRest: '52vw' },
-  { size: 'w-6 sm:w-8', duration: '46s', delay: '-18s', offset: '-2%', rest: '70vw', restSm: '80vw', lightTop: '9%', lightRest: '80vw' },
+  { size: 'w-7 sm:w-9', duration: '18s', delay: '-1.8s', offset: '-2%', rest: '6%', restSm: '14%', lightTop: '6%', lightRest: '14%' },
+  { size: 'sm:w-11', duration: '21s', delay: '-6.3s', offset: '3%', desktopOnly: true, lightTop: '12%' },
+  { size: 'w-8 sm:w-10', duration: '24s', delay: '-12s', offset: '0%', rest: '38%', restSm: '41%', lightTop: '16%', lightRest: '52%' },
+  { size: 'sm:w-8', duration: '27s', delay: '-18.9s', offset: '4%', desktopOnly: true, lightTop: '9%' },
+  { size: 'w-6 sm:w-9', duration: '30s', delay: '-27s', offset: '1%', rest: '70%', restSm: '91%', lightTop: '20%', lightRest: '80%' },
 ]
 
 // Over the whole skyline image (the parent wraps it), below the hero text
@@ -38,8 +46,8 @@ export function HeroBats() {
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-10">
       {bats.map((bat) => (
         <div
-          key={bat.rest}
-          className="halloween-bat absolute left-0"
+          key={bat.duration}
+          className={`halloween-bat absolute ${bat.desktopOnly ? 'halloween-bat-extra hidden sm:block' : ''}`}
           style={
             {
               '--bat-duration': bat.duration,

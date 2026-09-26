@@ -99,12 +99,17 @@
 /* Pixel-art sprites (src/components/halloween). Bats drift across the hero
    sky and flap; the ghost bobs. All of it holds still under
    prefers-reduced-motion. */
+/* Left to right across exactly the skyline's width (a percent of the bat
+   layer), not the viewport: the hero can be narrower than the window, and
+   a bat flying out to 100vw spent part of every crossing out of sight.
+   Bats enter from just off the left edge (--bat-enter: 2rem on phones,
+   4rem wider), so little of each cycle is spent off screen. */
 @keyframes halloween-bat-drift {
   from {
-    transform: translateX(-4rem);
+    left: var(--bat-enter, -4rem);
   }
   to {
-    transform: translateX(calc(100vw + 4rem));
+    left: 100%;
   }
 }
 @keyframes halloween-bob {
@@ -175,6 +180,7 @@
 }
 
 .halloween-bat {
+  --bat-enter: -2rem;
   top: calc(44% + var(--bat-offset, 0%));
   animation:
     halloween-bat-drift var(--bat-duration, 45s) linear var(--bat-delay, 0s) infinite,
@@ -182,6 +188,7 @@
 }
 @media (min-width: 640px) {
   .halloween-bat {
+    --bat-enter: -4rem;
     animation-name: halloween-bat-drift, halloween-bat-path-wide;
   }
 }
@@ -215,16 +222,20 @@
 @media (prefers-reduced-motion: reduce) {
   .halloween-bat {
     animation: none;
-    transform: translateX(var(--bat-rest, 50vw));
+    left: var(--bat-rest, 50%);
   }
   @media (min-width: 640px) {
     .halloween-bat {
-      transform: translateX(var(--bat-rest-sm, 50vw));
+      left: var(--bat-rest-sm, 50%);
     }
   }
   [data-theme='light'] .halloween-bat {
     animation: none;
-    transform: translateX(var(--bat-light-rest, 50vw));
+    left: var(--bat-light-rest, 50%);
+  }
+  /* Three bats rest in place; the extra desktop ones sit out. */
+  .halloween-bat-extra {
+    display: none !important;
   }
   .halloween-bat-bob,
   .halloween-flap-a,
