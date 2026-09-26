@@ -4,19 +4,8 @@ import { ArrowRight02Icon } from '@hugeicons/core-free-icons'
 import { useTheme } from '../../hooks/useTheme'
 import { heroTitle } from '../../lib/resume-data'
 import { neonOutlineButton } from '../../lib/styles'
-import dallasSkylineDark from '../../assets/dallas-skyline.webp'
-import dallasSkylineLight from '../../assets/dallas-skyline-light.webp'
-
-// Shared by both themed <img>s below so they can never drift apart --
-// identical height, object-fit/position, rendering, and fade mask. Only
-// src and alt differ per theme; see the render below. image-rendering:
-// pixelated was tested against the light art specifically (both at 1440px
-// and 375px, since the two widths scale the source art differently) and
-// made no visible difference -- the source art's own blocky style reads
-// the same crisp either way at the sizes this hero displays it, so both
-// themes keep it rather than one theme silently diverging from the other.
-const skylineImgClass =
-  'block h-56 w-full object-cover [object-position:left_bottom] select-none [image-rendering:pixelated] [mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] sm:h-auto'
+import { SkylineImages } from './SkylineImages'
+import { Seasonal } from '../halloween/Seasonal'
 
 const eyebrow = [heroTitle, 'Board Gamer', 'Outdoorsman', 'Dallas, TX']
 
@@ -87,55 +76,15 @@ export function HeroSkyline() {
     <section className="hero-sky relative isolate overflow-hidden text-center">
       <HeroText />
 
-      {/* Both themed images are always mounted, shown/hidden purely by the
-          theme-dark-only/theme-light-only CSS classes (index.css, keyed off
-          the `data-theme` attribute on <html>) rather than a JS ternary
-          picking `hidden` from `theme` state -- so scripts/prerender-meta.mjs
-          can bake theme-agnostic markup with no light/dark flash on a
-          hard/prerendered load (the server has no real `theme` to read; see
-          useTheme.ts's SSR guard), while a runtime toggle still swaps
-          instantly since it's the same data-theme attribute driving both.
-          Both are still eager (never `loading="lazy"`, which on a
-          `display:none`/hidden image can silently skip loading it
-          altogether, breaking the very toggle this is meant to protect),
-          but fetchPriority still tells the browser which one actually
-          matters for THIS paint -- it stays keyed off `theme` (a plain
-          resource-priority hint, not visible markup, so it doesn't need to
-          be CSS-driven): the active image is "high" (it's competing for
-          LCP), the inactive one is "low" (it still loads, just deprioritized
-          so it stops contending for bandwidth with the active image and the
-          rest of the page's critical path). This keeps the no-flash
-          guarantee absolute -- both images are always decoded and ready
-          before a toggle -- while fixing the actual LCP contention, which
-          was the always-mounted approach competing with itself, not the
-          mounting strategy itself. Each image's own mask fades its top
-          (sky/stars) and bottom (water line) edges to transparent, so the
-          section's own gradient shows through the top seam and the floor
-          grid below shows through the bottom seam -- no separate
-          solid-color blend divs needed. The two images share an identical
-          aspect ratio and water-line row (verified against the source
-          pixels), so they can share one mask/height/position with no
-          per-theme adjustment. On mobile the panorama is cropped to a fixed
-          height rather than shrunk to a sliver, anchored left so Reunion
-          Tower and the Margaret Hunt Hill Bridge stay in frame even though
-          the American Airlines Center end gets cropped off; at sm+ the full
-          panorama displays uncropped. */}
-      <img
-        src={dallasSkylineDark}
-        alt="Pixel-art neon skyline of Dallas, Texas at night, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center reflected in the water below"
-        className={`${skylineImgClass} theme-dark-only`}
-        loading="eager"
-        decoding="async"
-        fetchPriority={theme === 'dark' ? 'high' : 'low'}
-      />
-      <img
-        src={dallasSkylineLight}
-        alt="Pixel-art Dallas, Texas skyline at dawn, rendered in a pastel palette, with Reunion Tower, the Margaret Hunt Hill Bridge, and American Airlines Center reflected in the water below"
-        className={`${skylineImgClass} theme-light-only`}
-        loading="eager"
-        decoding="async"
-        fetchPriority={theme === 'light' ? 'high' : 'low'}
-      />
+      {/* Theme and season variants of the skyline, swapped by CSS so the
+          prerendered page paints the right one with no flash -- see
+          SkylineImages.tsx. Each image's mask fades its top and bottom edges
+          so this section's gradient and the floor grid below show through
+          the seams. */}
+      <div className="relative">
+        <SkylineImages theme={theme} />
+        <Seasonal sprite="heroBats" />
+      </div>
 
       {/* The city's own reflection breaks into an actual neon grid, pulled
           up to overlap the image's own faded water line so the two connect

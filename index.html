@@ -5,6 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0a0612" />
     <meta name="darkreader-lock" />
     <title>Aaron Tilley</title>
     <script>
@@ -19,6 +20,47 @@
         } catch (e) {
           document.documentElement.setAttribute('data-theme', 'dark');
         }
+      })();
+    </script>
+    <script id="season-script">
+      // October-only Halloween theme, applied before first paint so there's
+      // no flash of the normal theme. A hand-copied mirror of resolveSeason()
+      // in src/lib/season.ts (season.test.ts runs this script against the
+      // same cases). Order: ?season= URL parameter (saved for the session),
+      // a saved session preview, the visitor's opt-out, then the date.
+      (function () {
+        var season = null;
+        try {
+          var param = new URLSearchParams(window.location.search).get('season');
+          if (param === 'halloween' || param === 'none') {
+            season = param;
+            try {
+              sessionStorage.setItem('season-preview', param);
+            } catch (e) {}
+          }
+          if (!season) {
+            try {
+              var preview = sessionStorage.getItem('season-preview');
+              if (preview === 'halloween' || preview === 'none') season = preview;
+            } catch (e) {}
+          }
+          if (!season) {
+            try {
+              if (localStorage.getItem('halloween-opt-out') === 'true') season = 'none';
+            } catch (e) {}
+          }
+          if (!season) season = new Date().getMonth() === 9 ? 'halloween' : 'none';
+        } catch (e) {
+          season = 'none';
+        }
+        if (season === 'halloween') document.documentElement.setAttribute('data-season', 'halloween');
+        else document.documentElement.removeAttribute('data-season');
+        // Browser UI color for the active theme and season (themeColorFor).
+        var light = document.documentElement.getAttribute('data-theme') === 'light';
+        var color =
+          season === 'halloween' ? (light ? '#fbf5ec' : '#0c0710') : light ? '#f7f5fb' : '#0a0612';
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', color);
       })();
     </script>
   </head>

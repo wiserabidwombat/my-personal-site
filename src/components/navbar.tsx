@@ -11,6 +11,8 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu'
 import { useTheme } from '../hooks/useTheme'
+import { PixelSprite } from './halloween/PixelSprite'
+import { jackOLantern, pumpkin } from './halloween/pumpkins'
 
 const primaryNavItems = [
   { to: '/', label: 'Home' },
@@ -95,14 +97,23 @@ export function Navbar() {
                 server has no real `theme` to read; see useTheme.ts's SSR
                 guard), while a runtime toggle still swaps instantly since
                 it's the same data-theme attribute driving both. */}
-            <HugeiconsIcon icon={Sun02Icon} size={22} strokeWidth={2} className="theme-dark-only" aria-hidden="true" />
-            <HugeiconsIcon
-              icon={Moon02Icon}
-              size={22}
-              strokeWidth={2}
-              className="theme-light-only"
-              aria-hidden="true"
-            />
+            {/* In October (or a preview) the same CSS approach swaps in pixel
+                pumpkins, off <html data-season>: a lit jack-o'-lantern in
+                dark mode, an unlit pumpkin in light mode. */}
+            <span className="block season-hidden">
+              <HugeiconsIcon icon={Sun02Icon} size={22} strokeWidth={2} className="theme-dark-only" aria-hidden="true" />
+              <HugeiconsIcon
+                icon={Moon02Icon}
+                size={22}
+                strokeWidth={2}
+                className="theme-light-only"
+                aria-hidden="true"
+              />
+            </span>
+            <span className="season-only">
+              <PixelSprite art={jackOLantern} className="theme-dark-only h-[22px] w-auto" />
+              <PixelSprite art={pumpkin} className="theme-light-only h-[22px] w-auto" />
+            </span>
           </button>
 
           <button

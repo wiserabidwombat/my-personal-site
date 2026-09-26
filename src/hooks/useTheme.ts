@@ -1,4 +1,5 @@
 import { createContext, createElement, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { updateThemeColor } from '../lib/season'
 
 export type Theme = 'dark' | 'light'
 
@@ -39,6 +40,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
+    updateThemeColor()
     try {
       localStorage.setItem(STORAGE_KEY, theme)
     } catch {
