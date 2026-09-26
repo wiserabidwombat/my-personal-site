@@ -20,7 +20,7 @@ component conventions and making a coherent design.
 Early on, I tried just prompting the agent with pretty plain English
 statements such as "build a component that can display a blog article".
 It produced the component but didn't use Tailwind or shadcn.  And of
-course it looked nothing like what I though it should.
+course it looked nothing like what I thought it should.
 
 ## What actually worked
 

@@ -1,15 +1,13 @@
-import { useEffect, useState } from 'react'
 import { cn } from 'cn'
 import { BookOpen01Icon } from '@hugeicons/core-free-icons'
 import type { CurrentlyReadingBook } from '../../types/book'
+import { useCurrentlyReading } from '../../hooks/useCurrentlyReading'
 import { SectionHeading } from '../SectionHeading'
 import { pageContainer } from '../../lib/styles'
 import { splitTitle } from './bookFilters'
 import { BookCover } from './BookCover'
 import { BookLink } from './BookLink'
 import { CurrentlyReadingSkeleton } from './CurrentlyReadingSkeleton'
-
-type Status = 'loading' | 'live' | 'error'
 
 // A currently-reading shelf is realistically 1-3 books; two skeleton slots
 // fill one row of the sm:grid-cols-2 grid below without overcommitting to a
@@ -51,31 +49,7 @@ function CurrentlyReadingCard({ book }: { book: CurrentlyReadingBook }) {
 }
 
 export function CurrentlyReading() {
-  const [books, setBooks] = useState<CurrentlyReadingBook[]>([])
-  const [status, setStatus] = useState<Status>('loading')
-
-  useEffect(() => {
-    let cancelled = false
-
-    fetch('/api/currently-reading')
-      .then((response) => {
-        if (!response.ok) throw new Error(`Request failed: ${response.status}`)
-        return response.json() as Promise<{ books: CurrentlyReadingBook[] }>
-      })
-      .then((data) => {
-        if (!cancelled) {
-          setBooks(data.books)
-          setStatus('live')
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setStatus('error')
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const { books, status } = useCurrentlyReading()
 
   return (
     <section className={cn(pageContainer, 'py-8 sm:py-10')}>

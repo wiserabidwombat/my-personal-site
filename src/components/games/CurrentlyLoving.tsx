@@ -1,14 +1,10 @@
 import { FireIcon } from '@hugeicons/core-free-icons'
 import type { BoardGame } from '../../types/board-game'
+import { currentlyLoving } from '../../data/currently-loving'
 import { GameArt } from './GameArt'
 import { GameDetailTrigger } from './GameDetailTrigger'
 import { GameSection } from './GameSection'
 import { findGameByName, formatBggRating, formatPlaytime, formatRange } from './shared'
-
-const currentlyLoving = {
-  name: 'Champions of Midgard',
-  blurb: 'Viking worker-placement with a monster-hunting twist — back on the table on repeat.',
-}
 
 type Props = {
   games: BoardGame[]
