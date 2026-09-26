@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { PostImage } from './PostImage'
 import ReactMarkdown from 'react-markdown'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
@@ -52,9 +53,10 @@ export function BlogPostView({ post }: Props) {
       </section>
 
       <article className="mx-auto max-w-3xl px-6 py-12">
-        <img
+        <PostImage
           src={post.image}
           alt={post.title}
+          loading="eager"
           className="aspect-video w-full rounded-2xl border-2 border-[var(--laser-cyan)]/40 object-cover shadow-glow-cyan"
         />
 

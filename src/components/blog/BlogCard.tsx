@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { cn } from 'cn'
 import { formatPostDate, readingMinutes, tagLabel } from '../../lib/blog'
 import type { BlogPost } from '../../types/blog-post'
+import { PostImage } from './PostImage'
 
 type Props = {
   post: BlogPost
@@ -39,7 +40,7 @@ export function BlogCard({ post, featured = false, latest = false }: Props) {
       <div className={cn('relative shrink-0', !featured && 'md:aspect-video md:w-1/3')}>
         {/* Decorative: the title beside it already names the post, and alt
             text would be read again as part of the link's name. */}
-        <img
+        <PostImage
           src={post.image}
           alt=""
           loading={featured ? 'eager' : 'lazy'}

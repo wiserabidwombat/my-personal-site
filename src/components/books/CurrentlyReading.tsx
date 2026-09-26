@@ -23,7 +23,7 @@ function ReadingProgress({ percent }: { percent: number }) {
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label="Reading progress"
-        className="h-1 overflow-hidden rounded-full bg-white/10"
+        className="h-1 overflow-hidden rounded-full bg-[var(--cyber-purple)]/25"
       >
         <div className="h-full rounded-full bg-[var(--laser-cyan)]" style={{ width: `${percent}%` }} />
       </div>

@@ -6,7 +6,7 @@ import flyFishingPhoto from '../../assets/fly-fishing.jpg'
 import golfPhoto from '../../assets/highest-golf.jpg'
 import beefJerkyPhoto from '../../assets/beef-jerky.jpg'
 
-const linkClass = 'text-[var(--laser-cyan)] underline underline-offset-2 hover:text-white'
+const linkClass = 'text-[var(--laser-cyan)] underline underline-offset-2 hover:text-[var(--neon-pink)]'
 
 const photos = [
   { src: boardGamePhoto, alt: 'Deep into a strategy board game session', caption: 'Strategy board game night' },
