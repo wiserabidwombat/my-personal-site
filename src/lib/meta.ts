@@ -2,7 +2,11 @@ import { pageTitle } from './title'
 
 export const SITE_URL = 'https://aarontilley.me'
 const SITE_NAME = 'Aaron Tilley'
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`
+// Bump whenever public/og-image.png changes (see `npm run og:image`). The
+// file name stays the same; the new query string makes link-preview
+// crawlers, which cache images by URL, fetch the new banner.
+export const OG_IMAGE_VERSION = 2
+export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png?v=${OG_IMAGE_VERSION}`
 
 type SeoOptions = {
   // Page name passed through pageTitle() for the "X | Aaron Tilley" format;
