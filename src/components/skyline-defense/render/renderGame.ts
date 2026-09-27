@@ -22,7 +22,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, view
   drawBuildings(ctx, state, view.palette)
   drawLaunchers(ctx, state, view.palette, fontSize)
   drawProjectiles(ctx, state, view.palette)
-  drawBlasts(ctx, state, view.palette)
+  drawBlasts(ctx, state, view.palette, view.still)
   if (state.phase !== 'ready') drawHud(ctx, state, view.palette, view.highScore, fontSize)
   drawBanner(ctx, state, view.palette)
   if (view.crosshair && state.phase === 'playing') drawCrosshair(ctx, view.crosshair, view.palette)

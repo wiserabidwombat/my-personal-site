@@ -74,8 +74,13 @@ export function blastMaxRadius(width: number): number {
   return Math.min(Math.max(width * TUNING.blastRadiusFraction, TUNING.blastRadiusMin), TUNING.blastRadiusMax)
 }
 
+export function chainBlastRadius(width: number): number {
+  return blastMaxRadius(width) * TUNING.chainRadiusFraction
+}
+
 function addBlast(state: GameState, kind: BlastKind, pos: Vec) {
-  const maxRadius = kind === 'impact' ? TUNING.impactRadius : blastMaxRadius(state.width)
+  const maxRadius =
+    kind === 'impact' ? TUNING.impactRadius : kind === 'chain' ? chainBlastRadius(state.width) : blastMaxRadius(state.width)
   state.blasts.push({ id: state.nextId++, kind, pos: { ...pos }, maxRadius, age: 0 })
 }
 

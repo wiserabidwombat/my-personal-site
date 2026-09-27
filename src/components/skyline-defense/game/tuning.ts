@@ -34,10 +34,15 @@ export const TUNING = {
   blastRadiusFraction: 0.045,
   blastRadiusMin: 38,
   blastRadiusMax: 46,
-  // Blast lifetime in seconds: grow, hold, shrink.
-  blastGrow: 0.35,
-  blastHold: 0.25,
-  blastShrink: 0.3,
+  // Blast lifetime in seconds, like classic Missile Command: grow to full
+  // radius, hold, then shrink. Lethal for the whole lifetime (1.6s),
+  // shrinking included, so blasts linger long enough to chain.
+  blastGrow: 0.4,
+  blastHold: 0.7,
+  blastShrink: 0.5,
+  // A meteor destroyed by a blast leaves its own blast, this fraction of a
+  // full blast's radius, with the same lifecycle.
+  chainRadiusFraction: 0.6,
   impactRadius: 16,
   meteorPoints: 25,
   buildingBonus: 100,

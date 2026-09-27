@@ -37,6 +37,15 @@ export function blastRadius(blast: Blast): number {
   return 0
 }
 
+export type BlastStage = 'grow' | 'hold' | 'shrink' | 'done'
+
+export function blastStage(blast: Blast): BlastStage {
+  if (blast.age < TUNING.blastGrow) return 'grow'
+  if (blast.age < TUNING.blastGrow + TUNING.blastHold) return 'hold'
+  if (blast.age < blastLifetime) return 'shrink'
+  return 'done'
+}
+
 // The launcher with ammo closest to x (horizontally), or null if all are
 // empty. Ties go to the leftmost.
 export function nearestLauncherWithAmmo(launchers: Launcher[], x: number): Launcher | null {

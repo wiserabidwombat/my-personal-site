@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { beginWave, blastMaxRadius, createGame, fire, startGame, step, totalAmmo } from './engine'
+import { beginWave, blastMaxRadius, chainBlastRadius, createGame, fire, startGame, step, totalAmmo } from './engine'
+import { blastLifetime } from './geometry'
 import { resizeWorld } from './resize'
 import { meteorPoints } from './scoring'
 import { TUNING } from './tuning'
@@ -55,9 +56,27 @@ describe('collisions', () => {
     expect(state.blasts.some((blast) => blast.kind === 'chain')).toBe(true)
   })
 
+  it('gives a chain blast about 60% of a full blast radius', () => {
+    const state = playing()
+    state.meteors.push(meteorAt(state, 500, 200))
+    state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 500, y: 200 }, maxRadius: 40, age: TUNING.blastGrow })
+    step(state, 0.01)
+    const chain = state.blasts.find((blast) => blast.kind === 'chain')
+    expect(chain?.maxRadius).toBeCloseTo(blastMaxRadius(1000) * TUNING.chainRadiusFraction)
+  })
+
+  it('stays lethal while shrinking', () => {
+    const state = playing()
+    state.meteors.push(meteorAt(state, 500, 200))
+    const age = blastLifetime - TUNING.blastShrink / 2
+    state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 505, y: 200 }, maxRadius: 40, age })
+    step(state, 0.01)
+    expect(state.meteors).toHaveLength(0)
+  })
+
   it('lets a chain blast catch a nearby meteor on a later frame', () => {
     const state = playing()
-    state.meteors.push(meteorAt(state, 500, 200), meteorAt(state, 500 + blastMaxRadius(1000) * 0.8, 200))
+    state.meteors.push(meteorAt(state, 500, 200), meteorAt(state, 500 + chainBlastRadius(1000) * 0.8, 200))
     state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 500, y: 200 }, maxRadius: 5, age: TUNING.blastGrow })
     step(state, 0.01)
     expect(state.meteors).toHaveLength(1)

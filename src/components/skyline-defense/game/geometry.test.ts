@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { blastLifetime, blastRadius, buildingRect, circleContains, nearestLauncherWithAmmo, rectContains } from './geometry'
+import { blastLifetime, blastRadius, blastStage, buildingRect, circleContains, nearestLauncherWithAmmo, rectContains } from './geometry'
 import { TUNING } from './tuning'
 import type { Blast, Building } from './types'
 
@@ -30,6 +30,13 @@ describe('blastRadius', () => {
     expect(blastRadius(blast(TUNING.blastGrow + TUNING.blastHold / 2))).toBe(40)
     expect(blastRadius(blast(blastLifetime - TUNING.blastShrink / 2))).toBeCloseTo(20)
     expect(blastRadius(blast(blastLifetime))).toBe(0)
+  })
+
+  it('reports each stage of the lifecycle', () => {
+    expect(blastStage(blast(TUNING.blastGrow / 2))).toBe('grow')
+    expect(blastStage(blast(TUNING.blastGrow + TUNING.blastHold / 2))).toBe('hold')
+    expect(blastStage(blast(blastLifetime - 0.01))).toBe('shrink')
+    expect(blastStage(blast(blastLifetime))).toBe('done')
   })
 })
 
