@@ -90,6 +90,7 @@ These same variables must also be set in the Vercel dashboard for the deployed `
 | `npm run sync:bgg` | Fill any empty BoardGameGeek-sourced fields on the Notion games rows (box art, players, playtimes, year, BGG rating, weight, designer, publisher, categories, mechanics) from BGG. Never overwrites filled fields or touches personal ones. A new row only needs its name and "BGG Link". Dry run by default; add `-- --write` to apply |
 | `npm run db:migrate` | Apply every `.sql` file in `db/migrations`, in filename order, against `DATABASE_URL` |
 | `npm run spotify:auth` | One-time Spotify authorization for the Music page: opens the consent screen, catches the callback on `http://127.0.0.1:8888/callback`, and prints a refresh token to the terminal (never saved to a file). Requires `SPOTIFY_CLIENT_ID`/`SPOTIFY_CLIENT_SECRET` |
+| `npm run og:image` | Regenerate the 1200x630 link-preview banner, `public/og-image.png`, by screenshotting `scripts/og-image/og-image.html` with Playwright. Edit that HTML file to change the banner's text or design, then run this and commit the new PNG (run manually, not part of `build`; the first run may need `npx playwright install chromium`) |
 
 ## Project structure
 

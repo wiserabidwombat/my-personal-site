@@ -29,7 +29,7 @@ export const homeMeta: RouteMetaEntry = {
 export const aboutMeta: RouteMetaEntry = {
   path: '/about',
   title: 'About',
-  description: 'Senior Developer specializing in React, .NET, and enterprise CRM systems.',
+  description: 'Senior developer who makes the people around him better. React, Angular, .NET, and enterprise CRM.',
 }
 
 export const resumeMeta: RouteMetaEntry = {
