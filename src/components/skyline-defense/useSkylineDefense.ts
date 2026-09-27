@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { createGame, fire, startGame, step } from './game/engine'
 import { resizeWorld } from './game/resize'
-import { TUNING } from './game/tuning'
 import type { GameState, Phase, Vec } from './game/types'
 import { loadHighScore, saveHighScore } from './highScore'
 import { attachInput } from './input'
+import { placeCrosshair, steerCrosshair } from './crosshair'
 import { readPalette } from './render/palette'
 import { renderGame } from './render/renderGame'
 
@@ -52,6 +52,9 @@ export function useSkylineDefense(
     const palette = readPalette(canvas)
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const heldKeys = new Set<string>()
+    // On touch screens the crosshair stays hidden until the first tap.
+    const touchFirst = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    const place = (point: Vec) => (gameRef.current ? placeCrosshair(point, gameRef.current) : point)
 
     const resize = () => {
       const rect = container.getBoundingClientRect()
@@ -64,7 +67,8 @@ export function useSkylineDefense(
       ctx.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0)
       if (gameRef.current) resizeWorld(gameRef.current, width, height)
       else gameRef.current = createGame(width, height)
-      crosshairRef.current ??= { x: width / 2, y: height * 0.4 }
+      if (crosshairRef.current) crosshairRef.current = place(crosshairRef.current)
+      else if (!touchFirst) crosshairRef.current = place({ x: width / 2, y: height * 0.4 })
     }
     resize()
     const observer = new ResizeObserver(resize)
@@ -74,23 +78,14 @@ export function useSkylineDefense(
     const detachInput = attachInput(canvas, {
       isPlaying: () => gameRef.current?.phase === 'playing' && !pausedRef.current,
       canPause: running,
-      fireAt: (point) => gameRef.current && fire(gameRef.current, point),
+      fireAt: (point) => gameRef.current && fire(gameRef.current, place(point)),
       fireAtCrosshair: () => gameRef.current && crosshairRef.current && fire(gameRef.current, crosshairRef.current),
-      setCrosshair: (point) => (crosshairRef.current = point),
+      setCrosshair: (point) => (crosshairRef.current = place(point)),
       togglePause: () => setPaused(!pausedRef.current),
       heldKeys,
     })
     const onVisibility = () => document.hidden && running() && setPaused(true)
     document.addEventListener('visibilitychange', onVisibility)
-
-    const moveCrosshair = (game: GameState, dt: number) => {
-      const crosshair = crosshairRef.current
-      if (!crosshair || heldKeys.size === 0) return
-      const dx = Number(heldKeys.has('ArrowRight')) - Number(heldKeys.has('ArrowLeft'))
-      const dy = Number(heldKeys.has('ArrowDown')) - Number(heldKeys.has('ArrowUp'))
-      crosshair.x = Math.min(Math.max(crosshair.x + dx * TUNING.crosshairSpeed * dt, 0), game.width)
-      crosshair.y = Math.min(Math.max(crosshair.y + dy * TUNING.crosshairSpeed * dt, 0), game.groundY - 12)
-    }
 
     const finish = (game: GameState) => {
       const newHighScore = game.score > highScoreRef.current
@@ -110,7 +105,7 @@ export function useSkylineDefense(
       const dt = Math.min((now - last) / 1000, 0.05)
       last = now
       if (!pausedRef.current) {
-        moveCrosshair(game, dt)
+        crosshairRef.current = steerCrosshair(crosshairRef.current, heldKeys, game, dt)
         step(game, dt)
       }
       if (game.phase !== phase) {

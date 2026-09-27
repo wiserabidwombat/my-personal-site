@@ -1,4 +1,4 @@
-import { groundLevel, layoutBuildings, layoutLaunchers } from './skyline'
+import { groundLevel, layoutBuildings, layoutLaunchers, skylineScale } from './skyline'
 import type { GameState, Vec } from './types'
 
 // Fits a running game to a new canvas size: the skyline and launchers are
@@ -48,4 +48,5 @@ export function resizeWorld(state: GameState, width: number, height: number) {
   state.width = width
   state.height = height
   state.groundY = groundLevel(height)
+  state.scale = skylineScale(width, height)
 }

@@ -49,6 +49,9 @@ export type GameState = {
   width: number
   height: number
   groundY: number
+  // World pixels per skyline design unit (see skylineScale): buildings and
+  // launchers are drawn at this one uniform scale.
+  scale: number
   phase: Phase
   // Seconds spent in the current phase.
   phaseTime: number

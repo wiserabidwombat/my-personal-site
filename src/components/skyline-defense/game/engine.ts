@@ -1,6 +1,6 @@
 import { blastLifetime, blastRadius, buildingRect, circleContains, distance, nearestLauncherWithAmmo, rectContains } from './geometry'
 import { meteorPoints, waveBonus } from './scoring'
-import { groundLevel, layoutBuildings, layoutLaunchers } from './skyline'
+import { groundLevel, LAUNCHER_SIZE, layoutBuildings, layoutLaunchers, skylineScale } from './skyline'
 import { TUNING } from './tuning'
 import type { BlastKind, GameState, Vec } from './types'
 import { spawnMeteor, splitMeteor, waveConfig } from './waves'
@@ -10,6 +10,7 @@ export function createGame(width: number, height: number, rng: () => number = Ma
     width,
     height,
     groundY: groundLevel(height),
+    scale: skylineScale(width, height),
     phase: 'ready',
     phaseTime: 0,
     wave: 0,
@@ -63,7 +64,7 @@ export function fire(state: GameState, target: Vec): boolean {
   const launcher = nearestLauncherWithAmmo(state.launchers, target.x)
   if (!launcher) return false
   launcher.ammo -= 1
-  const from = { x: launcher.x, y: launcher.y - 10 }
+  const from = { x: launcher.x, y: launcher.y - LAUNCHER_SIZE.height * state.scale }
   const aim = { x: target.x, y: Math.min(target.y, state.groundY - 12) }
   state.interceptors.push({ id: state.nextId++, from, pos: { ...from }, target: aim })
   return true

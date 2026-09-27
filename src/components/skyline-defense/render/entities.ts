@@ -1,4 +1,5 @@
 import { blastRadius } from '../game/geometry'
+import { LAUNCHER_SIZE } from '../game/skyline'
 import type { GameState, Vec } from '../game/types'
 import { alpha, type Palette } from './palette'
 
@@ -6,6 +7,8 @@ export function drawLaunchers(ctx: CanvasRenderingContext2D, state: GameState, p
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
   ctx.font = `600 ${fontSize}px system-ui, sans-serif`
+  const half = (LAUNCHER_SIZE.width / 2) * state.scale
+  const top = LAUNCHER_SIZE.height * state.scale
   for (const launcher of state.launchers) {
     const color = launcher.ammo > 0 ? palette.cyan : palette.darkEdge
     ctx.save()
@@ -15,10 +18,10 @@ export function drawLaunchers(ctx: CanvasRenderingContext2D, state: GameState, p
     ctx.shadowColor = color
     ctx.shadowBlur = launcher.ammo > 0 ? 8 : 0
     ctx.beginPath()
-    ctx.moveTo(launcher.x - 16, launcher.y)
-    ctx.lineTo(launcher.x - 8, launcher.y - 10)
-    ctx.lineTo(launcher.x + 8, launcher.y - 10)
-    ctx.lineTo(launcher.x + 16, launcher.y)
+    ctx.moveTo(launcher.x - half, launcher.y)
+    ctx.lineTo(launcher.x - half / 2, launcher.y - top)
+    ctx.lineTo(launcher.x + half / 2, launcher.y - top)
+    ctx.lineTo(launcher.x + half, launcher.y)
     ctx.closePath()
     ctx.fill()
     ctx.stroke()

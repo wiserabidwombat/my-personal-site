@@ -7,6 +7,9 @@ function text(ctx: CanvasRenderingContext2D, value: string, x: number, y: number
   ctx.fillText(value, x, y)
 }
 
+// Height of the HUD row along the top edge; the crosshair stays below it.
+export const HUD_HEIGHT = 36
+
 // Score, wave, and high score along the top edge.
 export function drawHud(ctx: CanvasRenderingContext2D, state: GameState, palette: Palette, highScore: number, fontSize: number) {
   ctx.font = `600 ${fontSize}px system-ui, sans-serif`

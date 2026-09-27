@@ -28,12 +28,12 @@ export function SkylineDefensePage() {
       <header className="flex items-center justify-between gap-3 border-b border-[var(--cyber-purple)]/40 px-4 py-2">
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-sm font-semibold text-[var(--laser-cyan)] transition-colors hover:[text-shadow:var(--glow-cyan)] focus-visible:outline-2 focus-visible:outline-[var(--laser-cyan)]"
+          className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-sm font-semibold whitespace-nowrap text-[var(--laser-cyan)] transition-colors hover:[text-shadow:var(--glow-cyan)] focus-visible:outline-2 focus-visible:outline-[var(--laser-cyan)]"
         >
           <HugeiconsIcon icon={ArrowLeft02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
           Back to site
         </Link>
-        <h1 className="text-xs font-bold tracking-[0.3em] text-[var(--neon-pink)] uppercase [text-shadow:var(--glow-pink)]">
+        <h1 className="text-xs font-bold tracking-[0.2em] whitespace-nowrap text-[var(--neon-pink)] uppercase [text-shadow:var(--glow-pink)] sm:tracking-[0.3em]">
           Skyline Defense
         </h1>
         <button

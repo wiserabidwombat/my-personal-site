@@ -26,9 +26,13 @@ export const TUNING = {
   ammoPerLauncher: 10,
   // Fraction of world height per second.
   interceptorSpeed: 0.85,
-  // Blast radius as a fraction of the world's width, clamped to px.
+  // Blast radius as a fraction of the world's width, clamped to px. Meteors
+  // fall at about the same px/s on phones and desktops, so the minimum
+  // keeps phone blasts big enough to match desktop: in a simulated wave 1
+  // (a player with ~10px tap error), 38 keeps ~99% of the city at 360-430px
+  // wide vs 100% at 1280px; 26 kept only ~85%.
   blastRadiusFraction: 0.045,
-  blastRadiusMin: 26,
+  blastRadiusMin: 38,
   blastRadiusMax: 46,
   // Blast lifetime in seconds: grow, hold, shrink.
   blastGrow: 0.35,
