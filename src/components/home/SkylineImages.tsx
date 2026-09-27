@@ -1,13 +1,18 @@
 import { useSeason } from '../../hooks/useSeason'
 import dallasSkylineDark from '../../assets/dallas-skyline.webp'
 import dallasSkylineLight from '../../assets/dallas-skyline-light.webp'
+import { cn } from 'cn'
+import { skylineMobileHeight } from './skylineFraming'
 
 // Shared by every skyline <img> so they can never drift apart -- identical
 // height, object-fit/position, pixelated rendering, and fade mask. On mobile
 // the panorama is cropped to a fixed height, anchored left so Reunion Tower
-// and the Margaret Hunt Hill Bridge stay in frame.
-const skylineImgClass =
-  'block h-56 w-full object-cover [object-position:left_bottom] select-none [image-rendering:pixelated] [mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] sm:h-auto'
+// and the Margaret Hunt Hill Bridge stay in frame (see skylineFraming.ts,
+// which the Reunion Tower hotspot relies on).
+const skylineImgClass = cn(
+  skylineMobileHeight,
+  'block w-full object-cover [object-position:left_bottom] select-none [image-rendering:pixelated] [mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_25%,black_80%,transparent_100%)] sm:h-auto',
+)
 
 // Optional October art (2172x724, same framing as the normal skylines):
 //   src/assets/skyline-halloween-dark.webp

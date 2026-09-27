@@ -19,6 +19,8 @@ type SeoOptions = {
   // Absolute URL; defaults to the site-wide social preview image.
   image?: string
   type?: 'website' | 'article'
+  // Keeps the page out of search results (e.g. the hidden game route).
+  noindex?: boolean
 }
 
 // Builds the full set of standard/OpenGraph/Twitter Card meta tags for a
@@ -26,7 +28,14 @@ type SeoOptions = {
 // the matched route chain, with the most specific (leaf) route's entry
 // winning -- so the root route's call to this same helper (for path "/")
 // acts as the site-wide fallback for any tag a page doesn't override.
-export function seoMeta({ title, description, path, image = DEFAULT_OG_IMAGE, type = 'website' }: SeoOptions) {
+export function seoMeta({
+  title,
+  description,
+  path,
+  image = DEFAULT_OG_IMAGE,
+  type = 'website',
+  noindex = false,
+}: SeoOptions) {
   const resolvedTitle = pageTitle(title)
   const url = `${SITE_URL}${path}`
 
@@ -43,6 +52,7 @@ export function seoMeta({ title, description, path, image = DEFAULT_OG_IMAGE, ty
     { name: 'twitter:title', content: resolvedTitle },
     { name: 'twitter:description', content: description },
     { name: 'twitter:image', content: image },
+    ...(noindex ? [{ name: 'robots', content: 'noindex, nofollow' }] : []),
   ]
 }
 

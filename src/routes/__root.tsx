@@ -1,4 +1,4 @@
-import { createRootRoute, HeadContent } from '@tanstack/react-router'
+import { createRootRoute, HeadContent, useMatches } from '@tanstack/react-router'
 import { Navbar } from '../components/navbar'
 import { PageTransition } from '../components/PageTransition'
 import { Footer } from '../components/Footer'
@@ -47,6 +47,9 @@ function RootComponent() {
   // rendering there exactly as before, which is what keeps per-route
   // titles/meta correct as the user navigates.
   const isPrerendering = (globalThis as { __PRERENDERING__?: boolean }).__PRERENDERING__ === true
+  // Routes flagged `staticData: { bareLayout: true }` (the hidden game)
+  // render full-screen with no navbar or footer.
+  const bareLayout = useMatches({ select: (matches) => matches.some((match) => match.staticData.bareLayout) })
 
   return (
     // flex-col + min-h-screen here (not relying on individual page wrappers'
@@ -58,11 +61,11 @@ function RootComponent() {
     <ThemeProvider>
       <div className="mx-auto flex min-h-screen w-full max-w-[1126px] flex-col">
         {!isPrerendering && <HeadContent />}
-        <Navbar />
+        {!bareLayout && <Navbar />}
         <main className="flex-1">
           <PageTransition />
         </main>
-        <Footer />
+        {!bareLayout && <Footer />}
       </div>
     </ThemeProvider>
   )
