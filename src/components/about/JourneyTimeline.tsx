@@ -19,7 +19,7 @@ export function JourneyTimeline() {
         <li key={entry.key} className="relative">
           <span className="absolute top-1.5 -left-[calc(1.25rem+5.5px)] size-2.5 rounded-full bg-[var(--laser-cyan)] sm:-left-[calc(2rem+5.5px)]" />
           <p className="text-xs font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">{entry.years}</p>
-          <p className={cn('mt-1', bodyText, 'leading-snug font-semibold text-slate-100')}>
+          <p className={cn(bodyText, 'leading-snug font-semibold text-slate-100')}>
             {/* A combined entry (e.g. MEDHOST) stacks its role progression one
                 title per line, oldest first, each later title led by a small
                 cyan arrow -- so it wraps within the content width at any size. */}
@@ -37,8 +37,8 @@ export function JourneyTimeline() {
               </span>
             ))}
           </p>
-          <p className={cn('mt-0.5', mutedText)}>{entry.place}</p>
-          {entry.detail && <p className={cn('mt-2', bodyText, proseWidth)}>{entry.detail}</p>}
+          <p className={cn(mutedText)}>{entry.place}</p>
+          {entry.detail && <p className={cn(bodyText, proseWidth)}>{entry.detail}</p>}
         </li>
       ))}
     </ol>

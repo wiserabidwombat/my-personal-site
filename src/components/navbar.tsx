@@ -129,7 +129,7 @@ export function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-[var(--laser-cyan)]/30 bg-[var(--deep-space-black)] px-6 py-3 text-left md:hidden">
+        <div className="border-t border-[var(--laser-cyan)]/30 bg-[var(--deep-space-black)] px-6 py-3 md:hidden">
           <ul className="flex flex-col gap-1">
             {primaryNavItems.map((item) => (
               <li key={item.to}>

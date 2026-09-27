@@ -36,7 +36,7 @@ export function WantToPlay({ games }: Props) {
                 <div className="min-w-0 py-1 pr-2">
                   <p className="text-sm font-semibold text-slate-50">{name}</p>
                   {game && (
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="text-xs text-slate-400">
                       {formatRange(game.playersMin, game.playersMax)} players · {formatPlaytime(game)}
                     </p>
                   )}

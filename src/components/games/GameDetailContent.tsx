@@ -1,3 +1,4 @@
+import { cn } from 'cn'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -6,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import type { BoardGame } from '../../types/board-game'
 import { ExpandableText } from './ExpandableText'
 import { formatRange, formatCommaList, extractBggId, formatPlaytime } from './shared'
+import { headingText } from '../../lib/styles'
 
 type Props = {
   game: BoardGame
@@ -29,7 +31,7 @@ function Stat({ label, value }: { label: string; value: ReactNode }) {
       <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
         {label}
       </p>
-      <p className="mt-0.5 text-sm text-slate-200">{value}</p>
+      <p className="text-sm text-slate-200">{value}</p>
     </div>
   )
 }
@@ -77,7 +79,7 @@ export function GameDetailContent({ game }: Props) {
             />
           )}
         </div>
-        <h2 className="text-xl font-bold text-[var(--neon-pink)]">
+        <h2 className={cn(headingText, 'font-bold text-[var(--neon-pink)]')}>
           {game.name}
         </h2>
       </div>

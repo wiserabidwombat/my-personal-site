@@ -15,7 +15,7 @@ import { CodeChip } from './stack/CodeChip'
 import { StackGroups } from './stack/StackGroups'
 import { aiWorkflowLayouts, buildDeployLayouts, dataFlowLayouts } from './stackDiagrams'
 import { useMediaQuery } from '../hooks/useMediaQuery'
-import { compactHero, neonOutlineButton, pageContainer } from '../lib/styles'
+import { compactHero, neonOutlineButton, pageContainer, pageTitle, pageTitleLeading } from '../lib/styles'
 
 const SOURCE_REPO_URL = 'https://github.com/wiserabidwombat/my-personal-site'
 
@@ -51,14 +51,14 @@ export function Stack() {
     isDesktop ? layouts.desktop : layouts.mobile
 
   return (
-    <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
+    <div className="bg-[var(--deep-space-black)] text-slate-200">
       <section className={compactHero}>
         <div className="relative z-10">
           <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">Under the Hood</p>
-          <h1 className="mx-auto mt-3 max-w-3xl text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
+          <h1 className={cn(pageTitle, pageTitleLeading, 'mx-auto max-w-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]')}>
             About This Site
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-lg leading-snug text-slate-300">
+          <p className="mx-auto max-w-2xl text-lg leading-snug text-slate-300">
             The stack behind this site, from the components on screen to the data sources behind them.
           </p>
           <a
@@ -79,7 +79,7 @@ export function Stack() {
       </Section>
 
       <Section icon={FlowConnectionIcon} title="Data Flow">
-        <p className="mt-2 text-slate-300">
+        <p className="text-slate-300">
           Vercel's serverless API routes branch out to four data sources at request time: Notion, Neon, Hardcover,
           and Spotify. Only the minerals & fossils path touches image storage: its photos live in Vercel Blob and are
           resized by wsrv.nl. BoardGameGeek details are copied into Notion ahead of time by a local sync script, and
@@ -89,7 +89,7 @@ export function Stack() {
       </Section>
 
       <Section icon={Rocket01Icon} title="Build & Deploy">
-        <p className="mt-2 text-slate-300">
+        <p className="text-slate-300">
           Every push runs the same Vercel build: tests, a type check, the RSS feed, the production build, then a
           prerendered HTML page per route. The branch alone decides whether it lands as a preview or goes live.
         </p>

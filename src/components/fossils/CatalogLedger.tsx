@@ -85,9 +85,9 @@ export function CatalogLedger({ specimens, loading, status }: Props) {
           {statusLabel[status]}
         </span>
       </div>
-      <p className="mt-2 text-slate-300">The full collection, searchable.</p>
+      <p className="text-slate-300">The full collection, searchable.</p>
       {!loading && summary.total > 0 && (
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="text-sm text-slate-400">
           {summary.total} specimens · {summary.minerals} minerals · {summary.fossils} fossils · from{' '}
           {summary.countries} {summary.countries === 1 ? 'country' : 'countries'}
         </p>

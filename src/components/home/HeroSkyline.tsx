@@ -1,9 +1,10 @@
+import { cn } from 'cn'
 import { Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowRight02Icon } from '@hugeicons/core-free-icons'
 import { useTheme } from '../../hooks/useTheme'
 import { heroTitle } from '../../lib/resume-data'
-import { neonOutlineButton } from '../../lib/styles'
+import { neonOutlineButton, pageTitle, homeTitleLeading } from '../../lib/styles'
 import { SkylineImages } from './SkylineImages'
 import { Seasonal } from '../halloween/Seasonal'
 
@@ -24,10 +25,10 @@ function HeroText() {
           </span>
         ))}
       </p>
-      <h1 className="mt-4 text-4xl font-extrabold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-5xl">
+      <h1 className={cn(pageTitle, homeTitleLeading, 'font-extrabold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]')}>
         Hi, I'm Aaron Tilley.
       </h1>
-      <p className="mx-auto mt-6 max-w-xl text-center text-lg leading-relaxed text-slate-200">
+      <p className="mx-auto max-w-xl text-center text-lg leading-relaxed text-slate-200">
         Full-stack engineer at work, board gamer, fly fisherman, and lifelong learner at not-work. Welcome to my
         site.
       </p>

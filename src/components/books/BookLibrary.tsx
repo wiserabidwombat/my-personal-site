@@ -55,7 +55,7 @@ export function BookLibrary({ books, status }: Props) {
   return (
     <section className={cn(pageContainer, 'py-8 sm:py-10')}>
       <SectionHeading icon={LibraryIcon}>Library</SectionHeading>
-      <p className="mt-2 text-slate-300">Everything read so far.</p>
+      <p className="text-slate-300">Everything read so far.</p>
       <HardcoverCredit />
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

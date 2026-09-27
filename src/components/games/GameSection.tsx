@@ -23,7 +23,7 @@ export function GameSection({ icon, title, description, aside, children }: Props
         <SectionHeading icon={icon}>{title}</SectionHeading>
         {aside}
       </div>
-      {description && <p className="mt-2 text-slate-300">{description}</p>}
+      {description && <p className="text-slate-300">{description}</p>}
       {children}
     </section>
   )

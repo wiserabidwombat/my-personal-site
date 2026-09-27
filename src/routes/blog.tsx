@@ -8,7 +8,7 @@ import { BlogToolbar } from '../components/blog/BlogToolbar'
 import { BlogEmptyState } from '../components/blog/BlogEmptyState'
 import { useBlogFilterState } from '../components/blog/useBlogFilterState'
 import { seoMeta, canonicalLink } from '../lib/meta'
-import { compactHero, pageContainer } from '../lib/styles'
+import { compactHero, pageContainer, pageTitle, pageTitleLeading } from '../lib/styles'
 import { blogMeta } from './routeMeta'
 
 type BlogSearch = {
@@ -52,7 +52,7 @@ function BlogRouteComponent() {
             Transmission Log
           </p>
           <div className="mt-3 flex items-center justify-center gap-3">
-            <h1 className="max-w-3xl text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
+            <h1 className={cn(pageTitle, pageTitleLeading, 'max-w-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]')}>
               Blog
             </h1>
             <a
@@ -64,7 +64,7 @@ function BlogRouteComponent() {
               <HugeiconsIcon icon={RssIcon} strokeWidth={2} className="size-6" aria-hidden="true" />
             </a>
           </div>
-          <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-300">
+          <p className="mx-auto max-w-2xl text-lg text-slate-300">
             Notes on code, teams, and everything in between.
           </p>
         </div>

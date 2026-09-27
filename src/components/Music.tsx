@@ -21,7 +21,7 @@ export function Music() {
   const state = useMusic()
 
   return (
-    <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
+    <div className="bg-[var(--deep-space-black)] text-slate-200">
       <MusicHero />
       {state.status === 'loading' && <MusicSkeleton />}
       {state.status === 'error' && (
