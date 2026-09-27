@@ -16,11 +16,15 @@ try {
   await page.goto(pathToFileURL(source).href)
   // The banner must use its bundled font, never an OS fallback, so it
   // renders the same everywhere.
-  const fontLoaded = await page.evaluate(async () => {
-    await document.fonts.load("600 16px 'Poppins'")
-    return document.fonts.check("600 16px 'Poppins'")
-  })
-  if (!fontLoaded) throw new Error('Bundled font poppins-semibold.woff2 did not load')
+  const fonts = { 500: 'poppins-medium.woff2', 600: 'poppins-semibold.woff2', 700: 'poppins-bold.woff2' }
+  const missing = await page.evaluate(async (fonts) => {
+    await document.fonts.ready
+    const loaded = [...document.fonts].filter((f) => f.family.replace(/['"]/g, '') === 'Poppins' && f.status === 'loaded')
+    return Object.keys(fonts).filter((w) => !loaded.some((f) => f.weight === w))
+  }, fonts)
+  if (missing.length) {
+    throw new Error(`Bundled font(s) did not load: ${missing.map((w) => fonts[w]).join(', ')}`)
+  }
   await page.screenshot({ path: out, clip: { x: 0, y: 0, width: 1200, height: 630 } })
 } finally {
   await browser.close()

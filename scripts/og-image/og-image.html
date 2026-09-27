@@ -3,8 +3,8 @@
   Source for public/og-image.png, the 1200x630 link-preview banner.
   Regenerate with `npm run og:image` (see scripts/og-image/render.mjs).
   Colors are the dark-theme synthwave tokens from src/index.css. The font
-  is bundled (Poppins SemiBold, poppins-semibold.woff2, SIL OFL 1.1 -- see
-  Poppins-OFL.txt) so the banner renders the same on any OS; it is used
+  is bundled (Poppins Medium/SemiBold/Bold, poppins-*.woff2, SIL OFL 1.1 --
+  see Poppins-OFL.txt) so the banner renders the same on any OS; it is used
   only here, never by the site.
 -->
 <html lang="en">
@@ -16,6 +16,20 @@
         font-family: 'Poppins';
         src: url('./poppins-semibold.woff2') format('woff2');
         font-weight: 600;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: 'Poppins';
+        src: url('./poppins-bold.woff2') format('woff2');
+        font-weight: 700;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: 'Poppins';
+        src: url('./poppins-medium.woff2') format('woff2');
+        font-weight: 500;
         font-style: normal;
       }
 
@@ -47,7 +61,8 @@
         height: 630px;
         overflow: hidden;
         font-family: var(--banner-font);
-        /* One bundled weight (600) for every line; never fake bold/italic. */
+        /* SemiBold by default; the name and stack line set their own bundled
+           weights. Never fake bold/italic. */
         font-weight: 600;
         font-synthesis: none;
         text-align: center;
@@ -112,14 +127,13 @@
       }
 
       .name {
-        top: 228px;
+        top: 227px;
         font-size: 96px;
+        font-weight: 700;
         line-height: 1.12;
-        letter-spacing: 0.076em;
-        text-indent: 0.076em;
+        letter-spacing: 0.061em;
+        text-indent: 0.061em;
         color: var(--laser-cyan);
-        /* Thickens the SemiBold strokes to the original's bold weight. */
-        -webkit-text-stroke: 1.5px var(--laser-cyan);
         text-shadow:
           0 0 12px rgba(0, 240, 255, 0.8),
           0 0 36px rgba(0, 240, 255, 0.5);
@@ -135,6 +149,7 @@
       .stack {
         top: 428px;
         font-size: 21.5px;
+        font-weight: 500;
         color: var(--slate-300);
       }
     </style>
