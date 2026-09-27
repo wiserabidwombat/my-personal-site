@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createGame, startGame, step } from './engine'
 import { TUNING } from './tuning'
 import { blastMaxRadius } from './geometry'
-import { salvoSize, spawnMeteor, spawnSalvo, splitMeteor, waveConfig } from './waves'
+import { salvoSize, spawnMeteor, spawnSalvo, splitMeteor, waveConfig, wideness } from './waves'
 
 describe('waveConfig', () => {
   it('adds meteors and speed each wave, and spawns them closer together', () => {
@@ -23,6 +23,21 @@ describe('waveConfig', () => {
     expect(waveConfig(2).salvoChance).toBeGreaterThan(waveConfig(1).salvoChance)
     expect(waveConfig(3).salvoChance).toBeGreaterThanOrEqual(0.5)
     expect(waveConfig(200).salvoChance).toBe(TUNING.salvoChanceMax)
+  })
+
+  it('adds wide-screen pressure only on wide screens and only from the start wave', () => {
+    expect(wideness(390)).toBe(0)
+    expect(wideness(430)).toBe(0)
+    expect(wideness(1280)).toBe(1)
+    expect(wideness(1920)).toBe(1)
+    const start = TUNING.widePressureStartWave
+    // Phones and the early waves get the base values.
+    expect(waveConfig(start + 2, 390)).toEqual(waveConfig(start + 2))
+    expect(waveConfig(start - 1, 1280)).toEqual(waveConfig(start - 1))
+    // Desktop from the start wave on: more meteors, faster.
+    expect(waveConfig(start + 2, 1280).meteorCount).toBeGreaterThan(waveConfig(start + 2).meteorCount)
+    expect(waveConfig(start + 2, 1280).meteorSpeed).toBeGreaterThan(waveConfig(start + 2).meteorSpeed)
+    expect(waveConfig(start + 2, 800).meteorCount).toBeLessThanOrEqual(waveConfig(start + 2, 1280).meteorCount)
   })
 
   it('caps speed, spawn rate, and split chance on very late waves', () => {

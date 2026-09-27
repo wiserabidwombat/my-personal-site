@@ -45,7 +45,7 @@ function setPhase(state: GameState, phase: GameState['phase']) {
 }
 
 export function beginWave(state: GameState, wave: number) {
-  const config = waveConfig(wave)
+  const config = waveConfig(wave, state.width)
   state.wave = wave
   state.toSpawn = config.meteorCount
   state.spawnTimer = 0.6
@@ -156,7 +156,7 @@ export function step(state: GameState, dt: number) {
   if (state.phase === 'waveBonus' && state.phaseTime >= TUNING.waveBonusTime) beginWave(state, state.wave + 1)
   if (state.phase !== 'playing') return
 
-  const config = waveConfig(state.wave)
+  const config = waveConfig(state.wave, state.width)
   state.spawnTimer -= dt
   if (state.toSpawn > 0 && state.spawnTimer <= 0) {
     const salvo = spawnSalvo(state, config, salvoSize(state, config, state.toSpawn))

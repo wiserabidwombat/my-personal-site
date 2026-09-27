@@ -2,15 +2,32 @@ import { blastMaxRadius } from './geometry'
 import { TUNING } from './tuning'
 import type { GameState, Meteor, Vec, WaveConfig } from './types'
 
+// 0 on phones, rising to 1 at TUNING.widePressureFullWidth and wider.
+export function wideness(width: number): number {
+  const span = TUNING.widePressureFullWidth - TUNING.widePressureMinWidth
+  return Math.min(Math.max((width - TUNING.widePressureMinWidth) / span, 0), 1)
+}
+
+// Extra count/speed multiplier for wide screens (see TUNING.widePressure*).
+export function widePressure(wave: number, width: number, perWave: number): number {
+  const waves = wave - TUNING.widePressureStartWave + 1
+  return waves > 0 ? 1 + wideness(width) * perWave * waves : 1
+}
+
 // Difficulty for wave n (1-based): more, faster meteors, spawning closer
 // together, splitting meteors from TUNING.splitStartWave on, and salvos
 // becoming more common. Speed is a fraction of world height per second.
-export function waveConfig(wave: number): WaveConfig {
+// `width` adds the wide-screen pressure; omit it for the base values.
+export function waveConfig(wave: number, width = 0): WaveConfig {
   const step = Math.max(wave, 1) - 1
   const splitting = wave >= TUNING.splitStartWave
+  const baseSpeed = Math.min(TUNING.meteorSpeedBase + step * TUNING.meteorSpeedPerWave, TUNING.meteorSpeedMax)
   return {
-    meteorCount: TUNING.meteorCountBase + step * TUNING.meteorCountPerWave,
-    meteorSpeed: Math.min(TUNING.meteorSpeedBase + step * TUNING.meteorSpeedPerWave, TUNING.meteorSpeedMax),
+    meteorCount: Math.round(
+      (TUNING.meteorCountBase + step * TUNING.meteorCountPerWave) *
+        widePressure(wave, width, TUNING.widePressureCountPerWave),
+    ),
+    meteorSpeed: baseSpeed * widePressure(wave, width, TUNING.widePressureSpeedPerWave),
     spawnInterval: Math.max(TUNING.spawnIntervalBase - step * TUNING.spawnIntervalPerWave, TUNING.spawnIntervalMin),
     splitChance: splitting
       ? Math.min(

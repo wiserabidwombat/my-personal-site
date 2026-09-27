@@ -50,9 +50,11 @@ export const TUNING = {
   // keeps phone blasts big enough to match desktop: in a simulated wave 1
   // (a player with ~10px tap error), 38 keeps ~99% of the city at 360-430px
   // wide vs 100% at 1280px; 26 kept only ~85%.
-  blastRadiusFraction: 0.045,
+  blastRadiusFraction: 0.05,
   blastRadiusMin: 38,
-  blastRadiusMax: 46,
+  // ~5% of the width on desktop (64px at 1280px), so chains are easier to
+  // set up where the sky is wide.
+  blastRadiusMax: 64,
   // Blast lifetime in seconds, like classic Missile Command: grow to full
   // radius, hold, then shrink. Lethal for the whole lifetime (1.6s),
   // shrinking included, so blasts linger long enough to chain.
@@ -66,6 +68,18 @@ export const TUNING = {
   meteorPoints: 25,
   buildingBonus: 100,
   ammoBonus: 5,
+  // Wide-screen pressure. Meteor speed is already a fraction of the canvas
+  // height, so meteors take the same time to fall at every size; what a
+  // desktop has extra is width (more sky, bigger blasts). From
+  // widePressureStartWave on, each wave's meteor count and speed get
+  // (1 + wideness * perWave * wavesSinceStart), where wideness runs from 0
+  // at widePressureMinWidth (phones unaffected) to 1 at
+  // widePressureFullWidth and wider.
+  widePressureStartWave: 3,
+  widePressureMinWidth: 430,
+  widePressureFullWidth: 1280,
+  widePressureCountPerWave: 0.2,
+  widePressureSpeedPerWave: 0.08,
   // Seconds on the "Wave N" title and the between-wave bonus screen.
   waveTitleTime: 1.6,
   waveBonusTime: 2.4,
