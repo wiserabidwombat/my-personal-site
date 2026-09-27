@@ -5,10 +5,15 @@ export type BuildingKind = 'reunion' | 'bofa' | 'fountain' | 'comerica' | 'renai
 export type Building = {
   id: number
   kind: BuildingKind
-  // Center x, base width, and height above the ground, in world pixels.
+  name: string
+  // Bounding box: center x, width, and height above the ground, in world
+  // pixels (used for aiming meteors).
   x: number
   width: number
   height: number
+  // The building's outline in the skyline image, in world pixels (one or
+  // more polygons): what meteors hit, and what goes dark when destroyed.
+  outline: Vec[][]
   alive: boolean
 }
 

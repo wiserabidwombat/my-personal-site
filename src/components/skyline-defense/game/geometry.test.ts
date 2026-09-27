@@ -18,7 +18,7 @@ describe('collision helpers', () => {
   })
 
   it('buildingRect spans the base width and rises from the ground', () => {
-    const building: Building = { id: 0, kind: 'bofa', x: 100, width: 40, height: 200, alive: true }
+    const building: Building = { id: 0, kind: 'bofa', name: 'Test', x: 100, width: 40, height: 200, outline: [], alive: true }
     expect(buildingRect(building, 500)).toEqual({ left: 80, right: 120, top: 300, bottom: 500 })
   })
 })

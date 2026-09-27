@@ -81,8 +81,8 @@ export const TUNING = {
   // Calibrated against a human-like simulated player (~20% lead error,
   // 0.25s reaction delay) so 1280px tracks 390px: city kept ~99% in wave
   // 1, ~90-95% in waves 3-4, ~65-70% in wave 6 on both.
-  widePressureCountPerWave: 0.075,
-  widePressureSpeedPerWave: 0.03,
+  widePressureCountPerWave: 0.1,
+  widePressureSpeedPerWave: 0.04,
   // Seconds on the "Wave N" title and the between-wave bonus screen.
   waveTitleTime: 1.6,
   waveBonusTime: 2.4,

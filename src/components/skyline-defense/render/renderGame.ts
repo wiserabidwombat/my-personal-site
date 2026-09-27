@@ -1,5 +1,5 @@
 import type { GameState, Vec } from '../game/types'
-import { drawBuildings } from './buildings'
+import { drawCity, type CityLayer } from './city'
 import { drawBlasts, drawCrosshair, drawLaunchers, drawProjectiles } from './entities'
 import { drawBanner, drawHud } from './hud'
 import type { Palette } from './palette'
@@ -12,14 +12,17 @@ export type RenderView = {
   still: boolean
   highScore: number
   crosshair: Vec | null
+  // The skyline image layer, once the image has loaded.
+  city: CityLayer | null
 }
 
 // Draws one frame. The canvas transform is already scaled for
 // devicePixelRatio, so everything here is in world (CSS) pixels.
 export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, view: RenderView) {
   const fontSize = state.width < 500 ? 13 : 16
-  drawScene(ctx, state, view.palette, view.time, view.still)
-  drawBuildings(ctx, state, view.palette)
+  const horizon = view.city ? { y: view.city.y, color: view.city.skyColor } : null
+  drawScene(ctx, state, view.palette, view.time, view.still, horizon)
+  if (view.city) drawCity(ctx, state, view.city)
   drawLaunchers(ctx, state, view.palette, fontSize)
   drawProjectiles(ctx, state, view.palette)
   drawBlasts(ctx, state, view.palette, view.still)

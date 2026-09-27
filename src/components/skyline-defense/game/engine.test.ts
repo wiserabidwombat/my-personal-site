@@ -4,7 +4,7 @@ import { blastLifetime } from './geometry'
 import { resizeWorld } from './resize'
 import { meteorPoints } from './scoring'
 import { TUNING } from './tuning'
-import type { GameState, Meteor } from './types'
+import type { Building, GameState, Meteor } from './types'
 import { waveConfig } from './waves'
 
 const meteorAt = (state: GameState, x: number, y: number): Meteor => ({
@@ -14,6 +14,16 @@ const meteorAt = (state: GameState, x: number, y: number): Meteor => ({
   vel: { x: 0, y: 0 },
   splitAtY: null,
 })
+
+// A point inside a building's outline (the average of its first polygon's
+// corners -- inside for the convex shapes used here).
+function insideOf(building: Building) {
+  const polygon = building.outline[0]
+  return {
+    x: polygon.reduce((sum, p) => sum + p.x, 0) / polygon.length,
+    y: polygon.reduce((sum, p) => sum + p.y, 0) / polygon.length,
+  }
+}
 
 // A game in its first 'playing' frame with nothing in the sky and nothing
 // left to spawn (the step that starts play also spawns the first meteor).
@@ -91,11 +101,15 @@ describe('collisions', () => {
     state.toSpawn = 5
     state.spawnTimer = 999
     const [first, ...rest] = state.buildings
-    state.meteors.push(meteorAt(state, first.x, state.groundY - 1))
+    const firstPoint = insideOf(first)
+    state.meteors.push(meteorAt(state, firstPoint.x, firstPoint.y))
     step(state, 0.01)
     expect(first.alive).toBe(false)
     expect(state.phase).toBe('playing')
-    for (const building of rest) state.meteors.push(meteorAt(state, building.x, state.groundY - 1))
+    for (const building of rest) {
+      const point = insideOf(building)
+      state.meteors.push(meteorAt(state, point.x, point.y))
+    }
     step(state, 0.01)
     expect(state.phase).toBe('gameOver')
   })
@@ -134,7 +148,7 @@ describe('resizeWorld', () => {
     state.launchers[1].ammo = 4
     state.meteors.push(meteorAt(state, 500, 350))
     resizeWorld(state, 500, 350)
-    expect(state.buildings.find((b) => b.kind === 'reunion')?.alive).toBe(false)
+    expect(state.buildings.find((b) => b.name === 'Reunion Tower')?.alive).toBe(false)
     expect(state.launchers[1].ammo).toBe(4)
     expect(state.meteors[0].pos).toEqual({ x: 250, y: 175 })
   })

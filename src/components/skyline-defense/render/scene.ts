@@ -1,16 +1,35 @@
 import type { GameState } from '../game/types'
 import { alpha, noise, type Palette } from './palette'
 
+// Where the skyline image begins, and the color of its top row.
+export type Horizon = { y: number; color: string }
+
 // Night sky, stars, a pink glow on the horizon, and the perspective floor
-// grid below the ground line. `time` scrolls the grid unless motion is
-// reduced.
-export function drawScene(ctx: CanvasRenderingContext2D, state: GameState, palette: Palette, time: number, still: boolean) {
+// grid below the ground line. With the skyline image showing (`horizon`),
+// the sky runs from dark purple at the top to the image's own top-row
+// color where the image begins, so the two meet without a seam (the image
+// has its own glow, so the pink one is left out). `time` scrolls the grid
+// unless motion is reduced.
+export function drawScene(
+  ctx: CanvasRenderingContext2D,
+  state: GameState,
+  palette: Palette,
+  time: number,
+  still: boolean,
+  horizon: Horizon | null,
+) {
   const { width, height, groundY } = state
 
-  const sky = ctx.createLinearGradient(0, 0, 0, groundY)
+  const skyBottom = horizon ? Math.max(horizon.y, 1) : groundY
+  const sky = ctx.createLinearGradient(0, 0, 0, skyBottom)
   sky.addColorStop(0, palette.sky)
-  sky.addColorStop(0.6, palette.skyHigh)
-  sky.addColorStop(1, alpha(palette.pink, 0.16))
+  if (horizon) {
+    sky.addColorStop(0.45, palette.skyHigh)
+    sky.addColorStop(1, horizon.color)
+  } else {
+    sky.addColorStop(0.6, palette.skyHigh)
+    sky.addColorStop(1, alpha(palette.pink, 0.16))
+  }
   ctx.fillStyle = sky
   ctx.fillRect(0, 0, width, groundY)
 
@@ -21,13 +40,15 @@ export function drawScene(ctx: CanvasRenderingContext2D, state: GameState, palet
     ctx.fillRect(noise(i * 3) * width, noise(i * 3 + 1) * groundY * 0.75, 1.5, 1.5)
   }
 
-  // Drawn over the whole sky (the gradient fades out on its own), so it
-  // never shows a hard edge.
-  const glow = ctx.createRadialGradient(width / 2, groundY, 0, width / 2, groundY, Math.max(width * 0.6, groundY))
-  glow.addColorStop(0, alpha(palette.pink, 0.3))
-  glow.addColorStop(1, alpha(palette.pink, 0))
-  ctx.fillStyle = glow
-  ctx.fillRect(0, 0, width, groundY)
+  if (!horizon) {
+    // Drawn over the whole sky (the gradient fades out on its own), so it
+    // never shows a hard edge.
+    const glow = ctx.createRadialGradient(width / 2, groundY, 0, width / 2, groundY, Math.max(width * 0.6, groundY))
+    glow.addColorStop(0, alpha(palette.pink, 0.3))
+    glow.addColorStop(1, alpha(palette.pink, 0))
+    ctx.fillStyle = glow
+    ctx.fillRect(0, 0, width, groundY)
+  }
 
   ctx.fillStyle = palette.sky
   ctx.fillRect(0, groundY, width, height - groundY)

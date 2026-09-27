@@ -15,7 +15,25 @@ export function rectContains(rect: Rect, point: Vec): boolean {
   return point.x >= rect.left && point.x <= rect.right && point.y >= rect.top && point.y <= rect.bottom
 }
 
-// A building's hit box: its full base width and height above the ground.
+export function polygonContains(polygon: Vec[], point: Vec): boolean {
+  let inside = false
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const a = polygon[i]
+    const b = polygon[j]
+    if (a.y > point.y !== b.y > point.y && point.x < ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y) + a.x) inside = !inside
+  }
+  return inside
+}
+
+// Whether a point is inside the building as drawn (its outline).
+export function buildingContains(building: Building, groundY: number, point: Vec): boolean {
+  return (
+    rectContains(buildingRect(building, groundY), point) &&
+    building.outline.some((polygon) => polygonContains(polygon, point))
+  )
+}
+
+// A building's bounding box: its full width and height above the ground.
 export function buildingRect(building: Building, groundY: number): Rect {
   return {
     left: building.x - building.width / 2,
