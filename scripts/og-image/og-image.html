@@ -2,21 +2,30 @@
 <!--
   Source for public/og-image.png, the 1200x630 link-preview banner.
   Regenerate with `npm run og:image` (see scripts/og-image/render.mjs).
-  Colors are the dark-theme synthwave tokens from src/index.css, and the
-  font stack matches its --heading/--sans.
+  Colors are the dark-theme synthwave tokens from src/index.css. The font
+  is bundled (Poppins SemiBold, poppins-semibold.woff2, SIL OFL 1.1 -- see
+  Poppins-OFL.txt) so the banner renders the same on any OS; it is used
+  only here, never by the site.
 -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>OG image</title>
     <style>
+      @font-face {
+        font-family: 'Poppins';
+        src: url('./poppins-semibold.woff2') format('woff2');
+        font-weight: 600;
+        font-style: normal;
+      }
+
       :root {
         --deep-space-black: #0a0612;
         --neon-pink: #ff2bd6;
         --cyber-purple: #8b2fe0;
         --laser-cyan: #00f0ff;
         --slate-300: #cbd5e1;
-        --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+        --banner-font: 'Poppins', sans-serif;
       }
 
       * {
@@ -37,7 +46,10 @@
         width: 1200px;
         height: 630px;
         overflow: hidden;
-        font-family: var(--heading);
+        font-family: var(--banner-font);
+        /* One bundled weight (600) for every line; never fake bold/italic. */
+        font-weight: 600;
+        font-synthesis: none;
         text-align: center;
       }
 
@@ -54,18 +66,21 @@
         );
       }
 
-      /* Perspective floor grid, same construction as bg-synth-grid. */
+      /* Perspective floor grid, same construction as bg-synth-grid. Height
+         and offset put the horizontal lines where the original's were: a
+         bright one at y=603 and a faded one at y=561 (the mask fades the
+         lines out toward the horizon). */
       .floor {
         position: absolute;
         left: 0;
         right: 0;
         bottom: 0;
-        height: 330px;
+        height: 380px;
         background-image:
           linear-gradient(color-mix(in oklab, var(--laser-cyan) 60%, transparent) 1px, transparent 1px),
           linear-gradient(90deg, color-mix(in oklab, var(--laser-cyan) 60%, transparent) 1px, transparent 1px);
         background-size: 60px 60px;
-        background-position: 0 0;
+        background-position: 0 2px;
         transform: perspective(300px) rotateX(65deg);
         transform-origin: bottom;
         mask-image: linear-gradient(to top, black 40%, transparent 95%);
@@ -90,7 +105,6 @@
       .eyebrow {
         top: 170px;
         font-size: 22px;
-        font-weight: 700;
         letter-spacing: 0.36em;
         text-indent: 0.36em;
         color: var(--laser-cyan);
@@ -98,30 +112,29 @@
       }
 
       .name {
-        top: 221px;
+        top: 228px;
         font-size: 96px;
-        font-weight: 700;
         line-height: 1.12;
-        letter-spacing: 0.055em;
-        text-indent: 0.055em;
+        letter-spacing: 0.076em;
+        text-indent: 0.076em;
         color: var(--laser-cyan);
+        /* Thickens the SemiBold strokes to the original's bold weight. */
+        -webkit-text-stroke: 1.5px var(--laser-cyan);
         text-shadow:
           0 0 12px rgba(0, 240, 255, 0.8),
           0 0 36px rgba(0, 240, 255, 0.5);
       }
 
       .role {
-        top: 348px;
-        font-size: 41px;
-        font-weight: 600;
+        top: 350px;
+        font-size: 37px;
         color: var(--neon-pink);
         text-shadow: 0 0 14px rgba(255, 43, 214, 0.6);
       }
 
       .stack {
         top: 428px;
-        font-size: 23px;
-        font-weight: 500;
+        font-size: 21.5px;
         color: var(--slate-300);
       }
     </style>
