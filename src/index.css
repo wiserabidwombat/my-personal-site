@@ -188,17 +188,11 @@
     --shadow:
       rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
 }
 
+/* The site's max width (1126px) and centering live on the root layout's
+   wrapper in src/routes/__root.tsx, as Tailwind classes. */
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -266,42 +260,6 @@ body {
   }
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin-block: 32px;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin-block: 20px;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin-block: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
-}
 
 /* Retro-future perspective floor grid, receding toward a neon horizon glow. */
 @utility bg-synth-grid {

@@ -5,9 +5,21 @@ import { buttonVariants } from '@/components/ui/button'
 // page's headings, prose, and grids start on the same left edge.
 export const pageContainer = 'mx-auto max-w-4xl px-6'
 
+// Page title (h1) size, tracking, and spacing: 36px, 56px from lg up. These
+// were once global h1 rules in index.css; as classes they no longer fight
+// Tailwind. Line height is per title (see pageTitleLeading below).
+export const pageTitle = 'my-[20px] text-[36px] tracking-[-1.68px] lg:my-[32px] lg:text-[56px]'
+// Line heights for the two title scales used on the site.
+export const pageTitleLeading = 'leading-[1.2] sm:leading-[1.111]'
+export const homeTitleLeading = 'leading-[1.111] sm:leading-none'
+
+// Heading (h2) size, line height, tracking, and bottom spacing: 20px, 24px
+// from lg up -- formerly a global h2 rule in index.css.
+export const headingText = 'mb-[8px] text-[20px] leading-[1.18] tracking-[-0.24px] lg:text-[24px]'
+
 // Section heading below a hero: neon pink, no glow (the hero H1 keeps the
 // page's one glow), with an accent icon -- see SectionHeading.
-export const sectionHeading = 'flex items-center gap-2 text-2xl font-bold text-[var(--neon-pink)]'
+export const sectionHeading = cn(headingText, 'flex items-center gap-2 font-bold text-[var(--neon-pink)]')
 
 // Outlined pill (transparent, 1px cyan border/text). Used for skill pills on
 // About, tag pills on blog cards, and -- with outlinePillActive layered on

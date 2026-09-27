@@ -2,7 +2,7 @@
 // credit on the Games page.
 export function HardcoverCredit() {
   return (
-    <p className="mt-1 text-xs text-slate-500">
+    <p className="text-xs text-slate-500">
       Data from{' '}
       <a
         href="https://hardcover.app"

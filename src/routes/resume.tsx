@@ -10,7 +10,7 @@ import { ResumeEducation } from '../components/resume/ResumeEducation'
 import { useResumePdfDownload } from '../hooks/useResumePdfDownload'
 import { seoMeta, canonicalLink } from '../lib/meta'
 import { heroTitle, summary } from '../lib/resume-data'
-import { neonOutlineButton, pageContainer } from '../lib/styles'
+import { neonOutlineButton, pageContainer, pageTitle, pageTitleLeading } from '../lib/styles'
 import { resumeMeta } from './routeMeta'
 
 export const Route = createFileRoute('/resume')({
@@ -28,16 +28,16 @@ function RouteComponent() {
   const { download: handleDownload, generating: generatingPdf } = useResumePdfDownload()
 
   return (
-    <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
+    <div className="bg-[var(--deep-space-black)] text-slate-200">
       <section className="bg-synth-grid px-6 py-20 text-center">
         <div className="relative z-10">
           <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">
             Resume
           </p>
-          <h1 className="mx-auto mt-4 max-w-3xl text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
+          <h1 className={cn(pageTitle, pageTitleLeading, 'mx-auto max-w-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]')}>
             {heroTitle}
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">{summary}</p>
+          <p className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-300">{summary}</p>
           <Button onClick={handleDownload} disabled={generatingPdf} className={cn(neonOutlineButton, 'mt-8 gap-2')}>
             <HugeiconsIcon icon={Download04Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
             {generatingPdf ? 'Preparing…' : 'Download Resume (PDF)'}

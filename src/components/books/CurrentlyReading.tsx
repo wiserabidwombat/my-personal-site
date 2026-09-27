@@ -27,7 +27,7 @@ function ReadingProgress({ percent }: { percent: number }) {
       >
         <div className="h-full rounded-full bg-[var(--laser-cyan)]" style={{ width: `${percent}%` }} />
       </div>
-      <p className="mt-1 text-xs text-slate-400">{percent}% read</p>
+      <p className="text-xs text-slate-400">{percent}% read</p>
     </div>
   )
 }
@@ -40,8 +40,8 @@ function CurrentlyReadingCard({ book }: { book: CurrentlyReadingBook }) {
       <BookCover url={book.coverImageUrl} title={book.title} className="w-24 flex-none self-start rounded-lg sm:w-28" />
       <div className="flex min-w-0 flex-1 flex-col py-1">
         <h3 className="text-base leading-snug font-semibold text-slate-100">{main}</h3>
-        {sub && <p className="mt-0.5 text-sm leading-snug text-slate-300">{sub}</p>}
-        {book.author && <p className="mt-1.5 text-xs text-slate-400">{book.author}</p>}
+        {sub && <p className="text-sm leading-snug text-slate-300">{sub}</p>}
+        {book.author && <p className="text-xs text-slate-400">{book.author}</p>}
         {book.progressPercent != null && <ReadingProgress percent={book.progressPercent} />}
       </div>
     </BookLink>
@@ -62,13 +62,13 @@ export function CurrentlyReading() {
         </div>
       )}
       {status === 'error' && (
-        <p className="mt-2 text-sm text-slate-400">
+        <p className="text-sm text-slate-400">
           Unable to load what I'm reading right now. Please try again later.
         </p>
       )}
       {status === 'live' &&
         (books.length === 0 ? (
-          <p className="mt-2 text-slate-300">Not reading anything right now.</p>
+          <p className="text-slate-300">Not reading anything right now.</p>
         ) : (
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {books.map((book) => (

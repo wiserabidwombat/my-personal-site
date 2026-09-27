@@ -15,7 +15,7 @@ const systemMetrics = [
 
 export function Home() {
   return (
-    <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
+    <div className="bg-[var(--deep-space-black)] text-slate-200">
       <HeroSkyline />
       <CurrentStatus />
       <LatestPost />

@@ -36,8 +36,8 @@ export function ExploreGrid() {
           <li key={hobby.to}>
             <Link to={hobby.to} className={cn(gameCardBaseClass, gameCardInteractiveClass, 'flex-col p-5')}>
               <HugeiconsIcon icon={hobby.icon} strokeWidth={2} className="size-6 text-[var(--laser-cyan)]" aria-hidden="true" />
-              <p className="mt-3 font-semibold text-slate-50 group-hover:text-[var(--laser-cyan)]">{hobby.name}</p>
-              <p className="mt-1 text-sm leading-relaxed text-slate-300">{hobby.description}</p>
+              <p className="font-semibold text-slate-50 group-hover:text-[var(--laser-cyan)]">{hobby.name}</p>
+              <p className="text-sm leading-relaxed text-slate-300">{hobby.description}</p>
             </Link>
           </li>
         ))}

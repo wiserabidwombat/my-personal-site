@@ -27,7 +27,7 @@ function ArtistGrid({ artists }: { artists: MusicItem[] }) {
               round
               className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:group-hover:scale-100"
             />
-            <p className="mt-2 truncate text-sm font-medium text-slate-100 group-hover:text-[var(--laser-cyan)]">
+            <p className="truncate text-sm font-medium text-slate-100 group-hover:text-[var(--laser-cyan)]">
               {artist.name}
             </p>
           </SpotifyLink>
@@ -89,7 +89,7 @@ export function TopMusic({ ranges, tracks, artists }: Props) {
           ))}
         </div>
       )}
-      {ranges.length === 1 && <p className="mt-2 text-sm text-slate-400">{TIME_RANGE_LABELS[range]}</p>}
+      {ranges.length === 1 && <p className="text-sm text-slate-400">{TIME_RANGE_LABELS[range]}</p>}
 
       {rangeArtists.length > 0 && (
         <div className="mt-6">

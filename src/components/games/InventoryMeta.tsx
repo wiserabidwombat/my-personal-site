@@ -27,7 +27,7 @@ export function SourceIndicator({ source }: { source: BoardGamesSource }) {
 // BGG's XML API terms require attribution on public apps using its data.
 export function BggAttribution() {
   return (
-    <p className="mt-1 text-xs text-slate-500">
+    <p className="text-xs text-slate-500">
       Box art and ratings from{' '}
       <a
         href="https://boardgamegeek.com"

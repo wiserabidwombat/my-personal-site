@@ -99,7 +99,7 @@ export function GameInventory({ games: boardGames, source }: Props) {
       />
 
       {source !== 'loading' && results.length > 0 && (
-        <p ref={resultsTopRef} className="mt-6 text-sm text-slate-400" aria-live="polite">
+        <p ref={resultsTopRef} className="text-sm text-slate-400" aria-live="polite">
           Showing {firstIndex + 1}–{firstIndex + paginated.length} of {results.length} games
         </p>
       )}

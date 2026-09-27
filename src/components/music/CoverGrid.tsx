@@ -27,7 +27,7 @@ export function CoverGrid({ icon, title, description, items }: Props) {
                 url={item.imageUrl}
                 className="transition-transform duration-300 group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0"
               />
-              <p className="mt-2 line-clamp-2 text-sm leading-snug font-medium text-slate-100 group-hover:text-[var(--laser-cyan)]">
+              <p className="line-clamp-2 text-sm leading-snug font-medium text-slate-100 group-hover:text-[var(--laser-cyan)]">
                 {item.name}
               </p>
             </SpotifyLink>

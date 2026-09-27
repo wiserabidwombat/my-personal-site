@@ -1,4 +1,5 @@
-import { compactHero } from '../../lib/styles'
+import { cn } from 'cn'
+import { compactHero, pageTitle, pageTitleLeading } from '../../lib/styles'
 import { SpotifyLogo } from './SpotifyLogo'
 
 // Page heading with the Spotify credit, then the Spotify logo on its own
@@ -15,13 +16,13 @@ export function MusicHero() {
     <section className={compactHero}>
       <div className="relative z-10">
         <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">Music</p>
-        <h1 className="mx-auto mt-3 max-w-3xl text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
+        <h1 className={cn(pageTitle, pageTitleLeading, 'mx-auto max-w-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]')}>
           What I'm Listening To
         </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-lg leading-snug text-slate-300">
+        <p className="mx-auto max-w-2xl text-lg leading-snug text-slate-300">
           What's on repeat lately, the playlists I've made, and the podcasts I follow.
         </p>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="text-xs text-slate-500">
           Data from{' '}
           <a
             href="https://www.spotify.com"

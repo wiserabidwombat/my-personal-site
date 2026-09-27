@@ -31,7 +31,7 @@ export function NowPlaying({ track }: { track: NowPlayingData }) {
             <Equalizer />
             {track.type === 'episode' ? 'Podcast' : 'Playing now'}
           </p>
-          <p className="mt-1.5 line-clamp-2 font-semibold text-slate-100" title={track.name}>
+          <p className="line-clamp-2 font-semibold text-slate-100" title={track.name}>
             {track.name}
           </p>
           <p className="line-clamp-1 text-sm text-slate-400" title={track.artists}>

@@ -35,7 +35,7 @@ export function StatusCard({ icon, label, href, linkLabel, loading = false, clas
       )}
     >
       <HugeiconsIcon icon={icon} strokeWidth={2} className="size-6 text-[var(--laser-cyan)]" aria-hidden="true" />
-      <p className="mt-2 text-xs font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
+      <p className="text-xs font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">
         {href && !external && (
           <Link to={href} className={linkClass}>
             {label}

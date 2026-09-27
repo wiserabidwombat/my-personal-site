@@ -48,7 +48,7 @@ export function SpecimenCard({ specimen }: Props) {
           <h3 className="text-sm font-semibold text-slate-50 sm:text-base">
             <SpecimenName specimen={specimen} />
           </h3>
-          <SpecimenLocation location={specimen.locationFound} className="mt-auto text-xs text-slate-400" />
+          <SpecimenLocation location={specimen.locationFound} className="text-xs text-slate-400" />
         </div>
       </div>
 

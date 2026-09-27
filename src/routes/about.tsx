@@ -9,7 +9,7 @@ import { BeyondTheCode } from '../components/about/BeyondTheCode'
 import { bodyText, proseWidth } from '../components/about/typography'
 import { buttonVariants } from '@/components/ui/button'
 import { seoMeta, canonicalLink } from '../lib/meta'
-import { pageContainer, neonOutlineButton, sectionHeading } from '../lib/styles'
+import { pageContainer, neonOutlineButton, sectionHeading, pageTitle, pageTitleLeading } from '../lib/styles'
 import { aboutMeta } from './routeMeta'
 
 export const Route = createFileRoute('/about')({
@@ -34,7 +34,7 @@ const proseClass = cn(bodyText, proseWidth)
 
 function AboutRouteComponent() {
   return (
-    <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
+    <div className="bg-[var(--deep-space-black)] text-slate-200">
       {/* The hero's content uses the same page container as the sections
           below, so on desktop the avatar, intro paragraph, and section
           headings share one left edge. The grid and glow are the section's
@@ -59,10 +59,10 @@ function AboutRouteComponent() {
                 </span>
               ))}
             </div>
-            <h1 className="mt-4 text-3xl font-bold text-balance text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
+            <h1 className={cn(pageTitle, pageTitleLeading, 'font-bold text-balance text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]')}>
               I make the people around me better.
             </h1>
-            <p className="mt-4 text-lg text-slate-400">
+            <p className="text-lg text-slate-400">
               I also write full-stack software the next developer will thank me for.
             </p>
           </div>
@@ -83,7 +83,7 @@ function AboutRouteComponent() {
           <HugeiconsIcon icon={HistoryIcon} strokeWidth={2} className="size-6 text-[var(--neon-pink)]" aria-hidden="true" />
           My Journey
         </h2>
-        <p className={cn('mt-4', proseClass)}>
+        <p className={cn(proseClass)}>
           My interest in coding started back in high school, writing simple programs in BASIC.
         </p>
         <div className="mt-8">
@@ -116,7 +116,7 @@ function AboutRouteComponent() {
           Beyond the Code
           <Seasonal sprite="peekingGhost" />
         </h2>
-        <p className={cn('mt-3', proseClass)}>
+        <p className={cn(proseClass)}>
           When I'm not playing with code or AI, you can usually find me:
         </p>
         <BeyondTheCode />

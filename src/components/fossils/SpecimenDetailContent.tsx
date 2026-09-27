@@ -1,9 +1,11 @@
+import { cn } from 'cn'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ImageNotFound01Icon } from '@hugeicons/core-free-icons'
 import type { Specimen } from '../../types/specimen'
 import { getResizedImageUrl } from '../../lib/image'
 import { SpecimenLocation, SpecimenName, TypeTag } from './SpecimenText'
 import { specimenAlt } from './specimenFormat'
+import { headingText } from '../../lib/styles'
 
 type Props = {
   specimen: Specimen
@@ -45,10 +47,10 @@ export function SpecimenDetailContent({ specimen }: Props) {
       <div className="grid gap-5 p-6">
         <div>
           <TypeTag type={specimen.type} />
-          <h2 className="mt-1 text-xl font-bold text-[var(--neon-pink)]">
+          <h2 className={cn(headingText, 'font-bold text-[var(--neon-pink)]')}>
             <SpecimenName specimen={specimen} />
           </h2>
-          <SpecimenLocation location={specimen.locationFound} className="mt-1 text-sm text-slate-300" />
+          <SpecimenLocation location={specimen.locationFound} className="text-sm text-slate-300" />
         </div>
 
         {details.length > 0 && (
@@ -65,7 +67,7 @@ export function SpecimenDetailContent({ specimen }: Props) {
         {specimen.notes && (
           <div>
             <p className="text-[10px] font-semibold tracking-wide text-[var(--laser-cyan)] uppercase">Notes</p>
-            <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-line text-slate-300">{specimen.notes}</p>
+            <p className="text-sm leading-relaxed whitespace-pre-line text-slate-300">{specimen.notes}</p>
           </div>
         )}
       </div>

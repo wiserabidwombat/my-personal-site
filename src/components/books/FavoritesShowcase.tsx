@@ -20,7 +20,7 @@ function FavoriteCard({ book }: { book: Book }) {
         <h3 title={book.title} className="line-clamp-2 text-sm leading-snug font-semibold text-slate-100">
           {book.title}
         </h3>
-        {book.author && <p className="mt-1 line-clamp-1 text-xs text-slate-400">{book.author}</p>}
+        {book.author && <p className="line-clamp-1 text-xs text-slate-400">{book.author}</p>}
       </div>
     </BookLink>
   )
@@ -43,7 +43,7 @@ export function FavoritesShowcase({ books, status }: Props) {
   return (
     <section className={cn(pageContainer, 'py-8 sm:py-10')}>
       <SectionHeading icon={StarIcon}>Favorites</SectionHeading>
-      <p className="mt-2 text-slate-300">Books starred on Hardcover.</p>
+      <p className="text-slate-300">Books starred on Hardcover.</p>
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         {status === 'loading'
           ? Array.from({ length: SKELETON_COUNT }, (_, index) => <FavoriteCardSkeleton key={index} />)

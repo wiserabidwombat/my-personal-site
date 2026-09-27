@@ -78,7 +78,7 @@ function ShowcaseCard({
         </h3>
         <SpecimenLocation
           location={specimen.locationFound}
-          className={cn('mt-auto', spotlight ? 'text-sm text-slate-300' : 'text-xs text-slate-400')}
+          className={spotlight ? 'text-sm text-slate-300' : 'text-xs text-slate-400'}
         />
       </div>
     </div>
@@ -137,7 +137,7 @@ export function NeonShowcase({ specimens, loading }: Props) {
   return (
     <section className={cn(pageContainer, 'py-8 sm:py-10')}>
       <SectionHeading icon={SparklesIcon}>Neon Showcase</SectionHeading>
-      <p className="mt-2 text-slate-300">Five random finds from the collection.</p>
+      <p className="text-slate-300">Five random finds from the collection.</p>
 
       {loading &&
         (isMobile ? (
@@ -153,7 +153,7 @@ export function NeonShowcase({ specimens, loading }: Props) {
         ))}
 
       {!loading && featured.length === 0 && (
-        <p className="mt-8 text-slate-400">No specimens in the collection yet.</p>
+        <p className="text-slate-400">No specimens in the collection yet.</p>
       )}
 
       {!loading &&

@@ -3,6 +3,7 @@ import { cn } from 'cn'
 import { formatPostDate, readingMinutes, tagLabel } from '../../lib/blog'
 import type { BlogPost } from '../../types/blog-post'
 import { PostImage } from './PostImage'
+import { headingText } from '../../lib/styles'
 
 type Props = {
   post: BlogPost
@@ -25,7 +26,7 @@ export function BlogCard({ post, featured = false, latest = false }: Props) {
       to="/blog/$slug"
       params={{ slug: post.slug }}
       className={cn(
-        'group flex flex-col overflow-hidden rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/50 text-left transition duration-300',
+        'group flex flex-col overflow-hidden rounded-2xl border border-[var(--cyber-purple)]/40 bg-[var(--deep-space-purple)]/50 transition duration-300',
         'hover:-translate-y-1 hover:border-[var(--laser-cyan)]/70 motion-reduce:hover:translate-y-0',
         'focus-visible:-translate-y-1 focus-visible:border-[var(--laser-cyan)]/70 focus-visible:ring-2 focus-visible:ring-[var(--laser-cyan)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--deep-space-black)] focus-visible:outline-none',
         featured ? 'md:grid md:grid-cols-2' : 'md:flex-row',
@@ -66,7 +67,7 @@ export function BlogCard({ post, featured = false, latest = false }: Props) {
             {post.tags.map(tagLabel).join(' · ')}
           </p>
         )}
-        <h2 className={cn('font-bold text-slate-50', featured ? 'text-xl sm:text-2xl' : 'text-lg')}>{post.title}</h2>
+        <h2 className={cn(headingText, 'font-bold text-slate-50')}>{post.title}</h2>
         <p className={cn('text-slate-300', !featured && 'md:line-clamp-2')}>{post.blurb}</p>
         <p className="mt-auto pt-1 text-xs font-medium tracking-wide text-slate-400 uppercase">
           <time dateTime={post.date}>{formatPostDate(post.date)}</time> &middot; {readingMinutes(post.body)} min read

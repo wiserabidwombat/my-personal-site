@@ -8,7 +8,7 @@ import { bodyText, proseWidth } from '../components/about/typography'
 import { useResumePdfDownload } from '../hooks/useResumePdfDownload'
 import { contact, fullName } from '../lib/resume-data'
 import { seoMeta, canonicalLink } from '../lib/meta'
-import { compactHero, pageContainer } from '../lib/styles'
+import { compactHero, pageContainer, pageTitle, pageTitleLeading } from '../lib/styles'
 import { contactMeta } from './routeMeta'
 
 export const Route = createFileRoute('/contact')({
@@ -41,14 +41,14 @@ function ContactRouteComponent() {
   const cardCount = githubUrl ? 4 : 3
 
   return (
-    <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
+    <div className="bg-[var(--deep-space-black)] text-slate-200">
       <section className={compactHero}>
         <div className="relative z-10">
           <p className="text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase">Contact</p>
-          <h1 className="mx-auto mt-3 max-w-3xl text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
+          <h1 className={cn(pageTitle, pageTitleLeading, 'mx-auto max-w-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]')}>
             Let's Connect
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-lg leading-relaxed text-slate-300">
+          <p className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-300">
             Interested in working together or just want to say hi? Reach out.
           </p>
         </div>

@@ -57,7 +57,7 @@ function RootComponent() {
     // footer only ever sits right after real content or at the screen's
     // bottom edge, never floating mid-page.
     <ThemeProvider>
-      <div className="flex min-h-screen flex-col">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1126px] flex-col">
         {!isPrerendering && <HeadContent />}
         <Navbar />
         <main className="flex-1">
