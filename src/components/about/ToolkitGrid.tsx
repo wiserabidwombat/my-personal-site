@@ -2,11 +2,12 @@ import { OutlinePill } from '../OutlinePill'
 
 const toolkit = [
   {
-    category: 'Frontend Architecture',
-    skills: ['React', 'Angular', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'HTML5', 'CSS3'],
+    category: 'Frontend',
+    skills: ['React', 'Angular', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'HTML', 'CSS'],
   },
   {
     category: 'Data & Cloud',
+    // TODO(Aaron): name the specific tools behind "Data Analytics", or remove it.
     skills: ['SQL', 'Data Analytics', 'AWS', 'CI/CD'],
   },
   {

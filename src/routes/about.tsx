@@ -6,7 +6,7 @@ import { HistoryIcon, Wrench01Icon, GamepadIcon } from '@hugeicons/core-free-ico
 import { JourneyTimeline } from '../components/about/JourneyTimeline'
 import { ToolkitGrid } from '../components/about/ToolkitGrid'
 import { BeyondTheCode } from '../components/about/BeyondTheCode'
-import { bodyText, proseWidth, timelineContentIndent } from '../components/about/typography'
+import { bodyText, proseWidth } from '../components/about/typography'
 import { buttonVariants } from '@/components/ui/button'
 import { seoMeta, canonicalLink } from '../lib/meta'
 import { pageContainer, neonOutlineButton, sectionHeading } from '../lib/styles'
@@ -90,14 +90,14 @@ function AboutRouteComponent() {
           <JourneyTimeline />
         </div>
         {/* Set apart as the section's conclusion: mt-12 clears the timeline's
-            own 32px entry gap, the indent lines it up with the entries' text
-            column (not the line), and a short pink rule marks the break. */}
-        <div className={cn('mt-12', timelineContentIndent)}>
+            own 32px entry gap, and a short pink rule marks the break. It sits
+            at the page container's edge, with the section headings. */}
+        <div className="mt-12">
           <div aria-hidden="true" className="mb-5 h-px w-16 bg-linear-to-r from-[var(--neon-pink)] to-transparent" />
           <p className={proseClass}>
-            Today, my focus is split between architecting clean full-stack systems and mentoring teams. I am an
-            execution-driven learner who is constantly evolving—currently mastering the seamless implementation
-            of AI into modern development workflows to accelerate delivery and code quality.
+            These days I split my time between building full-stack apps and helping the developers around me
+            grow. Right now I'm learning how to use AI tools well in everyday development: where they speed
+            things up, where they improve the code, and where they don't.
           </p>
         </div>
       </section>
