@@ -11,8 +11,7 @@ export const Route = createRootRoute({
     // gets a complete, correct set of tags (TanStack Router lets a child
     // route's meta override the root's by matching `name`/`property`).
     meta: seoMeta({
-      description:
-        "Aaron Tilley's portfolio -- Senior Developer specializing in React, .NET, and enterprise CRM systems.",
+      description: 'Senior Developer working in React, Angular, .NET, and enterprise CRM systems.',
       path: '/',
     }),
     // No canonical <link> here on purpose -- every leaf route supplies its

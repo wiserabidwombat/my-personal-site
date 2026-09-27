@@ -23,7 +23,7 @@ export type RouteMetaEntry = {
 
 export const homeMeta: RouteMetaEntry = {
   path: '/',
-  description: 'Senior Developer specializing in React, .NET, and enterprise CRM systems.',
+  description: 'Senior Developer working in React, Angular, .NET, and enterprise CRM systems.',
 }
 
 export const aboutMeta: RouteMetaEntry = {
