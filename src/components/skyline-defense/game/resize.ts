@@ -13,20 +13,14 @@ export function resizeWorld(state: GameState, width: number, height: number) {
     point.y *= scaleY
   }
 
-  // Match buildings by kind, in order (the generic ones only exist on
-  // wide screens). A building that appears mid-game (narrow to wide)
-  // starts dark so a resize can't hand out free buildings.
-  const oldByKind = new Map<string, boolean[]>()
-  for (const building of state.buildings) {
-    oldByKind.set(building.kind, [...(oldByKind.get(building.kind) ?? []), building.alive])
-  }
-  const seen = new Map<string, number>()
-  state.buildings = layoutBuildings(width, height).map((building) => {
-    const index = seen.get(building.kind) ?? 0
-    seen.set(building.kind, index + 1)
-    const previous = oldByKind.get(building.kind)?.[index]
-    return { ...building, alive: previous ?? state.phase === 'ready' }
-  })
+  // Match buildings by name (some are only in view on wide screens). A
+  // building that comes into view mid-game (narrow to wide) starts dark so
+  // a resize can't hand out free buildings.
+  const wasAlive = new Map(state.buildings.map((building) => [building.name, building.alive]))
+  state.buildings = layoutBuildings(width, height).map((building) => ({
+    ...building,
+    alive: wasAlive.get(building.name) ?? state.phase === 'ready',
+  }))
 
   const ammo = state.launchers.map((launcher) => launcher.ammo)
   state.launchers = layoutLaunchers(width, height, 0).map((launcher, index) => ({ ...launcher, ammo: ammo[index] ?? 0 }))

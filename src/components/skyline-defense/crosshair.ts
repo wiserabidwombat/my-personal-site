@@ -1,13 +1,13 @@
 import { TUNING } from './game/tuning'
 import type { GameState, Vec } from './game/types'
-import { HUD_HEIGHT } from './render/hud'
+import { hudHeight } from './render/hud'
 
 // Keeps the crosshair inside the sky: below the HUD row (its arms reach
 // 14px) and above the ground.
 export function placeCrosshair(point: Vec, game: GameState): Vec {
   return {
     x: Math.min(Math.max(point.x, 0), game.width),
-    y: Math.min(Math.max(point.y, HUD_HEIGHT + 14), game.groundY - 12),
+    y: Math.min(Math.max(point.y, hudHeight(game.width) + 14), game.groundY - 12),
   }
 }
 

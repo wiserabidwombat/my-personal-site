@@ -1,5 +1,6 @@
 import type { GameState } from '../game/types'
 import type { Palette } from './palette'
+import { VISUALS, visualsFor } from './visuals'
 
 function text(ctx: CanvasRenderingContext2D, value: string, x: number, y: number, align: CanvasTextAlign, color: string) {
   ctx.textAlign = align
@@ -7,8 +8,13 @@ function text(ctx: CanvasRenderingContext2D, value: string, x: number, y: number
   ctx.fillText(value, x, y)
 }
 
-// Height of the HUD row along the top edge; the crosshair stays below it.
-export const HUD_HEIGHT = 36
+const STATUS_TOP = 32
+
+// Height of the HUD (score row plus the city status icons below it, which
+// are larger on wide screens); the crosshair stays below it.
+export function hudHeight(width: number): number {
+  return STATUS_TOP + VISUALS.statusIconHeight * visualsFor(width).statusIconScale + 4
+}
 
 // Score, wave, and high score along the top edge.
 export function drawHud(ctx: CanvasRenderingContext2D, state: GameState, palette: Palette, highScore: number, fontSize: number) {
@@ -18,6 +24,44 @@ export function drawHud(ctx: CanvasRenderingContext2D, state: GameState, palette
   text(ctx, `SCORE ${state.score}`, 14, y, 'left', palette.pink)
   if (state.wave > 0) text(ctx, `WAVE ${state.wave}`, state.width / 2, y, 'center', palette.cyan)
   text(ctx, `HI ${Math.max(highScore, state.score)}`, state.width - 14, y, 'right', palette.text)
+}
+
+// City status: one small silhouette per defended building, left to right as
+// on screen, centered under the score row. Heights share one scale (so
+// their relative sizes match); thin towers are widened to a minimum width
+// so each icon stays legible. Lit buildings are cyan; destroyed ones go dark.
+export function drawCityStatus(ctx: CanvasRenderingContext2D, state: GameState, palette: Palette) {
+  const buildings = [...state.buildings].sort((a, b) => a.x - b.x)
+  if (buildings.length === 0) return
+  const size = visualsFor(state.width).statusIconScale
+  const iconHeight = VISUALS.statusIconHeight * size
+  const scale = iconHeight / Math.max(...buildings.map((b) => b.height))
+  const iconWidth = (b: (typeof buildings)[number]) => Math.max(b.width * scale, VISUALS.statusIconMinWidth * size)
+  const gap = VISUALS.statusIconGap * size
+  const total = buildings.reduce((sum, b) => sum + iconWidth(b), 0) + gap * (buildings.length - 1)
+  let left = (state.width - total) / 2
+  const base = STATUS_TOP + iconHeight
+  ctx.save()
+  for (const building of buildings) {
+    const x0 = building.x - building.width / 2
+    const xScale = iconWidth(building) / building.width
+    const path = new Path2D()
+    for (const polygon of building.outline) {
+      polygon.forEach((p, i) => {
+        const x = left + (p.x - x0) * xScale
+        const y = base - (state.groundY - p.y) * scale
+        if (i) path.lineTo(x, y)
+        else path.moveTo(x, y)
+      })
+      path.closePath()
+    }
+    ctx.fillStyle = building.alive ? palette.cyan : palette.darkEdge
+    ctx.shadowColor = palette.cyan
+    ctx.shadowBlur = building.alive ? 4 : 0
+    ctx.fill(path)
+    left += iconWidth(building) + gap
+  }
+  ctx.restore()
 }
 
 // "Wave N" title before a wave, and the bonus tally after one.

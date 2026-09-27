@@ -2,11 +2,10 @@ import {
   blastLifetime,
   blastMaxRadius,
   blastRadius,
-  buildingRect,
+  buildingContains,
   circleContains,
   distance,
   nearestLauncherWithAmmo,
-  rectContains,
 } from './geometry'
 import { meteorPoints, waveBonus } from './scoring'
 import { groundLevel, LAUNCHER_SIZE, layoutBuildings, layoutLaunchers, skylineScale } from './skyline'
@@ -130,7 +129,7 @@ function resolveCollisions(state: GameState) {
       return false
     }
     const hit = state.buildings.find(
-      (building) => building.alive && rectContains(buildingRect(building, state.groundY), meteor.pos),
+      (building) => building.alive && buildingContains(building, state.groundY, meteor.pos),
     )
     if (hit || meteor.pos.y >= state.groundY) {
       if (hit) hit.alive = false

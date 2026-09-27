@@ -5,7 +5,9 @@ import type { GameState, Phase, Vec } from './game/types'
 import { loadHighScore, saveHighScore } from './highScore'
 import { attachInput } from './input'
 import { placeCrosshair, steerCrosshair } from './crosshair'
+import { cityLayerCache } from './render/city'
 import { readPalette } from './render/palette'
+import skylineUrl from '../../assets/dallas-skyline.webp'
 import { renderGame } from './render/renderGame'
 
 export type GameUi = {
@@ -52,6 +54,8 @@ export function useSkylineDefense(
     const palette = readPalette(canvas)
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const heldKeys = new Set<string>()
+    // The city is the home page's dark skyline art.
+    const cityLayer = cityLayerCache(skylineUrl)
     // On touch screens the crosshair stays hidden until the first tap.
     const touchFirst = window.matchMedia('(hover: none) and (pointer: coarse)').matches
     const place = (point: Vec) => (gameRef.current ? placeCrosshair(point, gameRef.current) : point)
@@ -112,7 +116,8 @@ export function useSkylineDefense(
         phase = game.phase
         if (phase === 'gameOver') finish(game)
       }
-      const view = { palette, time: now / 1000, still, highScore: highScoreRef.current, crosshair: crosshairRef.current }
+      const city = cityLayer(game, window.devicePixelRatio || 1)
+      const view = { palette, time: now / 1000, still, highScore: highScoreRef.current, crosshair: crosshairRef.current, city }
       renderGame(ctx, game, view)
       frame = requestAnimationFrame(tick)
     }
