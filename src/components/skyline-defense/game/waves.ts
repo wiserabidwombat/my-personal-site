@@ -83,7 +83,7 @@ export function spawnSalvo(state: GameState, config: WaveConfig, size: number): 
   const lead = { x: state.rng() * state.width, y: -8 }
   const target = pickTarget(state)
   const heading = Math.atan2(target.y - lead.y, target.x - lead.x)
-  const spacing = TUNING.salvoSpacing * blastMaxRadius(state.width)
+  const spacing = TUNING.salvoSpacing * blastMaxRadius(state.width, state.height)
   return Array.from({ length: size }, (_, index) => {
     const offset = index - (size - 1) / 2
     const from = {

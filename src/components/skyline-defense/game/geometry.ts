@@ -25,9 +25,11 @@ export function buildingRect(building: Building, groundY: number): Rect {
   }
 }
 
-// Full blast radius (a radius, not a diameter) for a world this wide.
-export function blastMaxRadius(width: number): number {
-  return Math.min(Math.max(width * TUNING.blastRadiusFraction, TUNING.blastRadiusMin), TUNING.blastRadiusMax)
+// Full blast radius (a radius, not a diameter) for a world this size: a
+// share of its height, capped by its width, clamped to px.
+export function blastMaxRadius(width: number, height: number): number {
+  const radius = Math.min(height * TUNING.blastRadiusHeightFraction, width * TUNING.blastRadiusMaxWidthFraction)
+  return Math.min(Math.max(radius, TUNING.blastRadiusMin), TUNING.blastRadiusMax)
 }
 
 export const blastLifetime = TUNING.blastGrow + TUNING.blastHold + TUNING.blastShrink

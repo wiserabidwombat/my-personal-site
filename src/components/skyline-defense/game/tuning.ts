@@ -45,16 +45,16 @@ export const TUNING = {
   ammoPerLauncher: 10,
   // Fraction of world height per second.
   interceptorSpeed: 0.85,
-  // Blast radius as a fraction of the world's width, clamped to px. Meteors
-  // fall at about the same px/s on phones and desktops, so the minimum
-  // keeps phone blasts big enough to match desktop: in a simulated wave 1
-  // (a player with ~10px tap error), 38 keeps ~99% of the city at 360-430px
-  // wide vs 100% at 1280px; 26 kept only ~85%.
-  blastRadiusFraction: 0.05,
-  blastRadiusMin: 38,
-  // ~5% of the width on desktop (64px at 1280px), so chains are easier to
-  // set up where the sky is wide.
-  blastRadiusMax: 64,
+  // Full blast radius (a radius, not a diameter): a fraction of the canvas
+  // height, since meteors cover the same share of the height per second on
+  // every screen, so blasts are equally forgiving on phone and desktop
+  // (~44px at 1280x741, ~47px at 390x791). Also capped at a fraction of
+  // the width so very tall, narrow screens don't get screen-wide blasts,
+  // and clamped to px for extreme sizes.
+  blastRadiusHeightFraction: 0.06,
+  blastRadiusMaxWidthFraction: 0.14,
+  blastRadiusMin: 28,
+  blastRadiusMax: 72,
   // Blast lifetime in seconds, like classic Missile Command: grow to full
   // radius, hold, then shrink. Lethal for the whole lifetime (1.6s),
   // shrinking included, so blasts linger long enough to chain.
@@ -78,8 +78,11 @@ export const TUNING = {
   widePressureStartWave: 3,
   widePressureMinWidth: 430,
   widePressureFullWidth: 1280,
-  widePressureCountPerWave: 0.2,
-  widePressureSpeedPerWave: 0.08,
+  // Calibrated against a human-like simulated player (~20% lead error,
+  // 0.25s reaction delay) so 1280px tracks 390px: city kept ~99% in wave
+  // 1, ~90-95% in waves 3-4, ~65-70% in wave 6 on both.
+  widePressureCountPerWave: 0.075,
+  widePressureSpeedPerWave: 0.03,
   // Seconds on the "Wave N" title and the between-wave bonus screen.
   waveTitleTime: 1.6,
   waveBonusTime: 2.4,

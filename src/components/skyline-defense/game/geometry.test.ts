@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { blastLifetime, blastRadius, blastStage, buildingRect, circleContains, nearestLauncherWithAmmo, rectContains } from './geometry'
+import { blastLifetime, blastMaxRadius, blastRadius, blastStage, buildingRect, circleContains, nearestLauncherWithAmmo, rectContains } from './geometry'
 import { TUNING } from './tuning'
 import type { Blast, Building } from './types'
 
@@ -37,6 +37,17 @@ describe('blastRadius', () => {
     expect(blastStage(blast(TUNING.blastGrow + TUNING.blastHold / 2))).toBe('hold')
     expect(blastStage(blast(blastLifetime - 0.01))).toBe('shrink')
     expect(blastStage(blast(blastLifetime))).toBe('done')
+  })
+})
+
+describe('blastMaxRadius', () => {
+  it('sizes blasts by height, capped by width and clamped to px', () => {
+    expect(blastMaxRadius(1280, 741)).toBeCloseTo(741 * TUNING.blastRadiusHeightFraction)
+    expect(blastMaxRadius(390, 791)).toBeCloseTo(791 * TUNING.blastRadiusHeightFraction)
+    // Very tall and narrow: the width cap wins.
+    expect(blastMaxRadius(300, 2000)).toBeCloseTo(300 * TUNING.blastRadiusMaxWidthFraction)
+    expect(blastMaxRadius(100, 100)).toBe(TUNING.blastRadiusMin)
+    expect(blastMaxRadius(4000, 3000)).toBe(TUNING.blastRadiusMax)
   })
 })
 

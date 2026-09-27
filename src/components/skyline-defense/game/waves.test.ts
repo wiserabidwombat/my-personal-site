@@ -72,7 +72,7 @@ describe('spawning', () => {
     }
     // Still inside one full blast half a second after splitting.
     const spread = Math.hypot(fragments[0].vel.x - fragments[2].vel.x, fragments[0].vel.y - fragments[2].vel.y) * 0.5
-    expect(spread).toBeLessThan(blastMaxRadius(800) * 2)
+    expect(spread).toBeLessThan(blastMaxRadius(800, 600) * 2)
   })
 })
 
@@ -91,7 +91,7 @@ describe('salvos', () => {
     const config = waveConfig(3)
     const salvo = spawnSalvo(state, config, 3)
     expect(salvo).toHaveLength(3)
-    const spacing = TUNING.salvoSpacing * blastMaxRadius(800)
+    const spacing = TUNING.salvoSpacing * blastMaxRadius(800, 600)
     expect(salvo[1].pos.x - salvo[0].pos.x).toBeCloseTo(spacing)
     expect(salvo[1].pos.y).toBeLessThan(salvo[0].pos.y)
     expect(salvo[2].pos.y).toBeLessThan(salvo[1].pos.y)
