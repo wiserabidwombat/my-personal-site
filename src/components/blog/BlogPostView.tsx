@@ -54,9 +54,11 @@ export function BlogPostView({ post }: Props) {
         </div>
       </section>
 
-      <article className="py-12">
-        {/* Hero image and "Back to blog" keep their original centered width. */}
-        <div className="mx-auto max-w-3xl px-6">
+      {/* Hero image, body, and "Back to blog" share the page container's left
+          edge. The image keeps its original width (45rem: the old max-w-3xl
+          block minus its padding), capped at the container on small screens. */}
+      <article className={cn(pageContainer, 'py-12')}>
+        <div className="max-w-[45rem]">
           <PostImage
             src={post.image}
             alt={post.title}
@@ -65,11 +67,11 @@ export function BlogPostView({ post }: Props) {
           />
         </div>
 
-        {/* Body: left-aligned prose on the shared page container's edge,
-            capped at max-w-prose. Blocks are 16px apart; headings get 48px
+        {/* Body: left-aligned prose capped at 60ch, which keeps desktop lines
+            within about 65-75 characters. Blocks are 16px apart; headings get 48px
             above and 24px below (adjacent margins collapse to the larger). */}
-        <div className={cn(pageContainer, 'pt-8')}>
-          <div className="max-w-prose [&>:first-child]:mt-0">
+        <div className="pt-8">
+          <div className="max-w-[60ch] [&>:first-child]:mt-0">
             <ReactMarkdown
               components={{
                 h2: ({ children }) => <h2 className={cn(headingText, 'mt-[48px] mb-[24px] font-bold text-[var(--neon-pink)]')}>{children}</h2>,
@@ -104,7 +106,7 @@ export function BlogPostView({ post }: Props) {
           </div>
         </div>
 
-        <div className="mx-auto max-w-3xl px-6">
+        <div>
           <Link to="/blog" className={buttonVariants({ variant: 'outline', className: 'mt-12' })}>
             <HugeiconsIcon icon={ArrowLeft02Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
             Back to blog
