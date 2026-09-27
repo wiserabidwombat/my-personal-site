@@ -117,7 +117,7 @@ function AboutRouteComponent() {
           <Seasonal sprite="peekingGhost" />
         </h2>
         <p className={cn('mt-3', proseClass)}>
-          When I'm not playing with code or AIs, I like to unplug and stay active. You can usually find me:
+          When I'm not playing with code or AI, you can usually find me:
         </p>
         <BeyondTheCode />
       </section>
