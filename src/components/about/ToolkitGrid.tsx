@@ -2,12 +2,12 @@ import { OutlinePill } from '../OutlinePill'
 
 const toolkit = [
   {
-    category: 'Frontend Architecture',
-    skills: ['React', 'Angular', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'HTML5', 'CSS3'],
+    category: 'Frontend',
+    skills: ['React', 'Angular', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'HTML', 'CSS'],
   },
   {
     category: 'Data & Cloud',
-    skills: ['SQL', 'Data Analytics', 'AWS', 'CI/CD'],
+    skills: ['SQL', 'DynamoDB', 'AWS', 'CI/CD', 'Notion', 'Neon'],
   },
   {
     category: 'Enterprise CRM & Platform',
