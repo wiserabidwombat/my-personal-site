@@ -35,8 +35,12 @@ const proseClass = cn(bodyText, proseWidth)
 function AboutRouteComponent() {
   return (
     <div className="bg-[var(--deep-space-black)] text-left text-slate-200">
-      <section className="bg-synth-grid px-6 py-20 text-center">
-        <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-6 lg:flex-row lg:items-center lg:gap-10">
+      {/* The hero's content uses the same page container as the sections
+          below, so on desktop the avatar, intro paragraph, and section
+          headings share one left edge. The grid and glow are the section's
+          own full-width background, unaffected by the container. */}
+      <section className="bg-synth-grid py-20 text-center">
+        <div className={cn(pageContainer, 'relative z-10 flex flex-col items-center gap-6 lg:flex-row lg:items-center lg:gap-10')}>
           <img
             src="/images/headshot.jpg"
             alt="Aaron Tilley"
@@ -68,9 +72,9 @@ function AboutRouteComponent() {
       <section className={sectionClass}>
         <p className={proseClass}>
           I'm a senior developer, and I spent three years leading a team before that. The part of the job I care
-          about most is the people. I like pairing with someone until they're unstuck, pointing out when they did
-          something great, and trusting them with the hard stuff so they grow. Good code matters, but good teams
-          are what make it happen, and I want to be the teammate who makes everyone's day a little easier.
+          about most is the people. I like pairing with someone until they're unstuck, calling out their wins, and
+          trusting them with the hard stuff so they grow. Good code matters, but good teams are what make it
+          happen, and I want to be the teammate who makes everyone's day a little easier.
         </p>
       </section>
 
