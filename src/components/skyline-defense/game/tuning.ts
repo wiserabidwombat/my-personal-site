@@ -83,6 +83,48 @@ export const TUNING = {
   // 1, ~90-95% in waves 3-4, ~65-70% in wave 6 on both.
   widePressureCountPerWave: 0.1,
   widePressureSpeedPerWave: 0.04,
+  // Chain bonus: every kill caused by a blast descended from one shot counts
+  // toward that shot's chain; the Nth kill in a chain scores xN, up to this.
+  chainMultiplierCap: 8,
+  // Seconds a score popup stays up after its last update (a chain's popup
+  // updates on every kill, so it lingers this long after the chain ends),
+  // and the length of its scale "pop" on each chain update.
+  popupSeconds: 0.8,
+  popupPopSeconds: 0.15,
+  // Bonus targets (harmless; the only cost of chasing them is ammo). Points
+  // are multiplied by the wave multiplier and the chain multiplier.
+  // UFO: one pass per wave from ufoStartWave, sometimes a second from
+  // ufoSecondPassWave. Delays are seconds into the wave's play.
+  ufoStartWave: 2,
+  ufoDelayMin: 3,
+  ufoDelayMax: 9,
+  ufoSecondPassWave: 5,
+  ufoSecondPassChance: 0.35,
+  ufoSecondPassGapMin: 6,
+  ufoSecondPassGapMax: 10,
+  // Seconds to cross the screen (much faster than a meteor falls, so it
+  // needs leading), and its width as a share of the world's width.
+  ufoCrossSeconds: 4.5,
+  ufoSizeFraction: 0.05,
+  ufoSizeMin: 40,
+  ufoSizeMax: 64,
+  ufoPoints: 500,
+  // Scouts: about one group per wave from scoutStartWave.
+  scoutStartWave: 3,
+  scoutGroupChance: 0.85,
+  scoutDelayMin: 4,
+  scoutDelayMax: 12,
+  scoutCountMin: 3,
+  scoutCountMax: 5,
+  scoutCrossSeconds: 7,
+  scoutSize: 18,
+  // Spacing between scouts in chain blast radii (< 1, so one scout's blast
+  // reaches the next), and their wobble: amplitude as a share of the sky
+  // band's height, and cycles per second.
+  scoutSpacing: 0.85,
+  scoutWobble: 0.06,
+  scoutWobbleHz: 0.7,
+  scoutPoints: 100,
   // Seconds on the "Wave N" title and the between-wave bonus screen.
   waveTitleTime: 1.6,
   waveBonusTime: 2.4,

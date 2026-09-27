@@ -3,7 +3,7 @@ import { blastLifetime, blastMaxRadius, blastRadius, blastStage, buildingRect, c
 import { TUNING } from './tuning'
 import type { Blast, Building } from './types'
 
-const blast = (age: number): Blast => ({ id: 1, kind: 'interceptor', pos: { x: 0, y: 0 }, maxRadius: 40, age })
+const blast = (age: number): Blast => ({ id: 1, kind: 'interceptor', pos: { x: 0, y: 0 }, maxRadius: 40, age, chainId: 1 })
 
 describe('collision helpers', () => {
   it('circleContains includes the edge and excludes points outside', () => {

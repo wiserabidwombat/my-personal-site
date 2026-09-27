@@ -2,28 +2,35 @@
 // Dev-only balance simulation for Skyline Defense (not part of the build or
 // the test suite). Plays seeded games with a simulated player using the
 // game's real logic and prints, per wave, the share of the city kept (among
-// runs still going), the share of runs still going, and kills per shot.
+// runs still going), the share of runs still going, kills per shot, and
+// (among runs still going) average points scored that wave and average
+// longest chain.
 //
 //   npm run sim                                  human player at 1280x741 and 390x791
 //   npm run sim -- --width 768 --height 965      one canvas size
 //   npm run sim -- --player all --waves 8        every player, 8 waves
 //   npm run sim -- --runs 100 --aim-error 8      faster run, custom aim error
+//   npm run sim -- --chase-bonus                 the player also shoots UFOs/scouts
 //
 // Players:
 //   human  (default) fires every 0.35s at the lowest meteor it hasn't shot,
 //          only after it's been on screen 0.25s, misjudging the lead by ~20%
 //   quick  every 0.35s, perfect lead      slow  every 0.8s, perfect lead
 //   smart  every 0.35s, aims at the center of the group around the lowest meteor
+// Every player ignores the bonus targets (UFOs, scouts) unless --chase-bonus
+// is passed; then it shoots at one on screen (leading it, with the same lead
+// error) whenever no meteor is past 60% of the way down.
 import { parseArgs } from 'node:util'
 import { createGame, fire, startGame, step } from '../src/components/skyline-defense/game/engine'
 import { blastMaxRadius, nearestLauncherWithAmmo } from '../src/components/skyline-defense/game/geometry'
+import { hudHeight } from '../src/components/skyline-defense/render/hud'
 import { TUNING } from '../src/components/skyline-defense/game/tuning'
 import type { GameState, Meteor, Vec } from '../src/components/skyline-defense/game/types'
 
 const PLAYERS = ['human', 'quick', 'slow', 'smart'] as const
 type Player = (typeof PLAYERS)[number]
 type Size = { width: number; height: number; aimError: number; label: string }
-type WaveResult = { alive: boolean; kept: number; kills: number; shots: number }
+type WaveResult = { alive: boolean; kept: number; kills: number; shots: number; score: number; longestChain: number }
 
 const REACTION = 0.25
 const LEAD_ERROR = 0.2
@@ -52,11 +59,15 @@ function lead(game: GameState, meteor: Meteor, misjudge: number): Vec | null {
   return { x: aim.x + (aim.x - meteor.pos.x) * misjudge, y: aim.y + (aim.y - meteor.pos.y) * misjudge }
 }
 
-function play(size: Size, seed: number, player: Player, waves: number): WaveResult[] {
+function play(size: Size, seed: number, player: Player, waves: number, chaseBonus: boolean): WaveResult[] {
   const noise = mulberry32(seed * 7 + 1)
   const gauss = () => Math.sqrt(-2 * Math.log(noise() || 1e-9)) * Math.cos(2 * Math.PI * noise())
-  const game = createGame(size.width, size.height, mulberry32(seed))
+  // Bonus targets get their own stream, so a seed's meteors don't change.
+  const game = createGame(size.width, size.height, mulberry32(seed), mulberry32(seed * 31 + 17))
+  game.hudBottom = hudHeight(size.width)
   startGame(game)
+  const bonusShotAt = new Map<number, number>()
+  let waveStartScore = 0
   const total = game.buildings.length
   const radius = blastMaxRadius(size.width, size.height)
   const targeted = new Set<number>()
@@ -71,18 +82,21 @@ function play(size: Size, seed: number, player: Player, waves: number): WaveResu
     const wave = game.wave
     step(game, DT)
     for (const blast of game.blasts) {
-      if (blast.kind === 'chain' && !counted.has(blast.id)) {
+      if ((blast.kind === 'chain' || blast.kind === 'bonus') && !counted.has(blast.id)) {
         counted.add(blast.id)
         kills++
       }
     }
     if (game.phase === 'waveBonus' && results.length < wave) {
-      results.push({ alive: true, kept: game.buildings.filter((b) => b.alive).length / total, kills, shots })
+      const kept = game.buildings.filter((b) => b.alive).length / total
+      const score = game.score - waveStartScore
+      results.push({ alive: true, kept, kills, shots, score, longestChain: game.waveLongestChain })
+      waveStartScore = game.score
       kills = 0
       shots = 0
     }
     if (game.phase === 'gameOver') {
-      while (results.length < waves) results.push({ alive: false, kept: 0, kills, shots })
+      while (results.length < waves) results.push({ alive: false, kept: 0, kills, shots, score: 0, longestChain: 0 })
       break
     }
 
@@ -96,6 +110,16 @@ function play(size: Size, seed: number, player: Player, waves: number): WaveResu
       .sort((a, b) => b.pos.y - a.pos.y)
     const lowest = open[0]
     const misjudge = player === 'human' ? gauss() * LEAD_ERROR : 0
+
+    if (chaseBonus && !(lowest && lowest.pos.y > game.groundY * 0.6)) {
+      const bonus = chaseTarget(game, t, bonusShotAt)
+      if (bonus) {
+        const aimAt = leadBonus(game, bonus, misjudge)
+        if (aimAt && fire(game, { x: aimAt.x + gauss() * size.aimError, y: aimAt.y + gauss() * size.aimError })) shots++
+        bonusShotAt.set(bonus.id, t)
+        continue
+      }
+    }
     const aim = lowest && lead(game, lowest, misjudge)
     if (!lowest || !aim) continue
 
@@ -117,19 +141,44 @@ function play(size: Size, seed: number, player: Player, waves: number): WaveResu
   return results
 }
 
-function report(size: Size, player: Player, runs: number, waves: number) {
-  const games = Array.from({ length: runs }, (_, i) => play(size, i + 1, player, waves))
+// An on-screen UFO or scout not shot at in the last 1.2s (UFOs first).
+function chaseTarget(game: GameState, t: number, shotAt: Map<number, number>) {
+  const ready = (target: { id: number; pos: Vec }) =>
+    target.pos.x > 0 && target.pos.x < game.width && t - (shotAt.get(target.id) ?? -Infinity) > 1.2
+  return game.ufos.find(ready) ?? game.scouts.find(ready)
+}
+
+// Where a bonus target will be when an interceptor reaches it (it moves
+// sideways at a constant speed), optionally misjudged.
+function leadBonus(game: GameState, target: { pos: Vec; vx: number }, misjudge: number): Vec | null {
+  const launcher = nearestLauncherWithAmmo(game.launchers, target.pos.x)
+  if (!launcher) return null
+  let x = target.pos.x
+  for (let i = 0; i < 3; i++) {
+    const time =
+      Math.hypot(x - launcher.x, target.pos.y - launcher.y) / (TUNING.interceptorSpeed * game.height) + TUNING.blastGrow / 2
+    x = target.pos.x + target.vx * time
+  }
+  return { x: x + (x - target.pos.x) * misjudge, y: target.pos.y }
+}
+
+function report(size: Size, player: Player, runs: number, waves: number, chaseBonus: boolean) {
+  const games = Array.from({ length: runs }, (_, i) => play(size, i + 1, player, waves, chaseBonus))
   const pct = (value: number) => `${value.toFixed(1)}%`.padStart(7)
-  console.log(`\n${size.label}  ${player}  (${runs} runs, aim error ${size.aimError}px)`)
-  console.log('wave  city kept  runs alive  kills/shot')
+  const mode = chaseBonus ? ', chasing bonus targets' : ''
+  console.log(`\n${size.label}  ${player}  (${runs} runs, aim error ${size.aimError}px${mode})`)
+  console.log('wave  city kept  runs alive  kills/shot  avg score  longest chain')
   for (let w = 0; w < waves; w++) {
     const rows = games.map((g) => g[w])
     const alive = rows.filter((r) => r.alive)
     const kept = alive.length ? (alive.reduce((sum, r) => sum + r.kept, 0) / alive.length) * 100 : 0
     const shots = rows.reduce((sum, r) => sum + r.shots, 0)
     const perShot = rows.reduce((sum, r) => sum + r.kills, 0) / Math.max(shots, 1)
+    const avg = (pick: (r: WaveResult) => number) =>
+      alive.length ? alive.reduce((sum, r) => sum + pick(r), 0) / alive.length : 0
     console.log(
-      `${String(w + 1).padStart(4)}  ${pct(kept)}    ${pct((alive.length / runs) * 100)}     ${perShot.toFixed(2)}`,
+      `${String(w + 1).padStart(4)}  ${pct(kept)}    ${pct((alive.length / runs) * 100)}     ${perShot.toFixed(2)}` +
+        `  ${String(Math.round(avg((r) => r.score))).padStart(9)}  ${avg((r) => r.longestChain).toFixed(2).padStart(13)}`,
     )
   }
 }
@@ -142,6 +191,7 @@ const { values } = parseArgs({
     player: { type: 'string', default: 'human' },
     runs: { type: 'string', default: '300' },
     'aim-error': { type: 'string' },
+    'chase-bonus': { type: 'boolean', default: false },
   },
 })
 
@@ -175,4 +225,4 @@ for (const size of sizes) {
   size.label = `${size.width}x${size.height}`
 }
 
-for (const player of players) for (const size of sizes) report(size, player, runs, waves)
+for (const player of players) for (const size of sizes) report(size, player, runs, waves, values['chase-bonus'])

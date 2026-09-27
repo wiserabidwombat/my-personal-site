@@ -6,6 +6,7 @@ import { loadHighScore, saveHighScore } from './highScore'
 import { attachInput } from './input'
 import { placeCrosshair, steerCrosshair } from './crosshair'
 import { cityLayerCache } from './render/city'
+import { hudHeight } from './render/hud'
 import { readPalette } from './render/palette'
 import skylineUrl from '../../assets/dallas-skyline.webp'
 import { renderGame } from './render/renderGame'
@@ -54,8 +55,7 @@ export function useSkylineDefense(
     const palette = readPalette(canvas)
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const heldKeys = new Set<string>()
-    // The city is the home page's dark skyline art.
-    const cityLayer = cityLayerCache(skylineUrl)
+    const cityLayer = cityLayerCache(skylineUrl) // the home page's dark skyline art
     // On touch screens the crosshair stays hidden until the first tap.
     const touchFirst = window.matchMedia('(hover: none) and (pointer: coarse)').matches
     const place = (point: Vec) => (gameRef.current ? placeCrosshair(point, gameRef.current) : point)
@@ -71,6 +71,8 @@ export function useSkylineDefense(
       ctx.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0)
       if (gameRef.current) resizeWorld(gameRef.current, width, height)
       else gameRef.current = createGame(width, height)
+      // Bonus targets fly below the HUD (which the page draws).
+      Object.assign(gameRef.current, { hudBottom: hudHeight(width), reducedMotion: still })
       if (crosshairRef.current) crosshairRef.current = place(crosshairRef.current)
       else if (!touchFirst) crosshairRef.current = place({ x: width / 2, y: height * 0.4 })
     }
