@@ -20,7 +20,7 @@ export const Route = createFileRoute('/about')({
   component: AboutRouteComponent,
 })
 
-const heroRoles = ['SENIOR DEVELOPER', 'FULL-STACK ENGINEER', 'TEAM ENABLER']
+const heroRoles = ['SENIOR DEVELOPER', 'FULL-STACK ENGINEER', 'MENTOR']
 
 // No glow (item 6): heading keeps the neon-pink color but drops the
 // text-shadow that every other glowing element on this page also drops.
@@ -55,11 +55,11 @@ function AboutRouteComponent() {
                 </span>
               ))}
             </div>
-            <h1 className="mt-4 text-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
-              I build up the people around me.
+            <h1 className="mt-4 text-3xl font-bold text-balance text-[var(--neon-pink)] [text-shadow:var(--glow-pink)] sm:text-4xl">
+              I make the people around me better.
             </h1>
             <p className="mt-4 text-lg text-slate-400">
-              I build full-stack, efficient, and highly maintainable software.
+              I also write full-stack software the next developer will thank me for.
             </p>
           </div>
         </div>
@@ -67,9 +67,10 @@ function AboutRouteComponent() {
 
       <section className={sectionClass}>
         <p className={proseClass}>
-          I am a Senior Developer specializing in creating robust, scalable applications while fostering
-          collaborative, high-performing engineering teams. I believe that great software isn't just about
-          clean code—it's about empowering the developers beside you to grow, innovate, and succeed together.
+          I'm a senior developer, and I spent three years leading a team before that. The part of the job I care
+          about most is the people. I like pairing with someone until they're unstuck, pointing out when they did
+          something great, and trusting them with the hard stuff so they grow. Good code matters, but good teams
+          are what make it happen, and I want to be the teammate who makes everyone's day a little easier.
         </p>
       </section>
 
