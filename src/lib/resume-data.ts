@@ -90,7 +90,7 @@ export const experience: Company[] = [
       {
         title: 'Senior Developer',
         dateRange: 'June 2026 – Present',
-        aboutDetail: 'Developing a Salesforce → Dynamics 365 CRM migration.',
+        aboutDetail: 'Back to hands-on work, helping move our CRM from Salesforce to Dynamics 365.',
         projects: [
           {
             name: 'Salesforce-to-Dynamics 365 Migration',
@@ -105,7 +105,7 @@ export const experience: Company[] = [
       {
         title: 'Team Lead',
         dateRange: 'April 2023 – June 2026',
-        aboutDetail: 'Led a development team while staying hands-on with the code.',
+        aboutDetail: 'Led a development team and kept writing code alongside them.',
         projects: [
           {
             name: 'Health Pros Platform',
@@ -130,7 +130,7 @@ export const experience: Company[] = [
       {
         title: 'Developer',
         dateRange: 'July 2022 – April 2023',
-        aboutDetail: 'Joined to build out enterprise-scale full-stack systems.',
+        aboutDetail: 'Joined Alight as a full-stack developer.',
         projects: [
           {
             name: 'Smart Select MD',
@@ -151,7 +151,7 @@ export const experience: Company[] = [
       {
         title: 'Software Engineer',
         dateRange: 'April 2019 – May 2022',
-        aboutDetail: 'Grew from quality into full-time development on the same product.',
+        aboutDetail: 'Switched from testing the product to building it.',
         bullets: [
           'Built and deployed microservices to scale security platform from 10k to 100k agents',
           'Deployed and troubleshot AWS SQS, RDS, DynamoDB, and Lambda infrastructure',
@@ -161,7 +161,7 @@ export const experience: Company[] = [
       {
         title: 'Quality Engineer',
         dateRange: 'May 2016 – April 2019',
-        aboutDetail: 'Moved into engineering, building quality practices into every release.',
+        aboutDetail: 'Tested the product and worked to make every release more reliable.',
         bullets: [
           'Performed end-to-end testing of the web application, APIs, and Linux and Windows applications across two-week Agile releases',
           'Drove logging improvements that surfaced errors earlier, so issues were caught before they reached release',
@@ -175,7 +175,7 @@ export const experience: Company[] = [
     location: 'Plano, TX',
     dateRange: '2011 – 2016',
     aboutCombined: {
-      detail: 'Supported mission-critical emergency department software where reliability wasn’t optional.',
+      detail: 'Supported emergency department software used by hospitals, then moved into implementation and QA.',
     },
     roles: [
       {
@@ -208,7 +208,7 @@ export const experience: Company[] = [
     roles: [
       {
         title: 'Systems Analyst II / Officer',
-        aboutDetail: 'Cut my teeth supporting production systems in a high-stakes financial environment.',
+        aboutDetail: 'My first job in tech: supporting production systems at a bank.',
         bullets: [
           'Monitored bank-wide IT infrastructure to keep Online Banking, Bill Pay, and ATM/POS networks up',
         ],
@@ -239,6 +239,6 @@ export const credentials: Credential[] = [
     detail: 'Bachelor of Science in Business Computer Information Systems',
     date: 'December 2004',
     location: 'Denton, TX',
-    aboutDetail: 'Turned that high-school BASIC habit into a real foundation in systems and software.',
+    aboutDetail: 'Turned that high-school hobby into a degree.',
   },
 ]

@@ -84,7 +84,7 @@ function AboutRouteComponent() {
           My Journey
         </h2>
         <p className={cn('mt-4', proseClass)}>
-          My passion for coding started back in high school, writing simple programs in BASIC.
+          My interest in coding started back in high school, writing simple programs in BASIC.
         </p>
         <div className="mt-8">
           <JourneyTimeline />
