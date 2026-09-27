@@ -5,7 +5,7 @@ const SITE_NAME = 'Aaron Tilley'
 // Bump whenever public/og-image.png changes (see `npm run og:image`). The
 // file name stays the same; the new query string makes link-preview
 // crawlers, which cache images by URL, fetch the new banner.
-export const OG_IMAGE_VERSION = 2
+export const OG_IMAGE_VERSION = 3
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png?v=${OG_IMAGE_VERSION}`
 
 type SeoOptions = {
