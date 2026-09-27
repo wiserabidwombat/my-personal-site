@@ -38,6 +38,16 @@ export function resizeWorld(state: GameState, width: number, height: number) {
     scale(shot.target)
   }
   for (const blast of state.blasts) scale(blast.pos)
+  for (const ufo of state.ufos) {
+    scale(ufo.pos)
+    ufo.vx *= scaleX
+  }
+  for (const scout of state.scouts) {
+    scale(scout.pos)
+    scout.baseY *= scaleY
+    scout.vx *= scaleX
+  }
+  for (const popup of state.popups) scale(popup.pos)
 
   state.width = width
   state.height = height

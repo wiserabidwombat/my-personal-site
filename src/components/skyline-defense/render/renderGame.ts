@@ -1,4 +1,5 @@
 import type { GameState, Vec } from '../game/types'
+import { drawBonusTargets, drawPopups } from './bonus'
 import { drawCity, drawDefendedOutlines, type CityLayer } from './city'
 import { drawBlasts, drawCrosshair, drawLaunchers, drawProjectiles } from './entities'
 import { drawBanner, drawCityStatus, drawHud } from './hud'
@@ -28,11 +29,13 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, view
   }
   drawLaunchers(ctx, state, view.palette, fontSize)
   drawProjectiles(ctx, state, view.palette)
+  drawBonusTargets(ctx, state, view.palette, view.still)
   drawBlasts(ctx, state, view.palette, view.still)
   if (state.phase !== 'ready') {
     drawHud(ctx, state, view.palette, view.highScore, fontSize)
     drawCityStatus(ctx, state, view.palette)
   }
   drawBanner(ctx, state, view.palette)
+  drawPopups(ctx, state, view.palette, view.still)
   if (view.crosshair && state.phase === 'playing') drawCrosshair(ctx, view.crosshair, view.palette)
 }

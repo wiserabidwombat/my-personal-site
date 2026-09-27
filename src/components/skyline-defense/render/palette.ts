@@ -1,7 +1,7 @@
 // Canvas colors, read from the site's CSS tokens on the game's element
-// (inside .night-scene, so always the dark synthwave values). Two colors
-// have no site token: Bank of America Plaza's signature green outline and
-// the meteors' hot orange.
+// (inside .night-scene, so always the dark synthwave values). A few colors
+// have no site token: Bank of America Plaza's signature green outline, the
+// meteors' hot orange, and the alien lime of the bonus targets.
 export type Palette = {
   sky: string
   skyHigh: string
@@ -13,6 +13,7 @@ export type Palette = {
   darkEdge: string
   bofaGreen: string
   meteor: string
+  lime: string
 }
 
 export function readPalette(element: Element): Palette {
@@ -29,6 +30,7 @@ export function readPalette(element: Element): Palette {
     darkEdge: '#3a3148',
     bofaGreen: '#39ff88',
     meteor: '#ffb347',
+    lime: '#9dff4a',
   }
 }
 

@@ -88,7 +88,14 @@ export function drawBlasts(ctx: CanvasRenderingContext2D, state: GameState, pale
     const radius = blastRadius(blast)
     if (radius <= 0) continue
     const intensity = blastIntensity(blast.age, blastStage(blast), still)
-    const color = blast.kind === 'interceptor' ? palette.cyan : blast.kind === 'chain' ? palette.pink : palette.meteor
+    const color =
+      blast.kind === 'interceptor'
+        ? palette.cyan
+        : blast.kind === 'chain'
+          ? palette.pink
+          : blast.kind === 'bonus'
+            ? palette.lime
+            : palette.meteor
     const gradient = ctx.createRadialGradient(blast.pos.x, blast.pos.y, 0, blast.pos.x, blast.pos.y, radius)
     gradient.addColorStop(0, alpha('#ffffff', 0.9 * intensity))
     gradient.addColorStop(0.35, alpha(color, 0.7 * intensity))

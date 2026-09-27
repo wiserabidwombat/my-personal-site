@@ -59,7 +59,7 @@ describe('collisions', () => {
   it('destroys meteors inside a blast, scores them, and chains a new blast', () => {
     const state = playing()
     state.meteors.push(meteorAt(state, 500, 200))
-    state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 500, y: 200 }, maxRadius: 40, age: TUNING.blastGrow })
+    state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 500, y: 200 }, maxRadius: 40, age: TUNING.blastGrow, chainId: 99 })
     step(state, 0.01)
     expect(state.meteors).toHaveLength(0)
     expect(state.score).toBe(meteorPoints(1))
@@ -69,7 +69,7 @@ describe('collisions', () => {
   it('gives a chain blast about 60% of a full blast radius', () => {
     const state = playing()
     state.meteors.push(meteorAt(state, 500, 200))
-    state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 500, y: 200 }, maxRadius: 40, age: TUNING.blastGrow })
+    state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 500, y: 200 }, maxRadius: 40, age: TUNING.blastGrow, chainId: 99 })
     step(state, 0.01)
     const chain = state.blasts.find((blast) => blast.kind === 'chain')
     expect(chain?.maxRadius).toBeCloseTo(blastMaxRadius(1000, 700) * TUNING.chainRadiusFraction)
@@ -79,7 +79,7 @@ describe('collisions', () => {
     const state = playing()
     state.meteors.push(meteorAt(state, 500, 200))
     const age = blastLifetime - TUNING.blastShrink / 2
-    state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 505, y: 200 }, maxRadius: 40, age })
+    state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 505, y: 200 }, maxRadius: 40, age, chainId: 99 })
     step(state, 0.01)
     expect(state.meteors).toHaveLength(0)
   })
@@ -87,12 +87,13 @@ describe('collisions', () => {
   it('lets a chain blast catch a nearby meteor on a later frame', () => {
     const state = playing()
     state.meteors.push(meteorAt(state, 500, 200), meteorAt(state, 500 + chainBlastRadius(1000, 700) * 0.8, 200))
-    state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 500, y: 200 }, maxRadius: 5, age: TUNING.blastGrow })
+    state.blasts.push({ id: 99, kind: 'interceptor', pos: { x: 500, y: 200 }, maxRadius: 5, age: TUNING.blastGrow, chainId: 99 })
     step(state, 0.01)
     expect(state.meteors).toHaveLength(1)
     for (let i = 0; i < 40 && state.meteors.length > 0; i++) step(state, 0.02)
     expect(state.meteors).toHaveLength(0)
-    expect(state.score).toBe(meteorPoints(1) * 2)
+    // The second kill in the chain scores double.
+    expect(state.score).toBe(meteorPoints(1) * (1 + 2))
   })
 
   it('darkens a building a meteor reaches, and ends the game when all are dark', () => {

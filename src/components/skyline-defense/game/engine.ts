@@ -7,7 +7,9 @@ import {
   distance,
   nearestLauncherWithAmmo,
 } from './geometry'
-import { meteorPoints, waveBonus } from './scoring'
+import { planBonus, stepBonus } from './bonus'
+import { scoreKill } from './chains'
+import { waveBonus } from './scoring'
 import { groundLevel, LAUNCHER_SIZE, layoutBuildings, layoutLaunchers, skylineScale } from './skyline'
 import { TUNING } from './tuning'
 import type { BlastKind, GameState, Vec } from './types'
@@ -15,7 +17,14 @@ import { salvoSize, spawnSalvo, splitMeteor, waveConfig } from './waves'
 
 export { blastMaxRadius }
 
-export function createGame(width: number, height: number, rng: () => number = Math.random): GameState {
+// `bonusRng` drives the bonus targets separately from the meteors (see
+// GameState.bonusRng); it defaults to the same stream.
+export function createGame(
+  width: number,
+  height: number,
+  rng: () => number = Math.random,
+  bonusRng: () => number = rng,
+): GameState {
   return {
     width,
     height,
@@ -33,8 +42,17 @@ export function createGame(width: number, height: number, rng: () => number = Ma
     toSpawn: 0,
     spawnTimer: 0,
     lastBonus: null,
+    ufos: [],
+    scouts: [],
+    popups: [],
+    bonusPlan: { ufoTimes: [], scoutTime: null, elapsed: 0 },
+    chains: {},
+    waveLongestChain: 0,
+    hudBottom: 0,
+    reducedMotion: false,
     nextId: 1,
     rng,
+    bonusRng,
   }
 }
 
@@ -50,6 +68,11 @@ export function beginWave(state: GameState, wave: number) {
   state.spawnTimer = 0.6
   state.meteors = []
   state.interceptors = []
+  state.ufos = []
+  state.scouts = []
+  state.chains = {}
+  state.waveLongestChain = 0
+  state.bonusPlan = planBonus(state, wave)
   for (const launcher of state.launchers) launcher.ammo = config.ammoPerLauncher
   setPhase(state, 'waveTitle')
 }
@@ -59,6 +82,7 @@ export function startGame(state: GameState) {
   state.score = 0
   state.lastBonus = null
   state.blasts = []
+  state.popups = []
   state.buildings = layoutBuildings(state.width, state.height)
   beginWave(state, 1)
 }
@@ -84,14 +108,17 @@ export function chainBlastRadius(width: number, height: number): number {
   return blastMaxRadius(width, height) * TUNING.chainRadiusFraction
 }
 
-function addBlast(state: GameState, kind: BlastKind, pos: Vec) {
+// `chainId` ties the blast to the shot it descends from (null for impacts);
+// `radius` overrides the kind's usual full size.
+function addBlast(state: GameState, kind: BlastKind, pos: Vec, chainId: number | null, radius?: number) {
   const maxRadius =
-    kind === 'impact'
+    radius ??
+    (kind === 'impact'
       ? TUNING.impactRadius
       : kind === 'chain'
         ? chainBlastRadius(state.width, state.height)
-        : blastMaxRadius(state.width, state.height)
-  state.blasts.push({ id: state.nextId++, kind, pos: { ...pos }, maxRadius, age: 0 })
+        : blastMaxRadius(state.width, state.height))
+  state.blasts.push({ id: state.nextId++, kind, pos: { ...pos }, maxRadius, age: 0, chainId })
 }
 
 function moveProjectiles(state: GameState, dt: number) {
@@ -108,7 +135,8 @@ function moveProjectiles(state: GameState, dt: number) {
   state.interceptors = state.interceptors.filter((shot) => {
     const remaining = distance(shot.pos, shot.target)
     if (remaining <= speed * dt) {
-      addBlast(state, 'interceptor', shot.target)
+      // Each shot starts its own chain.
+      addBlast(state, 'interceptor', shot.target, shot.id)
       return false
     }
     shot.pos.x += ((shot.target.x - shot.pos.x) / remaining) * speed * dt
@@ -117,15 +145,16 @@ function moveProjectiles(state: GameState, dt: number) {
   })
 }
 
-// Meteors touching a live interceptor or chain blast are destroyed, score,
-// and leave a chain blast of their own; meteors reaching a lit building or
-// the ground knock it out and flash.
+// Meteors touching a live (non-impact) blast are destroyed, score with the
+// chain bonus, and leave a chain blast of their own in the same chain;
+// meteors reaching a lit building or the ground knock it out and flash.
 function resolveCollisions(state: GameState) {
   const destructive = state.blasts.filter((blast) => blast.kind !== 'impact' && blastRadius(blast) > 0)
   state.meteors = state.meteors.filter((meteor) => {
-    if (destructive.some((blast) => circleContains(blast.pos, blastRadius(blast), meteor.pos))) {
-      state.score += meteorPoints(state.wave)
-      addBlast(state, 'chain', meteor.pos)
+    const blast = destructive.find((b) => circleContains(b.pos, blastRadius(b), meteor.pos))
+    if (blast) {
+      scoreKill(state, meteor.pos, TUNING.meteorPoints, blast.chainId)
+      addBlast(state, 'chain', meteor.pos, blast.chainId)
       return false
     }
     const hit = state.buildings.find(
@@ -133,7 +162,7 @@ function resolveCollisions(state: GameState) {
     )
     if (hit || meteor.pos.y >= state.groundY) {
       if (hit) hit.alive = false
-      addBlast(state, 'impact', { x: meteor.pos.x, y: Math.min(meteor.pos.y, state.groundY) })
+      addBlast(state, 'impact', { x: meteor.pos.x, y: Math.min(meteor.pos.y, state.groundY) }, null)
       return false
     }
     return true
@@ -154,6 +183,8 @@ export function step(state: GameState, dt: number) {
   state.phaseTime += dt
   for (const blast of state.blasts) blast.age += dt
   state.blasts = state.blasts.filter((blast) => blast.age < blastLifetime)
+  for (const popup of state.popups) popup.age += dt
+  state.popups = state.popups.filter((popup) => popup.age < TUNING.popupSeconds)
 
   if (state.phase === 'waveTitle' && state.phaseTime >= TUNING.waveTitleTime) setPhase(state, 'playing')
   if (state.phase === 'waveBonus' && state.phaseTime >= TUNING.waveBonusTime) beginWave(state, state.wave + 1)
@@ -172,10 +203,14 @@ export function step(state: GameState, dt: number) {
 
   moveProjectiles(state, dt)
   resolveCollisions(state)
+  stepBonus(state, dt, (kind, pos, chainId, radius) => addBlast(state, kind, pos, chainId, radius))
 
   if (!state.buildings.some((building) => building.alive)) {
     setPhase(state, 'gameOver')
   } else if (waveCleared(state)) {
+    // Bonus targets still crossing just leave; they never hold up a wave.
+    state.ufos = []
+    state.scouts = []
     state.lastBonus = waveBonus(state.buildings.filter((b) => b.alive).length, totalAmmo(state), state.wave)
     state.score += state.lastBonus.total
     setPhase(state, 'waveBonus')
