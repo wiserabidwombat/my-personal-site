@@ -1,9 +1,20 @@
-import { blastLifetime, blastRadius, buildingRect, circleContains, distance, nearestLauncherWithAmmo, rectContains } from './geometry'
+import {
+  blastLifetime,
+  blastMaxRadius,
+  blastRadius,
+  buildingRect,
+  circleContains,
+  distance,
+  nearestLauncherWithAmmo,
+  rectContains,
+} from './geometry'
 import { meteorPoints, waveBonus } from './scoring'
 import { groundLevel, LAUNCHER_SIZE, layoutBuildings, layoutLaunchers, skylineScale } from './skyline'
 import { TUNING } from './tuning'
 import type { BlastKind, GameState, Vec } from './types'
-import { spawnMeteor, splitMeteor, waveConfig } from './waves'
+import { salvoSize, spawnSalvo, splitMeteor, waveConfig } from './waves'
+
+export { blastMaxRadius }
 
 export function createGame(width: number, height: number, rng: () => number = Math.random): GameState {
   return {
@@ -68,10 +79,6 @@ export function fire(state: GameState, target: Vec): boolean {
   const aim = { x: target.x, y: Math.min(target.y, state.groundY - 12) }
   state.interceptors.push({ id: state.nextId++, from, pos: { ...from }, target: aim })
   return true
-}
-
-export function blastMaxRadius(width: number): number {
-  return Math.min(Math.max(width * TUNING.blastRadiusFraction, TUNING.blastRadiusMin), TUNING.blastRadiusMax)
 }
 
 export function chainBlastRadius(width: number): number {
@@ -152,9 +159,12 @@ export function step(state: GameState, dt: number) {
   const config = waveConfig(state.wave)
   state.spawnTimer -= dt
   if (state.toSpawn > 0 && state.spawnTimer <= 0) {
-    state.meteors.push(spawnMeteor(state, config))
-    state.toSpawn -= 1
-    state.spawnTimer = config.spawnInterval
+    const salvo = spawnSalvo(state, config, salvoSize(state, config, state.toSpawn))
+    state.meteors.push(...salvo)
+    state.toSpawn -= salvo.length
+    // A salvo uses up its members' share of the wave's time, so the
+    // average rate of meteors per second doesn't change.
+    state.spawnTimer = config.spawnInterval * salvo.length
   }
 
   moveProjectiles(state, dt)

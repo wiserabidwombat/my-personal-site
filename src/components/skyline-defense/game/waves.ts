@@ -1,9 +1,10 @@
+import { blastMaxRadius } from './geometry'
 import { TUNING } from './tuning'
 import type { GameState, Meteor, Vec, WaveConfig } from './types'
 
 // Difficulty for wave n (1-based): more, faster meteors, spawning closer
-// together, and splitting meteors from TUNING.splitStartWave on. Speed is
-// a fraction of world height per second.
+// together, splitting meteors from TUNING.splitStartWave on, and salvos
+// becoming more common. Speed is a fraction of world height per second.
 export function waveConfig(wave: number): WaveConfig {
   const step = Math.max(wave, 1) - 1
   const splitting = wave >= TUNING.splitStartWave
@@ -17,9 +18,12 @@ export function waveConfig(wave: number): WaveConfig {
           TUNING.splitChanceMax,
         )
       : 0,
+    salvoChance: Math.min(TUNING.salvoChanceBase + step * TUNING.salvoChancePerWave, TUNING.salvoChanceMax),
     ammoPerLauncher: TUNING.ammoPerLauncher,
   }
 }
+
+const radians = (degrees: number) => (degrees * Math.PI) / 180
 
 // A point on the ground to aim at: mostly lit buildings, sometimes a
 // random spot (which may still clip a building on the way down).
@@ -32,31 +36,59 @@ function pickTarget(state: GameState): Vec {
   return { x: state.rng() * state.width, y: state.groundY }
 }
 
-function meteorToward(state: GameState, from: Vec, target: Vec, speed: number, splitAtY: number | null): Meteor {
-  const dx = target.x - from.x
-  const dy = target.y - from.y
-  const length = Math.hypot(dx, dy) || 1
+function rollSplit(state: GameState, config: WaveConfig): number | null {
+  return state.rng() < config.splitChance ? state.height * (0.25 + state.rng() * 0.25) : null
+}
+
+function meteor(state: GameState, from: Vec, heading: number, speed: number, splitAtY: number | null): Meteor {
   return {
     id: state.nextId++,
     start: { ...from },
     pos: { ...from },
-    vel: { x: (dx / length) * speed, y: (dy / length) * speed },
+    vel: { x: Math.cos(heading) * speed, y: Math.sin(heading) * speed },
     splitAtY,
   }
 }
 
-export function spawnMeteor(state: GameState, config: WaveConfig): Meteor {
-  const from = { x: state.rng() * state.width, y: -8 }
-  const splits = state.rng() < config.splitChance
-  const splitAtY = splits ? state.height * (0.25 + state.rng() * 0.25) : null
-  return meteorToward(state, from, pickTarget(state), config.meteorSpeed * state.height, splitAtY)
+// Salvo size for the next spawn: 1 (a single), 2, or 3, never more than
+// the meteors left in the wave.
+export function salvoSize(state: GameState, config: WaveConfig, remaining: number): number {
+  if (remaining < 2 || state.rng() >= config.salvoChance) return 1
+  return Math.min(state.rng() < TUNING.salvoTripleChance ? 3 : 2, remaining)
 }
 
-// Fragments of a split meteor, each heading for its own target at the
-// parent's speed. Fragments don't split again.
-export function splitMeteor(state: GameState, meteor: Meteor): Meteor[] {
-  const speed = Math.hypot(meteor.vel.x, meteor.vel.y)
-  return Array.from({ length: TUNING.splitFragments }, () =>
-    meteorToward(state, meteor.pos, pickTarget(state), speed, null),
+// One meteor, or a salvo: neighbors start TUNING.salvoSpacing blast radii
+// apart, each a little later (higher up) than the last, with headings
+// fanned TUNING.salvoFanDegrees apart around a shared aim. Each member can
+// still be a splitting meteor.
+export function spawnSalvo(state: GameState, config: WaveConfig, size: number): Meteor[] {
+  const speed = config.meteorSpeed * state.height
+  const lead = { x: state.rng() * state.width, y: -8 }
+  const target = pickTarget(state)
+  const heading = Math.atan2(target.y - lead.y, target.x - lead.x)
+  const spacing = TUNING.salvoSpacing * blastMaxRadius(state.width)
+  return Array.from({ length: size }, (_, index) => {
+    const offset = index - (size - 1) / 2
+    const from = {
+      x: Math.min(Math.max(lead.x + offset * spacing, 0), state.width),
+      y: lead.y - index * TUNING.salvoTimeGap * speed,
+    }
+    return meteor(state, from, heading + offset * radians(TUNING.salvoFanDegrees), speed, rollSplit(state, config))
+  })
+}
+
+export function spawnMeteor(state: GameState, config: WaveConfig): Meteor {
+  return spawnSalvo(state, config, 1)[0]
+}
+
+// Fragments of a split meteor: a fan around the parent's heading, starting
+// from the split point, TUNING.splitFanDegrees apart, at the parent's
+// speed. Fragments don't split again.
+export function splitMeteor(state: GameState, parent: Meteor): Meteor[] {
+  const speed = Math.hypot(parent.vel.x, parent.vel.y)
+  const heading = Math.atan2(parent.vel.y, parent.vel.x)
+  const count = TUNING.splitFragments
+  return Array.from({ length: count }, (_, index) =>
+    meteor(state, parent.pos, heading + (index - (count - 1) / 2) * radians(TUNING.splitFanDegrees), speed, null),
   )
 }

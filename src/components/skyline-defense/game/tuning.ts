@@ -23,6 +23,25 @@ export const TUNING = {
   splitChancePerWave: 0.05,
   splitChanceMax: 0.5,
   splitFragments: 3,
+  // Degrees between neighboring fragments of a split meteor: they fan out
+  // from the split point around the parent's heading, starting close
+  // enough to catch in one blast.
+  splitFanDegrees: 9,
+  // Salvos: meteors arriving in small groups that start close together
+  // (in time and position) and fan out as they fall, so one blast or a
+  // chain can take several. Chance that a spawn is a salvo, by wave: mostly
+  // singles in wave 1, common from waves 2-3.
+  salvoChanceBase: 0.12,
+  salvoChancePerWave: 0.22,
+  salvoChanceMax: 0.7,
+  // Salvo size: 2, or 3 with this chance.
+  salvoTripleChance: 0.4,
+  // Start spacing between neighbors, in full blast radii (so salvos are
+  // equally catchable on any screen), and seconds between their starts.
+  salvoSpacing: 0.9,
+  salvoTimeGap: 0.2,
+  // Degrees between neighbors' headings as they fall.
+  salvoFanDegrees: 4,
   ammoPerLauncher: 10,
   // Fraction of world height per second.
   interceptorSpeed: 0.85,
@@ -42,7 +61,7 @@ export const TUNING = {
   blastShrink: 0.5,
   // A meteor destroyed by a blast leaves its own blast, this fraction of a
   // full blast's radius, with the same lifecycle.
-  chainRadiusFraction: 0.6,
+  chainRadiusFraction: 0.8,
   impactRadius: 16,
   meteorPoints: 25,
   buildingBonus: 100,

@@ -42,6 +42,8 @@ export type WaveConfig = {
   meteorSpeed: number
   spawnInterval: number
   splitChance: number
+  // Chance that a spawn is a salvo (a small group) rather than a single.
+  salvoChance: number
   ammoPerLauncher: number
 }
 
