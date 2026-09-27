@@ -1,7 +1,7 @@
 import type { GameState, Vec } from '../game/types'
-import { drawCity, type CityLayer } from './city'
+import { drawCity, drawDefendedOutlines, type CityLayer } from './city'
 import { drawBlasts, drawCrosshair, drawLaunchers, drawProjectiles } from './entities'
-import { drawBanner, drawHud } from './hud'
+import { drawBanner, drawCityStatus, drawHud } from './hud'
 import type { Palette } from './palette'
 import { drawScene } from './scene'
 
@@ -22,11 +22,17 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, view
   const fontSize = state.width < 500 ? 13 : 16
   const horizon = view.city ? { y: view.city.y, color: view.city.skyColor } : null
   drawScene(ctx, state, view.palette, view.time, view.still, horizon)
-  if (view.city) drawCity(ctx, state, view.city)
+  if (view.city) {
+    drawCity(ctx, state, view.city)
+    drawDefendedOutlines(ctx, state, view.palette.cyan, view.still)
+  }
   drawLaunchers(ctx, state, view.palette, fontSize)
   drawProjectiles(ctx, state, view.palette)
   drawBlasts(ctx, state, view.palette, view.still)
-  if (state.phase !== 'ready') drawHud(ctx, state, view.palette, view.highScore, fontSize)
+  if (state.phase !== 'ready') {
+    drawHud(ctx, state, view.palette, view.highScore, fontSize)
+    drawCityStatus(ctx, state, view.palette)
+  }
   drawBanner(ctx, state, view.palette)
   if (view.crosshair && state.phase === 'playing') drawCrosshair(ctx, view.crosshair, view.palette)
 }

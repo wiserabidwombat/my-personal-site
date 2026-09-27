@@ -1,5 +1,6 @@
 import { CITY_BAND, cityView } from '../game/skyline'
 import type { Building, GameState } from '../game/types'
+import { VISUALS, visualsFor } from './visuals'
 
 // The visible part of the skyline image, pre-rendered at world size, and
 // the image's top-row sky color (the game sky blends into it at `y`).
@@ -20,7 +21,8 @@ export const cityLayerKey = (state: GameState, dpr: number) => `${state.width}x$
 const FADE = 0.2
 
 // Draws the image's visible crop scaled to the world width with smoothing
-// on (like the home page), bottom on the ground line, top faded out.
+// on (like the home page), bottom on the ground line, top faded out, with
+// the scenery (everything outside the defended buildings) dimmed.
 export function buildCityLayer(image: HTMLImageElement, state: GameState, dpr: number): CityLayer {
   const view = cityView(state.width, state.height)
   const sourceWidth = view.crop.right - view.crop.left
@@ -46,8 +48,40 @@ export function buildCityLayer(image: HTMLImageElement, state: GameState, dpr: n
     ctx.globalCompositeOperation = 'destination-in'
     ctx.fillStyle = fade
     ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.globalCompositeOperation = 'source-over'
+    dimScenery(ctx, canvas, state, view.groundY - height, dpr)
   }
   return { canvas, y: view.groundY - height, width, height, skyColor, key: cityLayerKey(state, dpr) }
+}
+
+// Dims and partly desaturates the whole layer, then puts the original art
+// back inside each defended building's outline. Done per pixel (once per
+// size) rather than with ctx.filter, which older Safari doesn't support.
+function dimScenery(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, state: GameState, top: number, dpr: number) {
+  const original = document.createElement('canvas')
+  original.width = canvas.width
+  original.height = canvas.height
+  original.getContext('2d')?.drawImage(canvas, 0, 0)
+
+  const image = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  const data = image.data
+  const { sceneryDesaturation, sceneryBrightness } = visualsFor(state.width)
+  const keep = 1 - sceneryDesaturation
+  const bright = sceneryBrightness
+  for (let i = 0; i < data.length; i += 4) {
+    const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]
+    for (let c = 0; c < 3; c++) data[i + c] = (gray + (data[i + c] - gray) * keep) * bright
+  }
+  ctx.putImageData(image, 0, 0)
+
+  ctx.save()
+  ctx.setTransform(dpr, 0, 0, dpr, 0, -top * dpr)
+  const defended = new Path2D()
+  for (const building of state.buildings) defended.addPath(outlinePath(building))
+  ctx.clip(defended)
+  ctx.setTransform(1, 0, 0, 1, 0, 0)
+  ctx.drawImage(original, 0, 0)
+  ctx.restore()
 }
 
 // The average color of one row of the drawn image, as an rgb() string.
@@ -83,8 +117,10 @@ function outlinePath(building: Building): Path2D {
 }
 
 // The skyline, with each destroyed building's lights out: its outline
-// desaturated, then dimmed to ~45% brightness so the art stays readable.
+// desaturated, then dimmed (visualsFor().destroyedBrightness) so the art stays
+// readable but reads darker than the dimmed scenery.
 export function drawCity(ctx: CanvasRenderingContext2D, state: GameState, layer: CityLayer) {
+  const dim = Math.round(255 * visualsFor(state.width).destroyedBrightness)
   ctx.drawImage(layer.canvas, 0, layer.y, layer.width, layer.height)
   for (const building of state.buildings) {
     if (building.alive) continue
@@ -96,8 +132,34 @@ export function drawCity(ctx: CanvasRenderingContext2D, state: GameState, layer:
     ctx.fillStyle = '#808080'
     ctx.fillRect(left, top, building.width, building.height)
     ctx.globalCompositeOperation = 'multiply'
-    ctx.fillStyle = 'rgb(118, 110, 135)'
+    ctx.fillStyle = `rgb(${dim}, ${dim}, ${dim})`
     ctx.fillRect(left, top, building.width, building.height)
     ctx.restore()
   }
+}
+
+// Neon outlines around the defended buildings still standing: a pulsing
+// reveal that fades out while the "Wave N" title shows (steady under
+// reduced motion), and an optional faint edge during play.
+export function drawDefendedOutlines(ctx: CanvasRenderingContext2D, state: GameState, color: string, still: boolean) {
+  let alpha = 0
+  let width = 1
+  if (state.phase === 'waveTitle' && state.phaseTime < VISUALS.revealSeconds) {
+    const t = state.phaseTime / VISUALS.revealSeconds
+    const pulse = 0.65 + 0.35 * Math.cos(state.phaseTime * Math.PI * 2 * VISUALS.revealPulsesPerSecond)
+    alpha = still ? 1 : (1 - t) * pulse
+    width = VISUALS.revealLineWidth
+  } else if (state.phase === 'playing' || state.phase === 'waveTitle') {
+    alpha = visualsFor(state.width).defendedEdgeAlpha
+  }
+  if (alpha <= 0) return
+  ctx.save()
+  ctx.globalAlpha = alpha
+  ctx.strokeStyle = color
+  ctx.lineWidth = width
+  ctx.lineJoin = 'round'
+  ctx.shadowColor = color
+  ctx.shadowBlur = width > 1 ? 10 : 4
+  for (const building of state.buildings) if (building.alive) ctx.stroke(outlinePath(building))
+  ctx.restore()
 }
