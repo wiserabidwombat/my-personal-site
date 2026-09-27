@@ -6,6 +6,7 @@ import { useTheme } from '../../hooks/useTheme'
 import { heroTitle } from '../../lib/resume-data'
 import { neonOutlineButton, pageTitle, homeTitleLeading } from '../../lib/styles'
 import { SkylineImages } from './SkylineImages'
+import { ReunionHotspot } from './ReunionHotspot'
 import { Seasonal } from '../halloween/Seasonal'
 
 const eyebrow = [heroTitle, 'Board Gamer', 'Outdoorsman', 'Dallas, TX']
@@ -85,6 +86,7 @@ export function HeroSkyline() {
       <div className="relative">
         <SkylineImages theme={theme} />
         <Seasonal sprite="heroBats" />
+        <ReunionHotspot />
       </div>
 
       {/* The city's own reflection breaks into an actual neon grid, pulled

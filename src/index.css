@@ -435,6 +435,74 @@ body {
   }
 }
 
+/* Always-night scope: re-declares the dark synthwave tokens (the :root
+   values above) on a subtree, so the Skyline Defense game stays a night
+   scene in light mode too. Custom properties set on an element win over
+   inherited ones, so this also holds under the light and Halloween
+   overrides on <html>. */
+.night-scene {
+  --deep-space-black: #0a0612;
+  --deep-space-purple: #150a24;
+  --neon-pink: #ff2bd6;
+  --cyber-purple: #8b2fe0;
+  --laser-cyan: #00f0ff;
+  --glow-pink: 0 0 10px rgba(255, 43, 214, 0.7), 0 0 30px rgba(255, 43, 214, 0.4);
+  --glow-cyan: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 30px rgba(0, 240, 255, 0.4);
+  --shadow-glow-cyan: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 30px rgba(0, 240, 255, 0.4);
+  color-scheme: dark;
+}
+
+/* Reunion Tower hotspot (src/components/home/ReunionHotspot.tsx): the
+   ball's lights flicker once every ~25s, and glow faintly on hover/focus.
+   The glow follows --neon-pink, so the Halloween palette turns it orange.
+   Reduced motion drops the flicker but keeps the hover/focus glow. */
+@keyframes reunion-flicker {
+  0%,
+  95% {
+    opacity: 0;
+  }
+  95.6% {
+    opacity: 0.9;
+  }
+  96.2% {
+    opacity: 0.15;
+  }
+  96.8% {
+    opacity: 1;
+  }
+  98.5%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@utility reunion-ball-glow {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -15%;
+    border-radius: 9999px;
+    background: radial-gradient(circle, color-mix(in oklab, var(--neon-pink) 55%, transparent) 0%, transparent 70%);
+    box-shadow: 0 0 14px color-mix(in oklab, var(--neon-pink) 60%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease;
+    animation: reunion-flicker 25s linear infinite;
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    opacity: 0.45;
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      animation: none;
+    }
+  }
+}
+
 /* Skeleton loading placeholder: a pink/cyan shimmer sweeps across a dark
    bar rather than a generic gray pulse, to fit the synthwave aesthetic. */
 @keyframes skeleton-shimmer {

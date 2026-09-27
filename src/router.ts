@@ -12,3 +12,11 @@ import { routeTree } from './routeTree.gen'
 export function createAppRouter(history?: RouterHistory) {
   return createRouter({ routeTree, history })
 }
+
+declare module '@tanstack/react-router' {
+  interface StaticDataRouteOption {
+    // Full-screen route with no navbar or footer (see __root.tsx), e.g. the
+    // hidden Skyline Defense game.
+    bareLayout?: boolean
+  }
+}

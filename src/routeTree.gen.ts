@@ -18,6 +18,7 @@ import { Route as GamesRouteImport } from './routes/games'
 import { Route as Minerals_fossilsRouteImport } from './routes/minerals_fossils'
 import { Route as MusicRouteImport } from './routes/music'
 import { Route as ResumeRouteImport } from './routes/resume'
+import { Route as SkylineDefenseRouteImport } from './routes/skyline-defense'
 import { Route as StackRouteImport } from './routes/stack'
 import { Route as BlogSlugRouteImport } from './routes/blog_.$slug'
 
@@ -66,6 +67,11 @@ const ResumeRoute = ResumeRouteImport.update({
   path: '/resume',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SkylineDefenseRoute = SkylineDefenseRouteImport.update({
+  id: '/skyline-defense',
+  path: '/skyline-defense',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StackRoute = StackRouteImport.update({
   id: '/stack',
   path: '/stack',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/music': typeof MusicRoute
   '/resume': typeof ResumeRoute
+  '/skyline-defense': typeof SkylineDefenseRoute
   '/stack': typeof StackRoute
   '/blog/$slug': typeof BlogSlugRoute
 }
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/music': typeof MusicRoute
   '/resume': typeof ResumeRoute
+  '/skyline-defense': typeof SkylineDefenseRoute
   '/stack': typeof StackRoute
   '/blog/$slug': typeof BlogSlugRoute
 }
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/music': typeof MusicRoute
   '/resume': typeof ResumeRoute
+  '/skyline-defense': typeof SkylineDefenseRoute
   '/stack': typeof StackRoute
   '/blog_/$slug': typeof BlogSlugRoute
 }
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/minerals_fossils'
     | '/music'
     | '/resume'
+    | '/skyline-defense'
     | '/stack'
     | '/blog/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/minerals_fossils'
     | '/music'
     | '/resume'
+    | '/skyline-defense'
     | '/stack'
     | '/blog/$slug'
   id:
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/minerals_fossils'
     | '/music'
     | '/resume'
+    | '/skyline-defense'
     | '/stack'
     | '/blog_/$slug'
   fileRoutesById: FileRoutesById
@@ -169,6 +181,7 @@ export interface RootRouteChildren {
   Minerals_fossilsRoute: typeof Minerals_fossilsRoute
   MusicRoute: typeof MusicRoute
   ResumeRoute: typeof ResumeRoute
+  SkylineDefenseRoute: typeof SkylineDefenseRoute
   StackRoute: typeof StackRoute
   BlogSlugRoute: typeof BlogSlugRoute
 }
@@ -238,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/skyline-defense': {
+      id: '/skyline-defense'
+      path: '/skyline-defense'
+      fullPath: '/skyline-defense'
+      preLoaderRoute: typeof SkylineDefenseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stack': {
       id: '/stack'
       path: '/stack'
@@ -265,6 +285,7 @@ const rootRouteChildren: RootRouteChildren = {
   Minerals_fossilsRoute: Minerals_fossilsRoute,
   MusicRoute: MusicRoute,
   ResumeRoute: ResumeRoute,
+  SkylineDefenseRoute: SkylineDefenseRoute,
   StackRoute: StackRoute,
   BlogSlugRoute: BlogSlugRoute,
 }
