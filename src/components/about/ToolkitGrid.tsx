@@ -7,8 +7,7 @@ const toolkit = [
   },
   {
     category: 'Data & Cloud',
-    // TODO(Aaron): name the specific tools behind "Data Analytics", or remove it.
-    skills: ['SQL', 'Data Analytics', 'AWS', 'CI/CD'],
+    skills: ['SQL', 'DynamoDB', 'AWS', 'CI/CD', 'Notion', 'Neon'],
   },
   {
     category: 'Enterprise CRM & Platform',
