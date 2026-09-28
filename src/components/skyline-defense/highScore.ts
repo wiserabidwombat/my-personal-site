@@ -18,3 +18,24 @@ export function saveHighScore(score: number) {
     // Not saved; the in-memory high score still shows for this visit.
   }
 }
+
+const INITIALS_KEY = 'skyline-defense-initials'
+
+// The initials this player last put on the leaderboard, so the entry
+// screen can start there; null if none (or storage is unavailable).
+export function loadInitials(): string | null {
+  try {
+    const value = localStorage.getItem(INITIALS_KEY)
+    return value && /^[A-Z]{3}$/.test(value) ? value : null
+  } catch {
+    return null
+  }
+}
+
+export function saveInitials(initials: string) {
+  try {
+    localStorage.setItem(INITIALS_KEY, initials)
+  } catch {
+    // Not remembered; the entry screen starts at AAA next time.
+  }
+}

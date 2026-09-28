@@ -66,7 +66,7 @@ Copy `.env.example` to `.env.local` (already gitignored) and fill in:
 | `NOTION_TOKEN` | `scripts/fetch-games.mjs`, `scripts/sync-bgg.mjs`, `api/games.ts` | Notion integration token for the board games database. Only read server-side; it never reaches client code |
 | `NOTION_DATA_SOURCE_ID` | `scripts/fetch-games.mjs`, `scripts/sync-bgg.mjs`, `api/games.ts` | ID of the Notion data source holding the board game collection |
 | `BGG_API_TOKEN` | `scripts/sync-bgg.mjs` | BoardGameGeek XML API application token (BGG requires registration). Local only; not needed in Vercel |
-| `DATABASE_URL` | `scripts/migrate.mjs`, `api/fossils.ts` | Neon Postgres connection string. In production this is auto-injected by the Vercel Marketplace Neon integration |
+| `DATABASE_URL` | `scripts/migrate.mjs`, `api/fossils.ts`, `api/scores.ts` | Neon Postgres connection string. In production this is auto-injected by the Vercel Marketplace Neon integration |
 | `HARDCOVER_API_TOKEN` | `api/books.ts`, `api/currently-reading.ts` | Hardcover Personal Access Token. Expires after 1 year with no programmatic renewal — regenerate manually at hardcover.app account settings when it does |
 | `HARDCOVER_USER_ID` | `api/books.ts`, `api/currently-reading.ts` | Numeric Hardcover user ID (not a secret) — get it by querying `{ me { id } }` against the Hardcover API with your token |
 | `SPOTIFY_CLIENT_ID` | `scripts/spotify-auth.mjs`, `api/spotify.ts` | Client ID of your app in the Spotify Developer Dashboard (redirect URI `http://127.0.0.1:8888/callback`) |
@@ -74,6 +74,7 @@ Copy `.env.example` to `.env.local` (already gitignored) and fill in:
 | `SPOTIFY_REFRESH_TOKEN` | `api/spotify.ts` | Long-lived refresh token for your own Spotify account, printed once by `npm run spotify:auth`. Only read server-side |
 | `SPOTIFY_SHOW_NOW_PLAYING` | `api/spotify.ts` | Optional. Set to `true` to show the currently playing track on the Music page (off by default) |
 | `SPOTIFY_EXCLUDED_PLAYLISTS` | `api/spotify.ts` | Optional. Comma-separated playlist IDs to hide from the Music page (the part after `/playlist/` in a share link). Empty playlists are always hidden |
+| `SCORES_IP_SECRET` | `api/scores.ts` | Secret for hashing submitters' IPs to rate-limit Skyline Defense leaderboard entries (raw IPs are never stored). Any long random string, e.g. `openssl rand -hex 32`. Without it, score submission is disabled; the board still loads |
 
 These same variables must also be set in the Vercel dashboard for the deployed `api/*.ts` functions to work. Never commit real values — `.env.local` is gitignored.
 

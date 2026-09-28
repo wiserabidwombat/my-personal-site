@@ -1,4 +1,4 @@
-import type { Building, BuildingKind, Launcher, Vec } from './types'
+import type { Building, BuildingKind, Launcher, Vec } from './types.js'
 
 // The city is the home page's dark skyline art (src/assets/dallas-skyline.webp),
 // drawn as one image layer. This module maps that image onto the world and

@@ -1,6 +1,7 @@
 import type { GameState } from '../game/types'
 import type { Palette } from './palette'
 import { VISUALS, visualsFor } from './visuals'
+import { formatScore } from '../formatScore'
 
 function text(ctx: CanvasRenderingContext2D, value: string, x: number, y: number, align: CanvasTextAlign, color: string) {
   ctx.textAlign = align
@@ -21,9 +22,9 @@ export function drawHud(ctx: CanvasRenderingContext2D, state: GameState, palette
   ctx.font = `600 ${fontSize}px system-ui, sans-serif`
   ctx.textBaseline = 'top'
   const y = 12
-  text(ctx, `SCORE ${state.score}`, 14, y, 'left', palette.pink)
+  text(ctx, `SCORE ${formatScore(state.score)}`, 14, y, 'left', palette.pink)
   if (state.wave > 0) text(ctx, `WAVE ${state.wave}`, state.width / 2, y, 'center', palette.cyan)
-  text(ctx, `HI ${Math.max(highScore, state.score)}`, state.width - 14, y, 'right', palette.text)
+  text(ctx, `HI ${formatScore(Math.max(highScore, state.score))}`, state.width - 14, y, 'right', palette.text)
 }
 
 // City status: one small silhouette per defended building, left to right as

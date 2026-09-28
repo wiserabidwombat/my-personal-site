@@ -1,5 +1,5 @@
-import { TUNING } from './tuning'
-import type { WaveBonus } from './types'
+import { TUNING } from './tuning.js'
+import type { WaveBonus } from './types.js'
 
 // Points multiplier: x1 for waves 1-2, x2 for 3-4, and so on, up to x6.
 export function waveMultiplier(wave: number): number {

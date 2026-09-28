@@ -1,6 +1,10 @@
-import type { ReactNode } from 'react'
 import { neonOutlineButton } from '../../lib/styles'
-import type { GameUi } from './useSkylineDefense'
+import { GameOverScreen } from './leaderboard/GameOverScreen'
+import { Leaderboard } from './leaderboard/Leaderboard'
+import { useLeaderboard } from './leaderboard/useLeaderboard'
+import { Panel } from './Panel'
+import type { GameUi } from './gameUi'
+import { formatScore } from './formatScore'
 
 type Props = {
   ui: GameUi
@@ -8,25 +12,11 @@ type Props = {
   onResume: () => void
 }
 
-function Panel({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="absolute inset-0 flex items-center justify-center bg-[var(--deep-space-black)]/70 p-4">
-      <div
-        role="dialog"
-        aria-label={title}
-        className="w-full max-w-sm rounded-2xl border border-[var(--neon-pink)]/50 bg-[var(--deep-space-purple)]/90 p-6 text-center shadow-glow-pink"
-      >
-        <h2 className="text-2xl font-extrabold tracking-wide text-[var(--neon-pink)] uppercase [text-shadow:var(--glow-pink)]">
-          {title}
-        </h2>
-        {children}
-      </div>
-    </div>
-  )
-}
-
-// Start, pause, and game-over screens, drawn over the canvas.
+// Start, pause, and game-over screens, drawn over the canvas. The global
+// Top 10 is fetched once here and shared by the start and game-over screens.
 export function GameOverlay({ ui, onStart, onResume }: Props) {
+  const leaderboard = useLeaderboard()
+
   if (ui.screen === 'start') {
     return (
       <Panel title="Defend Dallas">
@@ -37,7 +27,10 @@ export function GameOverlay({ ui, onStart, onResume }: Props) {
         <p className="mt-3 text-sm leading-relaxed text-slate-300">
           Keyboard: arrow keys aim, Space fires, P pauses. Ammo refills each wave. Lose every building and it's over.
         </p>
-        {ui.highScore > 0 && <p className="mt-3 text-sm text-[var(--laser-cyan)]">High score: {ui.highScore}</p>}
+        {ui.highScore > 0 && (
+          <p className="mt-3 text-sm text-[var(--laser-cyan)]">Personal best: {formatScore(ui.highScore)}</p>
+        )}
+        <Leaderboard status={leaderboard.status} board={leaderboard.board} />
         <button type="button" autoFocus onClick={onStart} className={`${neonOutlineButton} mt-5`}>
           Start
         </button>
@@ -46,15 +39,17 @@ export function GameOverlay({ ui, onStart, onResume }: Props) {
   }
   if (ui.screen === 'gameOver') {
     return (
-      <Panel title="Game over">
-        <p className="mt-3 text-slate-200">Score: {ui.score}</p>
-        <p className="mt-1 text-sm text-[var(--laser-cyan)]">
-          {ui.newHighScore ? 'New high score!' : `High score: ${ui.highScore}`}
-        </p>
-        <button type="button" autoFocus onClick={onStart} className={`${neonOutlineButton} mt-5`}>
-          Play again
-        </button>
-      </Panel>
+      <GameOverScreen
+        score={ui.score}
+        wave={ui.wave}
+        highScore={ui.highScore}
+        newHighScore={ui.newHighScore}
+        status={leaderboard.status}
+        board={leaderboard.board}
+        refresh={leaderboard.refresh}
+        replace={leaderboard.replace}
+        onPlayAgain={onStart}
+      />
     )
   }
   if (ui.paused) {

@@ -1,6 +1,6 @@
-import { blastMaxRadius } from './geometry'
-import { TUNING } from './tuning'
-import type { GameState, Meteor, Vec, WaveConfig } from './types'
+import { blastMaxRadius } from './geometry.js'
+import { TUNING } from './tuning.js'
+import type { GameState, Meteor, Vec, WaveConfig } from './types.js'
 
 // 0 on phones, rising to 1 at TUNING.widePressureFullWidth and wider.
 export function wideness(width: number): number {
