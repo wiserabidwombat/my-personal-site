@@ -19,7 +19,14 @@ export function GameOverlay({ ui, onStart, onResume }: Props) {
 
   if (ui.screen === 'start') {
     return (
-      <Panel title="Defend Dallas">
+      <Panel
+        title="Defend Dallas"
+        actions={
+          <button type="button" autoFocus onClick={onStart} className={neonOutlineButton}>
+            Start
+          </button>
+        }
+      >
         <p className="mt-3 text-sm leading-relaxed text-slate-300">
           Meteors are falling on the skyline. Click or tap the sky to launch an interceptor from the nearest battery;
           its blast destroys any meteor it touches, and those set off blasts of their own.
@@ -31,9 +38,6 @@ export function GameOverlay({ ui, onStart, onResume }: Props) {
           <p className="mt-3 text-sm text-[var(--laser-cyan)]">Personal best: {formatScore(ui.highScore)}</p>
         )}
         <Leaderboard status={leaderboard.status} board={leaderboard.board} />
-        <button type="button" autoFocus onClick={onStart} className={`${neonOutlineButton} mt-5`}>
-          Start
-        </button>
       </Panel>
     )
   }
@@ -54,11 +58,15 @@ export function GameOverlay({ ui, onStart, onResume }: Props) {
   }
   if (ui.paused) {
     return (
-      <Panel title="Paused">
+      <Panel
+        title="Paused"
+        actions={
+          <button type="button" autoFocus onClick={onResume} className={neonOutlineButton}>
+            Resume
+          </button>
+        }
+      >
         <p className="mt-3 text-sm text-slate-300">Press P or the button to keep going.</p>
-        <button type="button" autoFocus onClick={onResume} className={`${neonOutlineButton} mt-5`}>
-          Resume
-        </button>
       </Panel>
     )
   }

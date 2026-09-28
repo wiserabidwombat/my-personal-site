@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowDown01Icon, ArrowUp01Icon } from '@hugeicons/core-free-icons'
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
 import { neonOutlineButton } from '../../../lib/styles'
+import { Panel } from '../Panel'
+import { LetterSlot } from './LetterSlot'
 
 type Props = {
+  title: string
+  // Shown above the slots (the score).
+  header: ReactNode
   // Starting initials (the player's last ones, or AAA).
   start: string
   busy: boolean
@@ -19,9 +22,10 @@ const SLOTS = [0, 1, 2]
 // Arcade-style initials: three letter slots. Keyboard: Up/Down cycle the
 // active letter (wrapping A-Z), Left/Right move between slots, typing a
 // letter sets it and advances, Backspace goes back, Enter submits. Touch:
-// up/down buttons around each slot. The container is marked data-owns-keys
-// so the game's own key handlers (see input.ts) ignore keys typed here.
-export function InitialsEntry({ start, busy, error, onSubmit, onSkip }: Props) {
+// up/down buttons around each slot. The whole panel, including its pinned
+// Submit/Skip footer, owns the keyboard (see Panel), so the game's own key
+// handlers (see input.ts) ignore keys typed here.
+export function InitialsEntry({ title, header, start, busy, error, onSubmit, onSkip }: Props) {
   const [letters, setLetters] = useState(() => [...start])
   const [active, setActive] = useState(0)
   const slots = useRef<(HTMLDivElement | null)[]>([])
@@ -75,47 +79,40 @@ export function InitialsEntry({ start, busy, error, onSubmit, onSkip }: Props) {
     return () => window.removeEventListener('keydown', onWindowKey, true)
   })
 
-  const arrow = (index: number, by: 1 | -1) => (
-    <button
-      type="button"
-      tabIndex={-1}
-      aria-label={`${by > 0 ? 'Next' : 'Previous'} letter for initial ${index + 1}`}
-      onClick={() => cycle(index, by)}
-      className="flex size-11 items-center justify-center rounded-lg text-[var(--laser-cyan)] transition-colors hover:bg-[var(--laser-cyan)]/10 focus-visible:outline-2 focus-visible:outline-[var(--laser-cyan)]"
-    >
-      <HugeiconsIcon icon={by > 0 ? ArrowUp01Icon : ArrowDown01Icon} strokeWidth={2} className="size-6" aria-hidden="true" />
-    </button>
+
+  const actions = (
+    <>
+      <button type="button" onClick={submit} disabled={busy} className={neonOutlineButton}>
+        {busy ? 'Saving...' : 'Submit'}
+      </button>
+      <button
+        type="button"
+        onClick={onSkip}
+        disabled={busy}
+        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-400 transition-colors hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-[var(--laser-cyan)] disabled:opacity-50"
+      >
+        Skip
+      </button>
+    </>
   )
 
   return (
-    <div data-owns-keys onKeyDown={onKeyDown}>
+    <Panel title={title} actions={actions} ownsKeys onKeyDown={onKeyDown}>
+      {header}
       <p className="mt-2 text-sm text-slate-300">Enter your initials for the Top 10.</p>
       <div className="mt-3 flex justify-center gap-2">
         {SLOTS.map((index) => (
-          <div key={index} className="flex flex-col items-center">
-            {arrow(index, 1)}
-            <div
-              ref={(element) => {
-                slots.current[index] = element
-              }}
-              role="spinbutton"
-              tabIndex={0}
-              aria-label={`Initial ${index + 1} of 3`}
-              aria-valuenow={letters[index].charCodeAt(0) - A + 1}
-              aria-valuemin={1}
-              aria-valuemax={26}
-              aria-valuetext={letters[index]}
-              onFocus={() => setActive(index)}
-              className={`flex h-14 w-12 items-center justify-center rounded-lg border-2 bg-[var(--deep-space-black)]/60 [font-family:var(--mono)] text-3xl font-bold text-slate-50 outline-none ${
-                index === active
-                  ? 'animate-[initials-blink_1s_steps(1)_infinite] border-[var(--laser-cyan)] motion-reduce:animate-none'
-                  : 'border-[var(--cyber-purple)]/50'
-              }`}
-            >
-              {letters[index]}
-            </div>
-            {arrow(index, -1)}
-          </div>
+          <LetterSlot
+            key={index}
+            index={index}
+            letter={letters[index]}
+            active={index === active}
+            slotRef={(element) => {
+              slots.current[index] = element
+            }}
+            onFocus={() => setActive(index)}
+            onCycle={(by) => cycle(index, by)}
+          />
         ))}
       </div>
       <p aria-live="polite" className="sr-only">
@@ -126,19 +123,6 @@ export function InitialsEntry({ start, busy, error, onSubmit, onSkip }: Props) {
           {error}
         </p>
       )}
-      <div className="mt-4 flex items-center justify-center gap-3">
-        <button type="button" onClick={submit} disabled={busy} className={neonOutlineButton}>
-          {busy ? 'Saving...' : 'Submit'}
-        </button>
-        <button
-          type="button"
-          onClick={onSkip}
-          disabled={busy}
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-400 transition-colors hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-[var(--laser-cyan)] disabled:opacity-50"
-        >
-          Skip
-        </button>
-      </div>
-    </div>
+    </Panel>
   )
 }

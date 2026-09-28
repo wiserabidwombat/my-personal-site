@@ -62,21 +62,27 @@ export function GameOverScreen(props: Props) {
 
   if (mode === 'entry' && status === 'ready') {
     return (
-      <Panel title="New high score">
-        <p className="mt-2 [font-family:var(--mono)] text-2xl text-slate-50 tabular-nums">{formatScore(score)}</p>
-        <InitialsEntry
-          start={loadInitials() ?? 'AAA'}
-          busy={busy}
-          error={error}
-          onSubmit={submit}
-          onSkip={() => setDecided('board')}
-        />
-      </Panel>
+      <InitialsEntry
+        title="New high score"
+        header={<p className="mt-2 [font-family:var(--mono)] text-2xl text-slate-50 tabular-nums">{formatScore(score)}</p>}
+        start={loadInitials() ?? 'AAA'}
+        busy={busy}
+        error={error}
+        onSubmit={submit}
+        onSkip={() => setDecided('board')}
+      />
     )
   }
 
   return (
-    <Panel title="Game over">
+    <Panel
+      title="Game over"
+      actions={
+        <button type="button" autoFocus onClick={onPlayAgain} className={neonOutlineButton}>
+          Play again
+        </button>
+      }
+    >
       <p className="mt-3 text-slate-200">
         Score: <span className="[font-family:var(--mono)] tabular-nums">{formatScore(score)}</span>
       </p>
@@ -85,9 +91,6 @@ export function GameOverScreen(props: Props) {
       </p>
       {note && <p className="mt-2 text-sm text-slate-400">{note}</p>}
       <Leaderboard status={status} board={board} highlightId={highlightId} />
-      <button type="button" autoFocus onClick={onPlayAgain} className={`${neonOutlineButton} mt-5`}>
-        Play again
-      </button>
     </Panel>
   )
 }
