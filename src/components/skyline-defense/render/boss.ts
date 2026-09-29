@@ -1,14 +1,16 @@
 import { TUNING } from '../game/tuning'
 import type { Boss, GameState } from '../game/types'
 import { hudHeight } from './hud'
+import { drawJackOLantern } from './jackOLantern'
 import { alpha, noise, type Palette } from './palette'
 
 // The Mega-meteor: a rough, dark rock much bigger than anything else on
 // screen, wrapped in the meteors' hot orange glow with a fiery trail, a
 // white-hot core showing through, and a crack pattern that spreads from the
 // core as it takes damage (one more crack per point of health lost, all of
-// them by the last point). A hit flashes it white (partly, so the cracks
-// still show).
+// them by the last point). A hit flashes it white; the cracks are drawn
+// over the flash, so it never hides them. During Halloween it's drawn as a
+// jack-o'-lantern instead (jackOLantern.ts), with the same cracks.
 
 const OUTLINE_POINTS = 14
 const CRACKS = 9
@@ -30,8 +32,9 @@ function rockPath(boss: Boss, spin: number): Path2D {
 }
 
 // Each crack is a jagged line from near the core out toward the rim; more
-// of them show, and each reaches further, as health drops.
-function drawCracks(ctx: CanvasRenderingContext2D, boss: Boss, spin: number, palette: Palette) {
+// of them show, and each reaches further, as health drops. `edge` adds a
+// dark border so the cracks read on a bright body (the pumpkin's rind).
+function drawCracks(ctx: CanvasRenderingContext2D, boss: Boss, spin: number, palette: Palette, edge?: string) {
   const damage = 1 - boss.health / boss.maxHealth
   const shown = Math.ceil(damage * CRACKS)
   if (shown === 0) return
@@ -55,6 +58,11 @@ function drawCracks(ctx: CanvasRenderingContext2D, boss: Boss, spin: number, pal
       y = boss.pos.y + Math.sin(angle) * (boss.radius * 0.18 + r * 0.82)
       ctx.lineTo(x, y)
     }
+    if (edge) {
+      ctx.strokeStyle = edge
+      ctx.lineWidth = 5
+      ctx.stroke()
+    }
     ctx.strokeStyle = alpha(palette.meteor, 0.95)
     ctx.lineWidth = 2.5
     ctx.stroke()
@@ -68,6 +76,11 @@ function drawCracks(ctx: CanvasRenderingContext2D, boss: Boss, spin: number, pal
 export function drawBoss(ctx: CanvasRenderingContext2D, state: GameState, palette: Palette, still: boolean) {
   const boss = state.boss
   if (!boss) return
+  if (palette.season === 'halloween') {
+    drawJackOLantern(ctx, boss, palette, still)
+    drawCracks(ctx, boss, 0, palette, alpha('#2a0e02', 0.85))
+    return
+  }
   const { x, y } = boss.pos
   const r = boss.radius
   const spin = still ? 0 : boss.age * 0.25
@@ -115,8 +128,6 @@ export function drawBoss(ctx: CanvasRenderingContext2D, state: GameState, palett
   ctx.stroke(rock)
   ctx.restore()
 
-  drawCracks(ctx, boss, spin, palette)
-
   if (boss.flash > 0) {
     ctx.save()
     ctx.globalAlpha = 0.7 * (boss.flash / TUNING.bossFlashSeconds)
@@ -126,6 +137,7 @@ export function drawBoss(ctx: CanvasRenderingContext2D, state: GameState, palett
     ctx.fill(rock)
     ctx.restore()
   }
+  drawCracks(ctx, boss, spin, palette)
 }
 
 // A compact health bar just under the HUD, centered: "BOSS" and one
@@ -179,11 +191,13 @@ export function shakeOffset(state: GameState, time: number, still: boolean): { x
 }
 
 // A brief orange wash over the sky after a boss impact (shown under
-// reduced motion too: it fades, it doesn't move).
+// reduced motion too: it fades, it doesn't move). During Halloween it's
+// pumpkin orange; the candle-yellow meteor color would muddy the sky.
 export function drawImpactFlash(ctx: CanvasRenderingContext2D, state: GameState, palette: Palette) {
   if (state.shake <= 0) return
+  const color = palette.season === 'halloween' ? palette.pink : palette.meteor
   ctx.save()
-  ctx.fillStyle = alpha(palette.meteor, 0.28 * (state.shake / TUNING.bossShakeSeconds))
+  ctx.fillStyle = alpha(color, 0.28 * (state.shake / TUNING.bossShakeSeconds))
   ctx.fillRect(0, 0, state.width, state.height)
   ctx.restore()
 }

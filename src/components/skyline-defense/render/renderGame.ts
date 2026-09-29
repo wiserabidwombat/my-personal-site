@@ -5,6 +5,7 @@ import { drawCity, drawDefendedOutlines, type CityLayer } from './city'
 import { drawBlasts, drawCrosshair, drawLaunchers, drawProjectiles } from './entities'
 import { drawBanner, drawCityStatus, drawHud, drawTestTag } from './hud'
 import type { Palette } from './palette'
+import { drawBossSparks } from './halloweenScene'
 import { drawScene } from './scene'
 
 export type RenderView = {
@@ -44,6 +45,9 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, view
   drawBoss(ctx, state, view.palette, view.still)
   drawBonusTargets(ctx, state, view.palette, view.still)
   drawBlasts(ctx, state, view.palette, view.still)
+  if (view.palette.season === 'halloween') drawBossSparks(ctx, state, view.palette, view.still)
+  // TODO(halloween-pass-2): witch and bat bonus targets in place of the UFO
+  // and scouts (render/bonus.ts), drawn only during the season.
   ctx.restore()
   drawImpactFlash(ctx, state, view.palette)
   if (state.phase !== 'ready') {

@@ -89,6 +89,8 @@ export function drawCityStatus(ctx: CanvasRenderingContext2D, state: GameState, 
 
 // "Wave N" title before a wave (with "BOSS WAVE" under it on a boss wave),
 // and the bonus tally after one.
+// TODO(halloween-pass-2): seasonal title text (the pumpkin boss stays
+// "BOSS WAVE"), chosen from the palette's season.
 export function drawBanner(ctx: CanvasRenderingContext2D, state: GameState, palette: Palette) {
   const size = Math.min(56, state.width * 0.11)
   const y = state.height * 0.3

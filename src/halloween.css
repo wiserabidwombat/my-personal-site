@@ -83,6 +83,23 @@
   background-image: linear-gradient(to bottom, #07040a, #150a1c, #2c1426);
 }
 
+/* Skyline Defense's always-night scope (.night-scene in index.css)
+   re-declares the dark synthwave tokens on the game page, which would hide
+   the Halloween ones on <html>. During the season it takes the dark
+   Halloween values instead -- in light mode too, since the game is always
+   a night scene. (0,2,0) beats .night-scene's (0,1,0). The canvas reads
+   these through readPalette (render/palette.ts). */
+[data-season='halloween'] .night-scene {
+  --deep-space-black: #0c0710;
+  --deep-space-purple: #1a0f22;
+  --neon-pink: #ff7a1a;
+  --laser-cyan: #7dff3a;
+  --cyber-purple: #a45ee8;
+  --glow-pink: 0 0 10px rgba(255, 122, 26, 0.7), 0 0 30px rgba(255, 122, 26, 0.4);
+  --glow-cyan: 0 0 10px rgba(125, 255, 58, 0.6), 0 0 30px rgba(125, 255, 58, 0.3);
+  --shadow-glow-cyan: 0 0 10px rgba(125, 255, 58, 0.6), 0 0 30px rgba(125, 255, 58, 0.3);
+}
+
 /* Seasonal markup: .season-only shows only in October (or a preview),
    .season-hidden hides its content then. Pure CSS off data-season, so
    prerendered pages paint the right variant before any JS runs. */

@@ -1,4 +1,5 @@
 import type { GameState } from '../game/types'
+import { drawMoon } from './halloweenScene'
 import { alpha, noise, type Palette } from './palette'
 
 // Where the skyline image begins, and the color of its top row.
@@ -39,6 +40,11 @@ export function drawScene(
     ctx.fillStyle = alpha(palette.text, twinkle * (0.4 + noise(i * 3 + 2) * 0.6))
     ctx.fillRect(noise(i * 3) * width, noise(i * 3 + 1) * groundY * 0.75, 1.5, 1.5)
   }
+
+  // Halloween: the moon rising behind the skyline. (The sky itself takes
+  // the Halloween tokens, and meets the graded skyline image's top row, so
+  // there's no seam.)
+  if (palette.season === 'halloween') drawMoon(ctx, state, horizon ? horizon.y : groundY)
 
   if (!horizon) {
     // Drawn over the whole sky (the gradient fades out on its own), so it
