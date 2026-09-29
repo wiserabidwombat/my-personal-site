@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" preserveAspectRatio="xMidYMid slice">
+  <!-- Colors are the site's theme tokens (with the default palette as the
+       fallback), so the art follows light/dark mode and the Halloween theme
+       when the site renders it inline. -->
+  <defs>
+    <linearGradient id="empathy-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" style="stop-color: var(--deep-space-purple, #150a24)"/>
+      <stop offset="100%" style="stop-color: var(--deep-space-black, #0a0612)"/>
+    </linearGradient>
+    <linearGradient id="empathy-glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" style="stop-color: var(--neon-pink, #ff2bd6)"/>
+      <stop offset="100%" style="stop-color: var(--laser-cyan, #00f0ff)"/>
+    </linearGradient>
+    <linearGradient id="empathy-shared" gradientUnits="userSpaceOnUse" x1="280" y1="0" x2="360" y2="0">
+      <stop offset="0%" style="stop-color: var(--neon-pink, #ff2bd6)"/>
+      <stop offset="100%" style="stop-color: var(--laser-cyan, #00f0ff)"/>
+    </linearGradient>
+    <clipPath id="empathy-left">
+      <circle cx="270" cy="180" r="90"/>
+    </clipPath>
+  </defs>
+  <rect width="640" height="360" fill="url(#empathy-bg)"/>
+  <!-- Ripples spreading from each side, fading as they reach outward. -->
+  <g fill="none" style="stroke: var(--neon-pink, #ff2bd6)" stroke-width="1.5">
+    <circle cx="270" cy="180" r="118" stroke-opacity="0.35"/>
+    <circle cx="270" cy="180" r="146" stroke-opacity="0.2"/>
+    <circle cx="270" cy="180" r="174" stroke-opacity="0.1"/>
+  </g>
+  <g fill="none" style="stroke: var(--laser-cyan, #00f0ff)" stroke-width="1.5">
+    <circle cx="370" cy="180" r="118" stroke-opacity="0.35"/>
+    <circle cx="370" cy="180" r="146" stroke-opacity="0.2"/>
+    <circle cx="370" cy="180" r="174" stroke-opacity="0.1"/>
+  </g>
+  <!-- The shared space where the two circles overlap. -->
+  <circle cx="370" cy="180" r="90" fill="url(#empathy-shared)" fill-opacity="0.4" clip-path="url(#empathy-left)"/>
+  <circle cx="270" cy="180" r="90" fill="none" style="stroke: var(--neon-pink, #ff2bd6)" stroke-width="4"/>
+  <circle cx="370" cy="180" r="90" fill="none" style="stroke: var(--laser-cyan, #00f0ff)" stroke-width="4"/>
+  <!-- A thread connecting the two cores through the shared space. -->
+  <path d="M236 180 C 286 136, 354 224, 404 180" fill="none" stroke="url(#empathy-glow)" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="236" cy="180" r="11" style="fill: var(--neon-pink, #ff2bd6)"/>
+  <circle cx="404" cy="180" r="11" style="fill: var(--laser-cyan, #00f0ff)"/>
+</svg>
