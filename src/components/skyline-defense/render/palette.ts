@@ -15,16 +15,15 @@ export type Palette = {
   text: string
   dark: string
   darkEdge: string
-  bofaGreen: string
   meteor: string
   lime: string
 }
 
-type SeasonColors = Pick<Palette, 'text' | 'dark' | 'darkEdge' | 'bofaGreen' | 'meteor' | 'lime'>
+type SeasonColors = Pick<Palette, 'text' | 'dark' | 'darkEdge' | 'meteor' | 'lime'>
 
-// Colors with no site token. Normally: Bank of America Plaza's signature
-// green outline, the meteors' hot orange, and the alien lime of the bonus
-// targets (never the cyan of the defended buildings). During Halloween the
+// Colors with no site token. Normally: the meteors' hot orange, and the
+// alien lime of the bonus targets (never the cyan of the defended
+// buildings). During Halloween the
 // tokens turn magenta into pumpkin orange and cyan into toxic green, so
 // these move out of their way: meteors burn candle yellow (distinct from
 // the orange chain blasts), bonus targets turn witchy violet (distinct from
@@ -34,7 +33,6 @@ export const SEASON_COLORS: Record<Season, SeasonColors> = {
     text: '#e2e8f0',
     dark: '#0d0913',
     darkEdge: '#3a3148',
-    bofaGreen: '#39ff88',
     meteor: '#ffb347',
     lime: '#9dff4a',
   },
@@ -42,7 +40,6 @@ export const SEASON_COLORS: Record<Season, SeasonColors> = {
     text: '#f3e9dc',
     dark: '#0c0710',
     darkEdge: '#3f2a47',
-    bofaGreen: '#b6ff5c',
     meteor: '#ffd23f',
     lime: '#c77dff',
   },
