@@ -20,19 +20,40 @@
 // Every player ignores the bonus targets (UFOs, scouts) unless --chase-bonus
 // is passed; then it shoots at one on screen (leading it, with the same lead
 // error) whenever no meteor is past 60% of the way down.
+//
+// "ammo left" is the average unused interceptors at the end of the wave
+// (among runs still going).
+//
+// Boss waves: every player shoots the boss (leading it, with the same lead
+// and aim error, at most once every BOSS_SHOT_GAP seconds) whenever no
+// meteor is past 60% of the way down, and first of all once the boss is
+// past 45% of the way down. After the table, each boss wave's kill rate
+// (among runs that reached it) and the average wave runs ended on.
 import { parseArgs } from 'node:util'
-import { createGame, fire, startGame, step } from '../src/components/skyline-defense/game/engine'
+import { createGame, fire, startGame, step, totalAmmo } from '../src/components/skyline-defense/game/engine'
 import { blastMaxRadius, nearestLauncherWithAmmo } from '../src/components/skyline-defense/game/geometry'
 import { hudHeight } from '../src/components/skyline-defense/render/hud'
+import { isBossWave } from '../src/components/skyline-defense/game/bossStats'
 import { TUNING } from '../src/components/skyline-defense/game/tuning'
-import type { GameState, Meteor, Vec } from '../src/components/skyline-defense/game/types'
+import type { Boss, GameState, Meteor, Vec } from '../src/components/skyline-defense/game/types'
 
 const PLAYERS = ['human', 'quick', 'slow', 'smart'] as const
 type Player = (typeof PLAYERS)[number]
 type Size = { width: number; height: number; aimError: number; label: string }
-type WaveResult = { alive: boolean; kept: number; kills: number; shots: number; score: number; longestChain: number }
+type BossResult = 'destroyed' | 'impact' | 'lost' | null
+type WaveResult = {
+  alive: boolean
+  kept: number
+  kills: number
+  shots: number
+  score: number
+  longestChain: number
+  ammoLeft: number
+  boss: BossResult
+}
 
 const REACTION = 0.25
+const BOSS_SHOT_GAP = 0.6
 const LEAD_ERROR = 0.2
 const DT = 1 / 60
 
@@ -62,8 +83,8 @@ function lead(game: GameState, meteor: Meteor, misjudge: number): Vec | null {
 function play(size: Size, seed: number, player: Player, waves: number, chaseBonus: boolean): WaveResult[] {
   const noise = mulberry32(seed * 7 + 1)
   const gauss = () => Math.sqrt(-2 * Math.log(noise() || 1e-9)) * Math.cos(2 * Math.PI * noise())
-  // Bonus targets get their own stream, so a seed's meteors don't change.
-  const game = createGame(size.width, size.height, mulberry32(seed), mulberry32(seed * 31 + 17))
+  // Bonus targets and bosses get their own streams, so a seed's meteors don't change.
+  const game = createGame(size.width, size.height, mulberry32(seed), mulberry32(seed * 31 + 17), mulberry32(seed * 53 + 5))
   game.hudBottom = hudHeight(size.width)
   startGame(game)
   const bonusShotAt = new Map<number, number>()
@@ -77,6 +98,8 @@ function play(size: Size, seed: number, player: Player, waves: number, chaseBonu
   let kills = 0
   let shots = 0
   let think = 0
+  let bossShotAt = -Infinity
+  const bossResult = (): BossResult => (isBossWave(game.wave) ? (game.bossOutcome ?? 'lost') : null)
 
   for (let t = 0; t < waves * 200 && results.length < waves; t += DT) {
     const wave = game.wave
@@ -90,13 +113,17 @@ function play(size: Size, seed: number, player: Player, waves: number, chaseBonu
     if (game.phase === 'waveBonus' && results.length < wave) {
       const kept = game.buildings.filter((b) => b.alive).length / total
       const score = game.score - waveStartScore
-      results.push({ alive: true, kept, kills, shots, score, longestChain: game.waveLongestChain })
+      results.push({ alive: true, kept, kills, shots, score, longestChain: game.waveLongestChain, ammoLeft: totalAmmo(game), boss: bossResult() })
       waveStartScore = game.score
       kills = 0
       shots = 0
     }
     if (game.phase === 'gameOver') {
-      while (results.length < waves) results.push({ alive: false, kept: 0, kills, shots, score: 0, longestChain: 0 })
+      const boss = bossResult()
+      while (results.length < waves) {
+        const lost = results.length === game.wave - 1
+        results.push({ alive: false, kept: 0, kills, shots, score: 0, longestChain: 0, ammoLeft: 0, boss: lost ? boss : null })
+      }
       break
     }
 
@@ -111,6 +138,14 @@ function play(size: Size, seed: number, player: Player, waves: number, chaseBonu
     const lowest = open[0]
     const misjudge = player === 'human' ? gauss() * LEAD_ERROR : 0
 
+    const boss = game.boss
+    const urgent = lowest && lowest.pos.y > game.groundY * 0.6
+    if (boss && boss.pos.y > 0 && t - bossShotAt >= BOSS_SHOT_GAP && (!urgent || boss.pos.y > game.groundY * 0.45)) {
+      const aimAt = leadBoss(game, boss, misjudge)
+      if (aimAt && fire(game, { x: aimAt.x + gauss() * size.aimError, y: aimAt.y + gauss() * size.aimError })) shots++
+      bossShotAt = t
+      continue
+    }
     if (chaseBonus && !(lowest && lowest.pos.y > game.groundY * 0.6)) {
       const bonus = chaseTarget(game, t, bonusShotAt)
       if (bonus) {
@@ -141,6 +176,21 @@ function play(size: Size, seed: number, player: Player, waves: number, chaseBonu
   return results
 }
 
+// Where the boss will be when an interceptor reaches it (it stands still
+// while stalled after a hit), optionally misjudged.
+function leadBoss(game: GameState, boss: Boss, misjudge: number): Vec | null {
+  const launcher = nearestLauncherWithAmmo(game.launchers, boss.pos.x)
+  if (!launcher) return null
+  const vel = boss.stall > 0 ? { x: 0, y: 0 } : boss.vel
+  let aim = { ...boss.pos }
+  for (let i = 0; i < 3; i++) {
+    const time =
+      Math.hypot(aim.x - launcher.x, aim.y - launcher.y) / (TUNING.interceptorSpeed * game.height) + TUNING.blastGrow / 2
+    aim = { x: boss.pos.x + vel.x * time, y: boss.pos.y + vel.y * time }
+  }
+  return { x: aim.x + (aim.x - boss.pos.x) * misjudge, y: aim.y + (aim.y - boss.pos.y) * misjudge }
+}
+
 // An on-screen UFO or scout not shot at in the last 1.2s (UFOs first).
 function chaseTarget(game: GameState, t: number, shotAt: Map<number, number>) {
   const ready = (target: { id: number; pos: Vec }) =>
@@ -167,7 +217,7 @@ function report(size: Size, player: Player, runs: number, waves: number, chaseBo
   const pct = (value: number) => `${value.toFixed(1)}%`.padStart(7)
   const mode = chaseBonus ? ', chasing bonus targets' : ''
   console.log(`\n${size.label}  ${player}  (${runs} runs, aim error ${size.aimError}px${mode})`)
-  console.log('wave  city kept  runs alive  kills/shot  avg score  longest chain')
+  console.log('wave  city kept  runs alive  kills/shot  avg score  longest chain  ammo left')
   for (let w = 0; w < waves; w++) {
     const rows = games.map((g) => g[w])
     const alive = rows.filter((r) => r.alive)
@@ -178,9 +228,27 @@ function report(size: Size, player: Player, runs: number, waves: number, chaseBo
       alive.length ? alive.reduce((sum, r) => sum + pick(r), 0) / alive.length : 0
     console.log(
       `${String(w + 1).padStart(4)}  ${pct(kept)}    ${pct((alive.length / runs) * 100)}     ${perShot.toFixed(2)}` +
-        `  ${String(Math.round(avg((r) => r.score))).padStart(9)}  ${avg((r) => r.longestChain).toFixed(2).padStart(13)}`,
+        `  ${String(Math.round(avg((r) => r.score))).padStart(9)}  ${avg((r) => r.longestChain).toFixed(2).padStart(13)}` +
+        `  ${avg((r) => r.ammoLeft).toFixed(1).padStart(9)}` +
+        (isBossWave(w + 1) ? '  boss' : ''),
     )
   }
+  for (let w = TUNING.bossEvery; w <= waves; w += TUNING.bossEvery) {
+    const fought = games.map((g) => g[w - 1].boss).filter((b) => b !== null)
+    if (fought.length === 0) continue
+    const share = (outcome: BossResult) => pct((fought.filter((b) => b === outcome).length / fought.length) * 100)
+    console.log(
+      `boss wave ${w}: fought in ${fought.length} runs; destroyed ${share('destroyed')}, ` +
+        `reached the city ${share('impact')}, city fell first ${share('lost')}`,
+    )
+  }
+  const ended = games.map((g) => {
+    const lost = g.findIndex((r) => !r.alive)
+    return lost === -1 ? waves : lost + 1
+  })
+  const sorted = [...ended].sort((a, b) => a - b)
+  const mean = ended.reduce((sum, w) => sum + w, 0) / ended.length
+  console.log(`run length: mean wave ${mean.toFixed(2)}, median ${sorted[Math.floor(sorted.length / 2)]} (capped at ${waves})`)
 }
 
 const { values } = parseArgs({

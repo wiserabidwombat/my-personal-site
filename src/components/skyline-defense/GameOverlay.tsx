@@ -48,6 +48,7 @@ export function GameOverlay({ ui, onStart, onResume }: Props) {
         wave={ui.wave}
         highScore={ui.highScore}
         newHighScore={ui.newHighScore}
+        testWave={ui.testWave}
         status={leaderboard.status}
         board={leaderboard.board}
         refresh={leaderboard.refresh}

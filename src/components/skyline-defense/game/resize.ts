@@ -1,3 +1,4 @@
+import { bossRadius } from './boss'
 import { groundLevel, layoutBuildings, layoutLaunchers, skylineScale } from './skyline'
 import type { GameState, Vec } from './types'
 
@@ -48,6 +49,12 @@ export function resizeWorld(state: GameState, width: number, height: number) {
     scout.vx *= scaleX
   }
   for (const popup of state.popups) scale(popup.pos)
+  if (state.boss) {
+    scale(state.boss.pos)
+    state.boss.vel.x *= scaleX
+    state.boss.vel.y *= scaleY
+    state.boss.radius = bossRadius(width, height)
+  }
 
   state.width = width
   state.height = height

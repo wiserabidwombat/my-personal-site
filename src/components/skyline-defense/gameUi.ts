@@ -8,13 +8,16 @@ export type GameUi = {
   wave: number
   highScore: number
   newHighScore: boolean
+  // The starting wave of a dev-only test run (?wave=N), or null.
+  testWave: number | null
 }
 
-export const initialUi = (highScore: number): GameUi => ({
+export const initialUi = (highScore: number, testWave: number | null = null): GameUi => ({
   screen: 'start',
   paused: false,
   score: 0,
   wave: 0,
   highScore,
   newHighScore: false,
+  testWave,
 })

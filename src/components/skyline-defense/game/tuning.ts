@@ -125,6 +125,77 @@ export const TUNING = {
   scoutWobble: 0.06,
   scoutWobbleHz: 0.7,
   scoutPoints: 100,
+  // Boss wave: every bossEvery-th wave (5, 10, 15, ...) a Mega-meteor
+  // replaces the wave's normal spawns. "Appearance" counts boss waves (1 at
+  // wave 5, 2 at wave 10, ...); health, fragments per hit, and descent
+  // speed grow per appearance up to their caps.
+  //
+  // Balanced with the simulated players (npm run sim, 300 runs): the human
+  // player (the standard) destroys the wave-5 boss in every run at both
+  // reference sizes, keeping 90% (1280x741) / 82% (390x791) of the city.
+  // At wave 10 on a phone the fight ends ~9% of the human runs that get
+  // there and ~25% of the slow player's (the fragments and trickle get
+  // through while it shoots the boss), and the wave-15 boss ends almost
+  // every slow run. The sim player shoots the boss as soon as it appears,
+  // so it almost never lands; health is what makes later bosses dangerous
+  // (it keeps the player busy while fragments fall), speed is what
+  // punishes ignoring it. Human run length is unchanged (mean wave 8.46 vs
+  // 8.48 at 1280x741, 10.74 vs 10.27 at 390x791).
+  // TODO(balance): the slow player (perfect aim, one shot per 0.8s) on a
+  // phone now averages wave 11.8, down from 15.3; confirm by playtesting
+  // whether later bosses are too harsh for deliberate players.
+  bossEvery: 5,
+  bossHealthBase: 6,
+  bossHealthPerAppearance: 3,
+  bossHealthMax: 17,
+  bossFragmentsBase: 2,
+  bossFragmentsPerAppearance: 1,
+  bossFragmentsMax: 5,
+  // Fraction of world height per second: if never hit, appearance 1 reaches
+  // the tallest tower in ~10-11s, appearance 3 in ~5s.
+  bossSpeedBase: 0.05,
+  bossSpeedPerAppearance: 0.03,
+  bossSpeedMax: 0.12,
+  // Drawn radius: a share of the height, capped by a share of the width,
+  // clamped to px (~56px at 1280x741, ~43px at 390x791): always larger
+  // than a full blast. Hits are checked against radius x bossHitScale, so a
+  // blast grazing the glow still counts (generous for taps on a phone).
+  bossRadiusHeightFraction: 0.075,
+  bossRadiusMaxWidthFraction: 0.11,
+  bossRadiusMin: 30,
+  bossRadiusMax: 72,
+  bossHitScale: 1.2,
+  // After each hit: seconds it hangs still, how far it's knocked back up
+  // (fraction of world height), and seconds of the white hit flash. Kept
+  // small: a bigger stall/knockback let steady fire hold the boss in place.
+  bossStallSeconds: 0.2,
+  bossKnockback: 0.004,
+  bossFlashSeconds: 0.18,
+  // Fragments shed per hit fan out from the boss's underside this many
+  // degrees apart, at the wave's meteor speed. The killing hit sheds
+  // bossKillFragmentScale times as many, and leaves a blast this many full
+  // blast radii wide.
+  bossFragmentFanDegrees: 16,
+  bossKillFragmentScale: 2,
+  bossExplosionScale: 1.8,
+  // Reaching the city: every building whose center is within this share of
+  // the world width of the impact point goes dark. The flash is this many
+  // full blast radii, and the screen shakes this long (not under
+  // prefers-reduced-motion).
+  bossImpactRadiusFraction: 0.2,
+  bossImpactFlashScale: 4,
+  bossShakeSeconds: 0.6,
+  // A light trickle of normal (single) meteors while the boss is alive:
+  // one every bossTrickleInterval seconds, at most bossTrickleMax a wave.
+  bossTrickleInterval: 3,
+  bossTrickleMax: 14,
+  // Points: for the kill (~4 UFOs, for a target that takes 8+ hits) and
+  // the end-of-wave bonus for destroying it before it lands. Both are
+  // multiplied by the wave multiplier (not the chain multiplier).
+  // Boss waves use the normal ammoPerLauncher: in the sim they end with
+  // more ammo left than the normal wave before them.
+  bossPoints: 2000,
+  bossBonus: 1000,
   // Seconds on the "Wave N" title and the between-wave bonus screen.
   waveTitleTime: 1.6,
   waveBonusTime: 2.4,

@@ -8,6 +8,8 @@ import {
   nearestLauncherWithAmmo,
 } from './geometry'
 import { planBonus, stepBonus } from './bonus'
+import { beginBossWave, stepBoss } from './boss'
+import { isBossWave } from './bossStats'
 import { scoreKill } from './chains'
 import { waveBonus } from './scoring'
 import { groundLevel, LAUNCHER_SIZE, layoutBuildings, layoutLaunchers, skylineScale } from './skyline'
@@ -18,12 +20,14 @@ import { salvoSize, spawnSalvo, splitMeteor, waveConfig } from './waves'
 export { blastMaxRadius }
 
 // `bonusRng` drives the bonus targets separately from the meteors (see
-// GameState.bonusRng); it defaults to the same stream.
+// GameState.bonusRng), and `bossRng` the boss waves; they default to the
+// same stream.
 export function createGame(
   width: number,
   height: number,
   rng: () => number = Math.random,
   bonusRng: () => number = rng,
+  bossRng: () => number = bonusRng,
 ): GameState {
   return {
     width,
@@ -53,6 +57,12 @@ export function createGame(
     nextId: 1,
     rng,
     bonusRng,
+    bossRng,
+    boss: null,
+    bossOutcome: null,
+    trickleSpawned: 0,
+    trickleTimer: 0,
+    shake: 0,
   }
 }
 
@@ -61,10 +71,12 @@ function setPhase(state: GameState, phase: GameState['phase']) {
   state.phaseTime = 0
 }
 
+// A boss wave (see boss.ts) replaces the normal spawns with the boss and
+// its trickle.
 export function beginWave(state: GameState, wave: number) {
   const config = waveConfig(wave, state.width)
   state.wave = wave
-  state.toSpawn = config.meteorCount
+  state.toSpawn = isBossWave(wave) ? 0 : config.meteorCount
   state.spawnTimer = 0.6
   state.meteors = []
   state.interceptors = []
@@ -73,18 +85,22 @@ export function beginWave(state: GameState, wave: number) {
   state.chains = {}
   state.waveLongestChain = 0
   state.bonusPlan = planBonus(state, wave)
+  beginBossWave(state, wave)
   for (const launcher of state.launchers) launcher.ammo = config.ammoPerLauncher
   setPhase(state, 'waveTitle')
 }
 
-// Fresh city, score 0, wave 1.
-export function startGame(state: GameState) {
+// Fresh city, score 0, starting at wave 1 (or `firstWave`, for dev test
+// runs: as if the player had just arrived there, with that wave's ammo,
+// multiplier, and boss).
+export function startGame(state: GameState, firstWave = 1) {
   state.score = 0
   state.lastBonus = null
   state.blasts = []
   state.popups = []
+  state.shake = 0
   state.buildings = layoutBuildings(state.width, state.height)
-  beginWave(state, 1)
+  beginWave(state, firstWave)
 }
 
 export function totalAmmo(state: GameState): number {
@@ -147,11 +163,14 @@ function moveProjectiles(state: GameState, dt: number) {
 
 // Meteors touching a live (non-impact) blast are destroyed, score with the
 // chain bonus, and leave a chain blast of their own in the same chain;
-// meteors reaching a lit building or the ground knock it out and flash.
+// meteors reaching a lit building or the ground knock it out and flash. A
+// boss fragment ignores the chain that shed it.
 function resolveCollisions(state: GameState) {
   const destructive = state.blasts.filter((blast) => blast.kind !== 'impact' && blastRadius(blast) > 0)
   state.meteors = state.meteors.filter((meteor) => {
-    const blast = destructive.find((b) => circleContains(b.pos, blastRadius(b), meteor.pos))
+    const blast = destructive.find(
+      (b) => b.chainId !== meteor.immuneChain && circleContains(b.pos, blastRadius(b), meteor.pos),
+    )
     if (blast) {
       scoreKill(state, meteor.pos, TUNING.meteorPoints, blast.chainId)
       addBlast(state, 'chain', meteor.pos, blast.chainId)
@@ -172,6 +191,7 @@ function resolveCollisions(state: GameState) {
 function waveCleared(state: GameState): boolean {
   return (
     state.toSpawn === 0 &&
+    state.boss === null &&
     state.meteors.length === 0 &&
     state.interceptors.length === 0 &&
     !state.blasts.some((blast) => blast.kind !== 'impact')
@@ -204,6 +224,7 @@ export function step(state: GameState, dt: number) {
   moveProjectiles(state, dt)
   resolveCollisions(state)
   stepBonus(state, dt, (kind, pos, chainId, radius) => addBlast(state, kind, pos, chainId, radius))
+  stepBoss(state, dt, (kind, pos, chainId, radius) => addBlast(state, kind, pos, chainId, radius))
 
   if (!state.buildings.some((building) => building.alive)) {
     setPhase(state, 'gameOver')
@@ -211,7 +232,8 @@ export function step(state: GameState, dt: number) {
     // Bonus targets still crossing just leave; they never hold up a wave.
     state.ufos = []
     state.scouts = []
-    state.lastBonus = waveBonus(state.buildings.filter((b) => b.alive).length, totalAmmo(state), state.wave)
+    const alive = state.buildings.filter((b) => b.alive).length
+    state.lastBonus = waveBonus(alive, totalAmmo(state), state.wave, state.bossOutcome === 'destroyed')
     state.score += state.lastBonus.total
     setPhase(state, 'waveBonus')
   }
