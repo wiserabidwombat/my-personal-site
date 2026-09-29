@@ -230,7 +230,7 @@ export type Credential = {
 export const credentials: Credential[] = [
   {
     kind: 'certification',
-    title: 'AWS Certified Developer – Associate',
+    title: 'AWS Certified Developer – Associate (2022–2025)',
     date: 'January 2022',
   },
   {
