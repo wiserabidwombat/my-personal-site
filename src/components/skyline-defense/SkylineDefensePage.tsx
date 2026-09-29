@@ -3,16 +3,20 @@ import { Link } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon, PauseIcon } from '@hugeicons/core-free-icons'
 import { GameOverlay } from './GameOverlay'
+import { useSeason } from '../../hooks/useSeason'
 import { useSkylineDefense } from './useSkylineDefense'
 
 // Full-screen game page (the route sets bareLayout, so there's no navbar
 // or footer): a slim top bar and the canvas. The page itself never
 // scrolls, and the canvas takes every touch, so play on a phone doesn't
-// scroll or zoom the page.
+// scroll or zoom the page. The Halloween look follows the site's season
+// (<html data-season>, via useSeason), switching live mid-run; it's
+// cosmetic only, so the game itself never sees it.
 export function SkylineDefensePage() {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const { ui, start, resume, pause } = useSkylineDefense(containerRef, canvasRef)
+  const { active: halloween } = useSeason()
+  const { ui, start, resume, pause } = useSkylineDefense(containerRef, canvasRef, halloween ? 'halloween' : 'none')
 
   useEffect(() => {
     const root = document.documentElement

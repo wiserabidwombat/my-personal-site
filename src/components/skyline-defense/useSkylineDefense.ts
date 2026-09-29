@@ -8,7 +8,7 @@ import { attachInput } from './input'
 import { placeCrosshair, steerCrosshair } from './crosshair'
 import { cityLayerCache } from './render/city'
 import { hudHeight } from './render/hud'
-import { readPalette } from './render/palette'
+import { readPalette, type Season } from './render/palette'
 import skylineUrl from '../../assets/dallas-skyline.webp'
 import { renderGame } from './render/renderGame'
 import { personalBestAfter, testWaveFromUrl } from './testRun'
@@ -18,15 +18,21 @@ const RUNNING: ReadonlySet<Phase> = new Set(['waveTitle', 'playing', 'waveBonus'
 // Runs the game on a canvas that fills `containerRef`: sizing for
 // devicePixelRatio, the animation loop, input, auto-pause when the tab is
 // hidden, and the high score. React state only changes on screen/pause
-// changes, never per frame.
+// changes, never per frame. `season` only changes how the game is drawn:
+// the loop picks it up on the next frame, without resetting the run.
 export function useSkylineDefense(
   containerRef: RefObject<HTMLDivElement | null>,
   canvasRef: RefObject<HTMLCanvasElement | null>,
+  season: Season = 'none',
 ) {
   const gameRef = useRef<GameState | null>(null)
   const pausedRef = useRef(false)
   const crosshairRef = useRef<Vec | null>(null)
   const highScoreRef = useRef(0)
+  const seasonRef = useRef(season)
+  useEffect(() => {
+    seasonRef.current = season
+  }, [season])
   // Dev-only ?wave=N (see testRun.ts); the guard lets production builds
   // drop it entirely.
   const [testWave] = useState(() => (import.meta.env.DEV ? testWaveFromUrl(window.location.search) : null))
@@ -43,7 +49,9 @@ export function useSkylineDefense(
     const ctx = canvas?.getContext('2d')
     if (!container || !canvas || !ctx) return
     highScoreRef.current = loadHighScore()
-    const palette = readPalette(canvas)
+    // Re-read when the season changes: the CSS tokens have already switched
+    // with <html data-season>.
+    let palette = readPalette(canvas, seasonRef.current)
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const heldKeys = new Set<string>()
     const cityLayer = cityLayerCache(skylineUrl) // the home page's dark skyline art
@@ -108,7 +116,8 @@ export function useSkylineDefense(
         phase = game.phase
         if (phase === 'gameOver') finish(game)
       }
-      const city = cityLayer(game, window.devicePixelRatio || 1)
+      if (palette.season !== seasonRef.current) palette = readPalette(canvas, seasonRef.current)
+      const city = cityLayer(game, window.devicePixelRatio || 1, palette.season)
       const view = {
         palette,
         time: now / 1000,

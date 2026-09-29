@@ -55,10 +55,14 @@ function dot(ctx: CanvasRenderingContext2D, at: Vec, radius: number, fill: strin
   ctx.restore()
 }
 
+// During Halloween the boss's fragments are pumpkin chunks: orange embers
+// with an orange trail, the same 3px as any meteor.
 export function drawProjectiles(ctx: CanvasRenderingContext2D, state: GameState, palette: Palette) {
+  const halloween = palette.season === 'halloween'
   for (const meteor of state.meteors) {
-    trail(ctx, meteor.start, meteor.pos, meteor.splitAtY === null ? palette.meteor : palette.pink)
-    dot(ctx, meteor.pos, 3, '#fff', palette.meteor)
+    const chunk = halloween && meteor.immuneChain !== undefined
+    trail(ctx, meteor.start, meteor.pos, chunk || meteor.splitAtY !== null ? palette.pink : palette.meteor)
+    dot(ctx, meteor.pos, 3, chunk ? '#ffb070' : '#fff', chunk ? palette.pink : palette.meteor)
   }
   for (const shot of state.interceptors) {
     trail(ctx, shot.from, shot.pos, palette.cyan)

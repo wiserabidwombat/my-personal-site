@@ -1,6 +1,7 @@
 import { CITY_BAND, cityView } from '../game/skyline'
 import type { Building, GameState } from '../game/types'
-import { VISUALS, visualsFor } from './visuals'
+import type { Season } from './palette'
+import { HALLOWEEN_GRADE, VISUALS, visualsFor } from './visuals'
 
 // The visible part of the skyline image, pre-rendered at world size, and
 // the image's top-row sky color (the game sky blends into it at `y`).
@@ -13,7 +14,8 @@ export type CityLayer = {
   key: string
 }
 
-export const cityLayerKey = (state: GameState, dpr: number) => `${state.width}x${state.height}@${dpr}`
+export const cityLayerKey = (state: GameState, dpr: number, season: Season) =>
+  `${state.width}x${state.height}@${dpr}/${season}`
 
 // Share of the drawn image (from its top) faded into the game's own sky,
 // which ends in the image's top-row color, so there's no visible seam. The
@@ -22,8 +24,10 @@ const FADE = 0.2
 
 // Draws the image's visible crop scaled to the world width with smoothing
 // on (like the home page), bottom on the ground line, top faded out, with
-// the scenery (everything outside the defended buildings) dimmed.
-export function buildCityLayer(image: HTMLImageElement, state: GameState, dpr: number): CityLayer {
+// the scenery (everything outside the defended buildings) dimmed. During
+// Halloween the image is color graded first (HALLOWEEN_GRADE), so the game
+// sky blends into the graded top row.
+export function buildCityLayer(image: HTMLImageElement, state: GameState, dpr: number, season: Season = 'none'): CityLayer {
   const view = cityView(state.width, state.height)
   const sourceWidth = view.crop.right - view.crop.left
   const sourceHeight = CITY_BAND.bottom - CITY_BAND.top
@@ -38,6 +42,7 @@ export function buildCityLayer(image: HTMLImageElement, state: GameState, dpr: n
     ctx.imageSmoothingEnabled = true
     ctx.imageSmoothingQuality = 'high'
     ctx.drawImage(image, view.crop.left, CITY_BAND.top, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height)
+    if (season === 'halloween') gradeHalloween(ctx, canvas)
     skyColor = averageRowColor(ctx, canvas.width, 1)
     // One fill over the whole layer: destination-in clears anything outside
     // what it draws, so the fade and the opaque rest share one gradient.
@@ -51,7 +56,20 @@ export function buildCityLayer(image: HTMLImageElement, state: GameState, dpr: n
     ctx.globalCompositeOperation = 'source-over'
     dimScenery(ctx, canvas, state, view.groundY - height, dpr)
   }
-  return { canvas, y: view.groundY - height, width, height, skyColor, key: cityLayerKey(state, dpr) }
+  return { canvas, y: view.groundY - height, width, height, skyColor, key: cityLayerKey(state, dpr, season) }
+}
+
+function gradeHalloween(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
+  const image = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  const data = image.data
+  const { r, g, b } = HALLOWEEN_GRADE
+  for (let i = 0; i < data.length; i += 4) {
+    const [red, green, blue] = [data[i], data[i + 1], data[i + 2]]
+    data[i] = r[0] * red + r[1] * green + r[2] * blue
+    data[i + 1] = g[0] * red + g[1] * green + g[2] * blue
+    data[i + 2] = b[0] * red + b[1] * green + b[2] * blue
+  }
+  ctx.putImageData(image, 0, 0)
 }
 
 // Dims and partly desaturates the whole layer, then puts the original art
@@ -94,15 +112,15 @@ function averageRowColor(ctx: CanvasRenderingContext2D, width: number, row: numb
 }
 
 // Loads the skyline image (usually already cached from the home page) and
-// returns the layer for the current size, rebuilding it only when the
-// size changes; null until the image has loaded.
+// returns the layer for the current size and season, rebuilding it only
+// when either changes; null until the image has loaded.
 export function cityLayerCache(url: string) {
   const image = new Image()
   image.src = url
   let layer: CityLayer | null = null
-  return (state: GameState, dpr: number): CityLayer | null => {
+  return (state: GameState, dpr: number, season: Season): CityLayer | null => {
     if (!image.complete || image.naturalWidth === 0) return null
-    if (layer?.key !== cityLayerKey(state, dpr)) layer = buildCityLayer(image, state, dpr)
+    if (layer?.key !== cityLayerKey(state, dpr, season)) layer = buildCityLayer(image, state, dpr, season)
     return layer
   }
 }

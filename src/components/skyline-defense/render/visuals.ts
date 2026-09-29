@@ -31,6 +31,17 @@ export function visualsFor(width: number) {
   return width >= NARROW_WIDTH ? WIDE : PHONE
 }
 
+// Halloween color grade for the skyline image (the Halloween skyline art
+// doesn't line up with the game's building outlines, so the normal image is
+// recolored instead). Each output channel is a mix of the input's r, g, b:
+// blues shift to dusky purple and the sky darkens, while warm lights stay
+// warm. Applied once per canvas size, like the scenery dimming.
+export const HALLOWEEN_GRADE = {
+  r: [0.9, 0.1, 0.35],
+  g: [0.05, 0.72, 0.08],
+  b: [0.12, 0.05, 0.55],
+} as const
+
 // Settings shared by every screen size.
 export const VISUALS = {
   // Neon outline around each defended building while the "Wave N" title

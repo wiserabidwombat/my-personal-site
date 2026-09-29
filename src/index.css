@@ -438,8 +438,9 @@ body {
 /* Always-night scope: re-declares the dark synthwave tokens (the :root
    values above) on a subtree, so the Skyline Defense game stays a night
    scene in light mode too. Custom properties set on an element win over
-   inherited ones, so this also holds under the light and Halloween
-   overrides on <html>. */
+   inherited ones, so this also holds under the light override on <html>.
+   During Halloween, halloween.css re-scopes it to the dark Halloween
+   values. */
 .night-scene {
   --deep-space-black: #0a0612;
   --deep-space-purple: #150a24;

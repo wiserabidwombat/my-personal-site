@@ -38,6 +38,8 @@ export function GameOverlay({ ui, onStart, onResume }: Props) {
           <p className="mt-3 text-sm text-[var(--laser-cyan)]">Personal best: {formatScore(ui.highScore)}</p>
         )}
         <Leaderboard status={leaderboard.status} board={leaderboard.board} />
+        {/* TODO(halloween-pass-2): seasonal sprites on the start screen
+            (e.g. the site's pixel pumpkins or bats), only during the season. */}
       </Panel>
     )
   }
