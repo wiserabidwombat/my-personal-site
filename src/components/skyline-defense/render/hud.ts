@@ -1,6 +1,6 @@
 import { isBossWave } from '../game/bossStats'
 import type { GameState } from '../game/types'
-import type { Palette } from './palette'
+import { alpha, type Palette } from './palette'
 import { VISUALS, visualsFor } from './visuals'
 import { formatScore } from '../formatScore'
 
@@ -26,6 +26,27 @@ export function drawHud(ctx: CanvasRenderingContext2D, state: GameState, palette
   text(ctx, `SCORE ${formatScore(state.score)}`, 14, y, 'left', palette.pink)
   if (state.wave > 0) text(ctx, `WAVE ${state.wave}`, state.width / 2, y, 'center', palette.cyan)
   text(ctx, `HI ${formatScore(Math.max(highScore, state.score))}`, state.width - 14, y, 'right', palette.text)
+}
+
+// "TEST: WAVE N" under the score on dev-only test runs (?wave=N), so a
+// screenshot can't pass for a real run: small, left of the centered city
+// status icons, above the boss bar.
+export function drawTestTag(ctx: CanvasRenderingContext2D, testWave: number, palette: Palette) {
+  const label = `TEST: WAVE ${testWave}`
+  ctx.save()
+  ctx.font = '700 10px system-ui, sans-serif'
+  ctx.textBaseline = 'middle'
+  ctx.textAlign = 'left'
+  const width = ctx.measureText(label).width + 10
+  const top = STATUS_TOP + 2
+  ctx.fillStyle = alpha(palette.sky, 0.7)
+  ctx.fillRect(14, top, width, 16)
+  ctx.strokeStyle = alpha(palette.lime, 0.7)
+  ctx.lineWidth = 1
+  ctx.strokeRect(14.5, top + 0.5, width - 1, 15)
+  ctx.fillStyle = palette.lime
+  ctx.fillText(label, 19, top + 8.5)
+  ctx.restore()
 }
 
 // City status: one small silhouette per defended building, left to right as

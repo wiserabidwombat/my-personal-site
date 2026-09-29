@@ -3,7 +3,7 @@ import { drawBonusTargets, drawPopups } from './bonus'
 import { drawBoss, drawBossBar, drawImpactFlash, shakeOffset } from './boss'
 import { drawCity, drawDefendedOutlines, type CityLayer } from './city'
 import { drawBlasts, drawCrosshair, drawLaunchers, drawProjectiles } from './entities'
-import { drawBanner, drawCityStatus, drawHud } from './hud'
+import { drawBanner, drawCityStatus, drawHud, drawTestTag } from './hud'
 import type { Palette } from './palette'
 import { drawScene } from './scene'
 
@@ -16,6 +16,8 @@ export type RenderView = {
   crosshair: Vec | null
   // The skyline image layer, once the image has loaded.
   city: CityLayer | null
+  // The starting wave of a dev-only test run (?wave=N), or null.
+  testWave: number | null
 }
 
 // Draws one frame. The canvas transform is already scaled for
@@ -48,6 +50,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, view
     drawHud(ctx, state, view.palette, view.highScore, fontSize)
     drawCityStatus(ctx, state, view.palette)
     drawBossBar(ctx, state, view.palette)
+    if (import.meta.env.DEV && view.testWave !== null) drawTestTag(ctx, view.testWave, view.palette)
   }
   drawBanner(ctx, state, view.palette)
   drawPopups(ctx, state, view.palette, view.still)

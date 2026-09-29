@@ -90,15 +90,17 @@ export function beginWave(state: GameState, wave: number) {
   setPhase(state, 'waveTitle')
 }
 
-// Fresh city, score 0, wave 1.
-export function startGame(state: GameState) {
+// Fresh city, score 0, starting at wave 1 (or `firstWave`, for dev test
+// runs: as if the player had just arrived there, with that wave's ammo,
+// multiplier, and boss).
+export function startGame(state: GameState, firstWave = 1) {
   state.score = 0
   state.lastBonus = null
   state.blasts = []
   state.popups = []
   state.shake = 0
   state.buildings = layoutBuildings(state.width, state.height)
-  beginWave(state, 1)
+  beginWave(state, firstWave)
 }
 
 export function totalAmmo(state: GameState): number {

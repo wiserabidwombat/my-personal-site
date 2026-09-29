@@ -11,6 +11,7 @@ import { hudHeight } from './render/hud'
 import { readPalette } from './render/palette'
 import skylineUrl from '../../assets/dallas-skyline.webp'
 import { renderGame } from './render/renderGame'
+import { personalBestAfter, testWaveFromUrl } from './testRun'
 
 const RUNNING: ReadonlySet<Phase> = new Set(['waveTitle', 'playing', 'waveBonus'])
 
@@ -26,7 +27,10 @@ export function useSkylineDefense(
   const pausedRef = useRef(false)
   const crosshairRef = useRef<Vec | null>(null)
   const highScoreRef = useRef(0)
-  const [ui, setUi] = useState<GameUi>(() => initialUi(loadHighScore()))
+  // Dev-only ?wave=N (see testRun.ts); the guard lets production builds
+  // drop it entirely.
+  const [testWave] = useState(() => (import.meta.env.DEV ? testWaveFromUrl(window.location.search) : null))
+  const [ui, setUi] = useState<GameUi>(() => initialUi(loadHighScore(), testWave))
 
   const setPaused = useCallback((paused: boolean) => {
     pausedRef.current = paused
@@ -81,13 +85,11 @@ export function useSkylineDefense(
     document.addEventListener('visibilitychange', onVisibility)
 
     const finish = (game: GameState) => {
-      const newHighScore = game.score > highScoreRef.current
-      if (newHighScore) {
-        highScoreRef.current = game.score
-        saveHighScore(game.score)
-      }
+      const { best, newHighScore, save } = personalBestAfter(game.score, highScoreRef.current, testWave)
+      highScoreRef.current = best
+      if (save) saveHighScore(best)
       const { score, wave } = game
-      setUi({ screen: 'gameOver', paused: false, score, wave, highScore: highScoreRef.current, newHighScore })
+      setUi({ screen: 'gameOver', paused: false, score, wave, highScore: best, newHighScore, testWave })
     }
 
     let frame = 0
@@ -107,7 +109,15 @@ export function useSkylineDefense(
         if (phase === 'gameOver') finish(game)
       }
       const city = cityLayer(game, window.devicePixelRatio || 1)
-      const view = { palette, time: now / 1000, still, highScore: highScoreRef.current, crosshair: crosshairRef.current, city }
+      const view = {
+        palette,
+        time: now / 1000,
+        still,
+        highScore: highScoreRef.current,
+        crosshair: crosshairRef.current,
+        city,
+        testWave,
+      }
       renderGame(ctx, game, view)
       frame = requestAnimationFrame(tick)
     }
@@ -119,15 +129,15 @@ export function useSkylineDefense(
       detachInput()
       document.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [containerRef, canvasRef, setPaused])
+  }, [containerRef, canvasRef, setPaused, testWave])
 
   const start = useCallback(() => {
     if (!gameRef.current) return
-    startGame(gameRef.current)
+    startGame(gameRef.current, testWave ?? 1)
     pausedRef.current = false
     setUi((current) => ({ ...current, screen: 'playing', paused: false, newHighScore: false }))
     canvasRef.current?.focus()
-  }, [canvasRef])
+  }, [canvasRef, testWave])
 
   const resume = useCallback(() => {
     setPaused(false)

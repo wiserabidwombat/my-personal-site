@@ -2,18 +2,20 @@ import { useEffect, useState } from 'react'
 import { neonOutlineButton } from '../../../lib/styles'
 import { loadInitials, saveInitials } from '../highScore'
 import { Panel } from '../Panel'
-import { qualifies } from '../scoreboard'
 import { submitScore, type BoardEntry } from './api'
 import { InitialsEntry } from './InitialsEntry'
 import { Leaderboard } from './Leaderboard'
 import type { BoardStatus } from './useLeaderboard'
 import { formatScore } from '../formatScore'
+import { canSubmit } from '../testRun'
 
 type Props = {
   score: number
   wave: number
   highScore: number
   newHighScore: boolean
+  // Set for a dev-only test run (?wave=N): never submitted.
+  testWave: number | null
   status: BoardStatus
   board: BoardEntry[]
   refresh: () => void
@@ -25,9 +27,10 @@ type Props = {
 // Top 10, the player enters initials first; then the board shows with their
 // row highlighted. Otherwise (or after Skip) it shows the score, the local
 // personal best, and the board -- or, when the board isn't available, the
-// local-only screen.
+// local-only screen. A dev test run skips initials entry and says it
+// wasn't saved.
 export function GameOverScreen(props: Props) {
-  const { score, wave, highScore, newHighScore, status, board, refresh, replace, onPlayAgain } = props
+  const { score, wave, highScore, newHighScore, testWave, status, board, refresh, replace, onPlayAgain } = props
   const [decided, setDecided] = useState<'entry' | 'board' | null>(null)
   const [highlightId, setHighlightId] = useState<number | null>(null)
   const [note, setNote] = useState<string | null>(null)
@@ -40,9 +43,10 @@ export function GameOverScreen(props: Props) {
   }, [refresh])
 
   // Decide once the board has loaded: initials entry if the score makes it.
-  const mode = decided ?? (status === 'ready' && qualifies(score, board) ? 'entry' : 'board')
+  const mode = decided ?? (status === 'ready' && canSubmit(testWave, score, board) ? 'entry' : 'board')
 
   const submit = async (initials: string) => {
+    if (testWave !== null) return
     setBusy(true)
     setError(null)
     const result = await submitScore(initials, score, wave)
@@ -89,6 +93,9 @@ export function GameOverScreen(props: Props) {
       <p className="mt-1 text-sm text-[var(--laser-cyan)]">
         {newHighScore ? 'New personal best!' : `Personal best: ${formatScore(highScore)}`}
       </p>
+      {import.meta.env.DEV && testWave !== null && (
+        <p className="mt-2 text-xs text-slate-400">Test run (started at wave {testWave}) - not saved</p>
+      )}
       {note && <p className="mt-2 text-sm text-slate-400">{note}</p>}
       <Leaderboard status={status} board={board} highlightId={highlightId} />
     </Panel>
