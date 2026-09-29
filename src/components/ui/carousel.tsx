@@ -57,14 +57,24 @@ function Carousel({
     },
     plugins
   )
-  const [canScrollPrev, setCanScrollPrev] = React.useState(false)
-  const [canScrollNext, setCanScrollNext] = React.useState(false)
+  // Scroll bounds as of Embla's latest "select"/"reInit" event, tagged with
+  // the api they came from. Until the first event for the current api, the
+  // bounds are read straight from it during render (a pure query), so the
+  // effect below only subscribes and never sets state synchronously.
+  const [scrollState, setScrollState] = React.useState<{
+    api: CarouselApi
+    prev: boolean
+    next: boolean
+  }>()
 
   const onSelect = React.useCallback((api: CarouselApi) => {
     if (!api) return
-    setCanScrollPrev(api.canScrollPrev())
-    setCanScrollNext(api.canScrollNext())
+    setScrollState({ api, prev: api.canScrollPrev(), next: api.canScrollNext() })
   }, [])
+
+  const current = scrollState?.api === api ? scrollState : undefined
+  const canScrollPrev = current ? current.prev : (api?.canScrollPrev() ?? false)
+  const canScrollNext = current ? current.next : (api?.canScrollNext() ?? false)
 
   const scrollPrev = React.useCallback(() => {
     api?.scrollPrev()
@@ -94,12 +104,12 @@ function Carousel({
 
   React.useEffect(() => {
     if (!api) return
-    onSelect(api)
     api.on("reInit", onSelect)
     api.on("select", onSelect)
 
     return () => {
-      api?.off("select", onSelect)
+      api.off("reInit", onSelect)
+      api.off("select", onSelect)
     }
   }, [api, onSelect])
 
