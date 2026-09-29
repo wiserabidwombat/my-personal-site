@@ -4,6 +4,7 @@
 // this file and the game files it imports keep their .js extensions: Vercel
 // runs api/ as native ES modules, which need them (Vite and TypeScript
 // resolve .js to the .ts source).
+import { bossAppearance, bossStats, isBossWave, killFragments } from './game/bossStats.js'
 import { waveBonus, waveMultiplier } from './game/scoring.js'
 import { launcherFractions, REGIONS } from './game/skyline.js'
 import { TUNING } from './game/tuning.js'
@@ -60,6 +61,9 @@ export function qualifies(score: number, board: readonly { score: number }[]): b
 //     (every kill scored at the highest chain multiplier).
 //   wave bonus: waveBonus() with every outlined building standing and
 //     every launcher's ammo unused.
+//   boss waves (every bossEvery-th wave) add bossWaveCeiling() on top: the
+//     normal wave's maximum above is kept too, so scores from before boss
+//     waves existed stay valid.
 //
 // It's deliberately loose (no real game scores every kill at the chain
 // cap), so it only rejects scores no game could reach. It tracks tuning.ts
@@ -77,9 +81,23 @@ export function scoreCeiling(wave: number): number {
       perKillScale *
       (meteorKills * TUNING.meteorPoints + ufos * TUNING.ufoPoints + scouts * TUNING.scoutPoints)
     const ammo = TUNING.ammoPerLauncher * launcherFractions.length
-    total += killPoints + waveBonus(REGIONS.length, ammo, w).total
+    total += killPoints + waveBonus(REGIONS.length, ammo, w).total + bossWaveCeiling(w)
   }
   return total
+}
+
+// The most a boss wave adds (0 on other waves): every fragment the boss can
+// shed (fragments on each of its health - 1 non-final hits, plus the
+// killing hit's burst) and every trickle meteor (each assumed to split),
+// all at the chain cap; the boss kill points; and the boss bonus.
+export function bossWaveCeiling(wave: number): number {
+  if (!isBossWave(wave)) return 0
+  const multiplier = waveMultiplier(wave)
+  const { health, fragments } = bossStats(bossAppearance(wave))
+  const shed = (health - 1) * fragments + killFragments(fragments)
+  const trickle = TUNING.bossTrickleMax * Math.max(1, TUNING.splitFragments)
+  const kills = (shed + trickle) * TUNING.meteorPoints * multiplier * TUNING.chainMultiplierCap
+  return kills + (TUNING.bossPoints + TUNING.bossBonus) * multiplier
 }
 
 // Sanity bounds on the wave reached, well past anything playable (speed and

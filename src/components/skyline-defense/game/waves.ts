@@ -44,17 +44,18 @@ const radians = (degrees: number) => (degrees * Math.PI) / 180
 
 // A point on the ground to aim at: mostly lit buildings, sometimes a
 // random spot (which may still clip a building on the way down).
-function pickTarget(state: GameState): Vec {
+// `rng` defaults to the meteor stream (a boss wave's trickle passes its own).
+export function pickTarget(state: GameState, rng = state.rng): Vec {
   const alive = state.buildings.filter((building) => building.alive)
-  if (alive.length > 0 && state.rng() < 0.75) {
-    const building = alive[Math.floor(state.rng() * alive.length)]
-    return { x: building.x + (state.rng() - 0.5) * building.width * 0.6, y: state.groundY }
+  if (alive.length > 0 && rng() < 0.75) {
+    const building = alive[Math.floor(rng() * alive.length)]
+    return { x: building.x + (rng() - 0.5) * building.width * 0.6, y: state.groundY }
   }
-  return { x: state.rng() * state.width, y: state.groundY }
+  return { x: rng() * state.width, y: state.groundY }
 }
 
-function rollSplit(state: GameState, config: WaveConfig): number | null {
-  return state.rng() < config.splitChance ? state.height * (0.25 + state.rng() * 0.25) : null
+function rollSplit(state: GameState, config: WaveConfig, rng: () => number): number | null {
+  return rng() < config.splitChance ? state.height * (0.25 + rng() * 0.25) : null
 }
 
 function meteor(state: GameState, from: Vec, heading: number, speed: number, splitAtY: number | null): Meteor {
@@ -77,11 +78,11 @@ export function salvoSize(state: GameState, config: WaveConfig, remaining: numbe
 // One meteor, or a salvo: neighbors start TUNING.salvoSpacing blast radii
 // apart, each a little later (higher up) than the last, with headings
 // fanned TUNING.salvoFanDegrees apart around a shared aim. Each member can
-// still be a splitting meteor.
-export function spawnSalvo(state: GameState, config: WaveConfig, size: number): Meteor[] {
+// still be a splitting meteor. `rng` defaults to the meteor stream.
+export function spawnSalvo(state: GameState, config: WaveConfig, size: number, rng = state.rng): Meteor[] {
   const speed = config.meteorSpeed * state.height
-  const lead = { x: state.rng() * state.width, y: -8 }
-  const target = pickTarget(state)
+  const lead = { x: rng() * state.width, y: -8 }
+  const target = pickTarget(state, rng)
   const heading = Math.atan2(target.y - lead.y, target.x - lead.x)
   const spacing = TUNING.salvoSpacing * blastMaxRadius(state.width, state.height)
   return Array.from({ length: size }, (_, index) => {
@@ -90,7 +91,7 @@ export function spawnSalvo(state: GameState, config: WaveConfig, size: number): 
       x: Math.min(Math.max(lead.x + offset * spacing, 0), state.width),
       y: lead.y - index * TUNING.salvoTimeGap * speed,
     }
-    return meteor(state, from, heading + offset * radians(TUNING.salvoFanDegrees), speed, rollSplit(state, config))
+    return meteor(state, from, heading + offset * radians(TUNING.salvoFanDegrees), speed, rollSplit(state, config, rng))
   })
 }
 
@@ -99,13 +100,18 @@ export function spawnMeteor(state: GameState, config: WaveConfig): Meteor {
 }
 
 // Fragments of a split meteor: a fan around the parent's heading, starting
-// from the split point, TUNING.splitFanDegrees apart, at the parent's
-// speed. Fragments don't split again.
-export function splitMeteor(state: GameState, parent: Meteor): Meteor[] {
+// from the split point, `fanDegrees` apart, at the parent's speed.
+// Fragments don't split again. A boss sheds its fragments the same way,
+// with its own count and fan.
+export function splitMeteor(
+  state: GameState,
+  parent: Meteor,
+  count: number = TUNING.splitFragments,
+  fanDegrees: number = TUNING.splitFanDegrees,
+): Meteor[] {
   const speed = Math.hypot(parent.vel.x, parent.vel.y)
   const heading = Math.atan2(parent.vel.y, parent.vel.x)
-  const count = TUNING.splitFragments
   return Array.from({ length: count }, (_, index) =>
-    meteor(state, parent.pos, heading + (index - (count - 1) / 2) * radians(TUNING.splitFanDegrees), speed, null),
+    meteor(state, parent.pos, heading + (index - (count - 1) / 2) * radians(fanDegrees), speed, null),
   )
 }

@@ -27,7 +27,32 @@ export type Meteor = {
   vel: Vec
   // Splits into fragments on passing this y; null for plain meteors.
   splitAtY: number | null
+  // A boss fragment ignores blasts from the chain whose hit shed it, so the
+  // hitting blast can't swallow its own fragments.
+  immuneChain?: number
 }
+
+// The Mega-meteor of a boss wave. `vel` is its descent while not stalled.
+export type Boss = {
+  id: number
+  pos: Vec
+  vel: Vec
+  radius: number
+  health: number
+  maxHealth: number
+  // 1 at the first boss wave, 2 at the second, ...
+  appearance: number
+  // Fragments shed per (non-final) hit.
+  fragments: number
+  // Seconds left hanging still after a hit, and of the hit flash.
+  stall: number
+  flash: number
+  // Chains (shots) that have already hit it: each shot hits at most once.
+  hitBy: number[]
+  age: number
+}
+
+export type BossOutcome = 'destroyed' | 'impact'
 
 export type Interceptor = { id: number; from: Vec; pos: Vec; target: Vec }
 
@@ -73,7 +98,8 @@ export type BonusPlan = { ufoTimes: number[]; scoutTime: number | null; elapsed:
 
 export type Phase = 'ready' | 'waveTitle' | 'playing' | 'waveBonus' | 'gameOver'
 
-export type WaveBonus = { buildings: number; ammo: number; total: number }
+// `boss` is the boss bonus (0 unless a boss was destroyed this wave).
+export type WaveBonus = { buildings: number; ammo: number; boss: number; total: number }
 
 export type WaveConfig = {
   meteorCount: number
@@ -124,4 +150,15 @@ export type GameState = {
   // Bonus targets use their own random stream, so adding them doesn't
   // change the meteors a given seed produces.
   bonusRng: () => number
+  // The boss (and its wave's trickle of meteors) use a third stream, so
+  // boss waves never draw from `rng`.
+  bossRng: () => number
+  // This wave's boss while it's alive, and how its fight ended.
+  boss: Boss | null
+  bossOutcome: BossOutcome | null
+  // Trickle meteors spawned so far this boss wave, and seconds until the next.
+  trickleSpawned: number
+  trickleTimer: number
+  // Seconds of screen shake left (a boss impact).
+  shake: number
 }

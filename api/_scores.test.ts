@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { qualifies, rankEntries, scoreCeiling } from '../src/components/skyline-defense/scoreboard'
+import { bossWaveCeiling, qualifies, rankEntries, scoreCeiling } from '../src/components/skyline-defense/scoreboard'
+import { bossStats } from '../src/components/skyline-defense/game/bossStats'
 import { waveBonus, waveMultiplier } from '../src/components/skyline-defense/game/scoring'
 import { TUNING } from '../src/components/skyline-defense/game/tuning'
 import { isBlockedInitials } from './_initialsBlocklist'
@@ -69,6 +70,35 @@ describe('plausibility ceiling', () => {
     const over = validateSubmission({ initials: 'ABC', score: ceiling + 1, wave: 4 })
     expect(over.ok).toBe(false)
     if (!over.ok) expect(over.field).toBe('score')
+  })
+
+  it('grows by the boss maximum on boss waves, and only on boss waves', () => {
+    for (let wave = 1; wave <= 20; wave++) {
+      const extra = bossWaveCeiling(wave)
+      if (wave % TUNING.bossEvery === 0) expect(extra).toBeGreaterThan(0)
+      else expect(extra).toBe(0)
+    }
+    // Waves 5 and 6 share a wave multiplier and 6 has more meteors, so
+    // without the boss wave 6 would add more; with it, wave 5 adds more.
+    const step = (wave: number) => scoreCeiling(wave) - scoreCeiling(wave - 1)
+    expect(step(5)).toBeGreaterThan(step(6))
+    expect(step(5) - bossWaveCeiling(5)).toBeLessThan(step(6))
+    expect(bossWaveCeiling(10)).toBeGreaterThan(bossWaveCeiling(5))
+  })
+
+  it("counts every fragment, trickle meteor and boss point in wave 5's boss maximum", () => {
+    const { health, fragments } = bossStats(1)
+    const kills =
+      ((health - 1) * fragments + fragments * TUNING.bossKillFragmentScale + TUNING.bossTrickleMax * TUNING.splitFragments) *
+      TUNING.meteorPoints *
+      waveMultiplier(5) *
+      TUNING.chainMultiplierCap
+    const flat = (TUNING.bossPoints + TUNING.bossBonus) * waveMultiplier(5)
+    expect(bossWaveCeiling(5)).toBe(kills + flat)
+  })
+
+  it('still accepts a real high score of 246,080 at wave 14', () => {
+    expect(validateSubmission({ initials: 'ABC', score: 246_080, wave: 14 }).ok).toBe(true)
   })
 })
 

@@ -11,10 +11,12 @@ export function meteorPoints(wave: number): number {
 }
 
 // End-of-wave bonus for every building still lit and every unused
-// interceptor.
-export function waveBonus(buildingsAlive: number, ammoLeft: number, wave: number): WaveBonus {
+// interceptor, plus the boss bonus when a boss was destroyed before it
+// reached the city.
+export function waveBonus(buildingsAlive: number, ammoLeft: number, wave: number, bossDestroyed = false): WaveBonus {
   const multiplier = waveMultiplier(wave)
   const buildings = buildingsAlive * TUNING.buildingBonus * multiplier
   const ammo = ammoLeft * TUNING.ammoBonus * multiplier
-  return { buildings, ammo, total: buildings + ammo }
+  const boss = bossDestroyed ? TUNING.bossBonus * multiplier : 0
+  return { buildings, ammo, boss, total: buildings + ammo + boss }
 }

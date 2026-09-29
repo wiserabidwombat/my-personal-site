@@ -1,3 +1,4 @@
+import { isBossWave } from '../game/bossStats'
 import type { GameState } from '../game/types'
 import type { Palette } from './palette'
 import { VISUALS, visualsFor } from './visuals'
@@ -65,7 +66,8 @@ export function drawCityStatus(ctx: CanvasRenderingContext2D, state: GameState, 
   ctx.restore()
 }
 
-// "Wave N" title before a wave, and the bonus tally after one.
+// "Wave N" title before a wave (with "BOSS WAVE" under it on a boss wave),
+// and the bonus tally after one.
 export function drawBanner(ctx: CanvasRenderingContext2D, state: GameState, palette: Palette) {
   const size = Math.min(56, state.width * 0.11)
   const y = state.height * 0.3
@@ -78,6 +80,12 @@ export function drawBanner(ctx: CanvasRenderingContext2D, state: GameState, pale
     ctx.fillStyle = palette.pink
     ctx.font = `800 ${size}px system-ui, sans-serif`
     ctx.fillText(`WAVE ${state.wave}`, state.width / 2, y)
+    if (isBossWave(state.wave)) {
+      ctx.shadowColor = palette.meteor
+      ctx.fillStyle = palette.meteor
+      ctx.font = `800 ${size * 0.55}px system-ui, sans-serif`
+      ctx.fillText('BOSS WAVE', state.width / 2, y + size * 0.95)
+    }
   }
   if (state.phase === 'waveBonus' && state.lastBonus) {
     const small = Math.max(14, size * 0.36)
@@ -90,6 +98,10 @@ export function drawBanner(ctx: CanvasRenderingContext2D, state: GameState, pale
     ctx.font = `600 ${small}px system-ui, sans-serif`
     ctx.fillText(`City bonus +${state.lastBonus.buildings}`, state.width / 2, y + size * 0.8)
     ctx.fillText(`Ammo bonus +${state.lastBonus.ammo}`, state.width / 2, y + size * 0.8 + small * 1.5)
+    if (state.lastBonus.boss > 0) {
+      ctx.fillStyle = palette.meteor
+      ctx.fillText(`Boss bonus +${state.lastBonus.boss}`, state.width / 2, y + size * 0.8 + small * 3)
+    }
   }
   ctx.restore()
 }
