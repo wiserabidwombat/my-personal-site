@@ -1,5 +1,5 @@
-import { TUNING } from './tuning'
-import type { Blast, Building, Launcher, Vec } from './types'
+import { TUNING } from './tuning.js'
+import type { Blast, Building, Launcher, Vec } from './types.js'
 
 export type Rect = { left: number; right: number; top: number; bottom: number }
 

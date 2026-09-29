@@ -30,6 +30,11 @@ export function attachInput(canvas: HTMLCanvasElement, handlers: InputHandlers):
   const onPointerMove = (event: PointerEvent) => handlers.setCrosshair(local(event))
 
   const onKeyDown = (event: KeyboardEvent) => {
+    // Keys typed into a panel that owns the keyboard (the leaderboard's
+    // initials entry, marked data-owns-keys) never reach the game, even
+    // though its keys (arrows, Space, P) overlap the game's.
+    const target = event.target instanceof Element ? event.target : null
+    if (event.defaultPrevented || target?.closest('[data-owns-keys]')) return
     if (ARROWS.has(event.key) && handlers.isPlaying()) {
       event.preventDefault()
       handlers.heldKeys.add(event.key)

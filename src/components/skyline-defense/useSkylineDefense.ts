@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { createGame, fire, startGame, step } from './game/engine'
 import { resizeWorld } from './game/resize'
 import type { GameState, Phase, Vec } from './game/types'
+import { initialUi, type GameUi } from './gameUi'
 import { loadHighScore, saveHighScore } from './highScore'
 import { attachInput } from './input'
 import { placeCrosshair, steerCrosshair } from './crosshair'
@@ -10,14 +11,6 @@ import { hudHeight } from './render/hud'
 import { readPalette } from './render/palette'
 import skylineUrl from '../../assets/dallas-skyline.webp'
 import { renderGame } from './render/renderGame'
-
-export type GameUi = {
-  screen: 'start' | 'playing' | 'gameOver'
-  paused: boolean
-  score: number
-  highScore: number
-  newHighScore: boolean
-}
 
 const RUNNING: ReadonlySet<Phase> = new Set(['waveTitle', 'playing', 'waveBonus'])
 
@@ -33,13 +26,7 @@ export function useSkylineDefense(
   const pausedRef = useRef(false)
   const crosshairRef = useRef<Vec | null>(null)
   const highScoreRef = useRef(0)
-  const [ui, setUi] = useState<GameUi>(() => ({
-    screen: 'start',
-    paused: false,
-    score: 0,
-    highScore: loadHighScore(),
-    newHighScore: false,
-  }))
+  const [ui, setUi] = useState<GameUi>(() => initialUi(loadHighScore()))
 
   const setPaused = useCallback((paused: boolean) => {
     pausedRef.current = paused
@@ -99,7 +86,8 @@ export function useSkylineDefense(
         highScoreRef.current = game.score
         saveHighScore(game.score)
       }
-      setUi({ screen: 'gameOver', paused: false, score: game.score, highScore: highScoreRef.current, newHighScore })
+      const { score, wave } = game
+      setUi({ screen: 'gameOver', paused: false, score, wave, highScore: highScoreRef.current, newHighScore })
     }
 
     let frame = 0
