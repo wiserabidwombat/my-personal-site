@@ -146,21 +146,23 @@
    shade's role on the dark theme -- slate-50/100 (most prominent) become
    the darkest text here, slate-400/500 (most muted) the lightest -- so
    relative text hierarchy stays intact. All pass WCAG AA (4.5:1+) against
-   both the page background and the --deep-space-purple card background. */
-[data-theme='light'] .text-slate-50,
-[data-theme='light'] .text-slate-100 {
+   both the page background and the --deep-space-purple card background.
+   Skipped on and inside .night-scene (the always-night Skyline Defense game),
+   whose dark panels keep the light dark-theme text in light mode too. */
+[data-theme='light'] .text-slate-50:not(.night-scene, .night-scene *),
+[data-theme='light'] .text-slate-100:not(.night-scene, .night-scene *) {
   color: #18122b;
 }
-[data-theme='light'] .text-slate-200 {
+[data-theme='light'] .text-slate-200:not(.night-scene, .night-scene *) {
   color: #332b47;
 }
-[data-theme='light'] .text-slate-300 {
+[data-theme='light'] .text-slate-300:not(.night-scene, .night-scene *) {
   color: #463c5c;
 }
-[data-theme='light'] .text-slate-400 {
+[data-theme='light'] .text-slate-400:not(.night-scene, .night-scene *) {
   color: #6b6280;
 }
-[data-theme='light'] .text-slate-500 {
+[data-theme='light'] .text-slate-500:not(.night-scene, .night-scene *) {
   color: #5f5775;
 }
 
