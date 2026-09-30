@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" preserveAspectRatio="xMidYMid slice">
+  <!-- Colors are the site's theme tokens (with the default palette as the
+       fallback), so the art follows light/dark mode and the Halloween theme
+       when the site renders it inline. -->
+  <defs>
+    <linearGradient id="jerky-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" style="stop-color: var(--deep-space-purple, #150a24)"/>
+      <stop offset="100%" style="stop-color: var(--deep-space-black, #0a0612)"/>
+    </linearGradient>
+    <!-- Smoke fades out as it rises. -->
+    <linearGradient id="jerky-smoke" gradientUnits="userSpaceOnUse" x1="0" y1="205" x2="0" y2="20">
+      <stop offset="0%" style="stop-color: var(--laser-cyan, #00f0ff)" stop-opacity="0.85"/>
+      <stop offset="100%" style="stop-color: var(--laser-cyan, #00f0ff)" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="jerky-embers" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" style="stop-color: var(--neon-pink, #ff2bd6)" stop-opacity="0.55"/>
+      <stop offset="100%" style="stop-color: var(--neon-pink, #ff2bd6)" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#jerky-bg)"/>
+  <!-- Embers glowing under the grill. -->
+  <ellipse cx="320" cy="300" rx="210" ry="60" fill="url(#jerky-embers)"/>
+  <!-- Smoke: a soft wide wisp under each thin one. -->
+  <g fill="none" stroke="url(#jerky-smoke)" stroke-linecap="round">
+    <g stroke-width="12" stroke-opacity="0.18">
+      <path d="M250 205 C 222 170, 278 140, 250 105 S 222 50, 252 20"/>
+      <path d="M320 200 C 350 165, 292 132, 322 96 S 350 44, 318 12"/>
+      <path d="M390 205 C 362 172, 418 142, 390 108 S 364 55, 394 24"/>
+    </g>
+    <g stroke-width="3">
+      <path d="M250 205 C 222 170, 278 140, 250 105 S 222 50, 252 20"/>
+      <path d="M320 200 C 350 165, 292 132, 322 96 S 350 44, 318 12"/>
+      <path d="M390 205 C 362 172, 418 142, 390 108 S 364 55, 394 24"/>
+    </g>
+  </g>
+  <!-- The grill grate, under the jerky. -->
+  <g style="stroke: var(--laser-cyan, #00f0ff)" stroke-width="4" stroke-linecap="round">
+    <line x1="150" y1="236" x2="490" y2="236"/>
+    <line x1="150" y1="258" x2="490" y2="258"/>
+    <line x1="150" y1="280" x2="490" y2="280"/>
+  </g>
+  <rect x="140" y="222" width="360" height="72" rx="14" fill="none" style="stroke: var(--laser-cyan, #00f0ff)" stroke-opacity="0.5" stroke-width="2"/>
+  <!-- Strips of jerky laid across the grate (a solid base, so they sit on
+       top of the bars, then the glowing tint). -->
+  <g style="fill: var(--deep-space-black, #0a0612)">
+    <rect x="180" y="214" width="34" height="84" rx="10" transform="rotate(-8 197 256)"/>
+    <rect x="242" y="210" width="34" height="90" rx="10" transform="rotate(5 259 255)"/>
+    <rect x="303" y="212" width="34" height="86" rx="10" transform="rotate(-4 320 255)"/>
+    <rect x="364" y="210" width="34" height="90" rx="10" transform="rotate(7 381 255)"/>
+    <rect x="426" y="214" width="34" height="84" rx="10" transform="rotate(-6 443 256)"/>
+  </g>
+  <g style="fill: var(--neon-pink, #ff2bd6); stroke: var(--neon-pink, #ff2bd6)" fill-opacity="0.28" stroke-width="3">
+    <rect x="180" y="214" width="34" height="84" rx="10" transform="rotate(-8 197 256)"/>
+    <rect x="242" y="210" width="34" height="90" rx="10" transform="rotate(5 259 255)"/>
+    <rect x="303" y="212" width="34" height="86" rx="10" transform="rotate(-4 320 255)"/>
+    <rect x="364" y="210" width="34" height="90" rx="10" transform="rotate(7 381 255)"/>
+    <rect x="426" y="214" width="34" height="84" rx="10" transform="rotate(-6 443 256)"/>
+  </g>
+  <!-- Marbling on the strips. -->
+  <g fill="none" style="stroke: var(--neon-pink, #ff2bd6)" stroke-opacity="0.55" stroke-width="1.5" stroke-linecap="round">
+    <path d="M192 236 q 8 10 0 22 M202 262 q -7 8 0 18"/>
+    <path d="M254 230 q 9 12 1 24 M266 262 q -8 9 0 20"/>
+    <path d="M314 234 q 8 10 0 20 M326 258 q -7 10 1 20"/>
+    <path d="M375 232 q 9 11 1 23 M388 262 q -8 9 0 19"/>
+    <path d="M437 236 q 8 10 0 21 M448 262 q -7 8 0 17"/>
+  </g>
+</svg>

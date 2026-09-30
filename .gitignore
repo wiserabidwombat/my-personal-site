@@ -35,3 +35,6 @@ public/rss.xml
 
 # Local git worktrees (superpowers:using-git-worktrees convention)
 .worktrees
+
+# Local review screenshots (Playwright captures for visual checks)
+review-screenshots/

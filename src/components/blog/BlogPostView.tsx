@@ -7,6 +7,7 @@ import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { tagLabel } from '../../lib/blog'
+import { IMAGE_GROUP_CLASS, rehypeImageGroups } from '../../lib/imageGroups'
 import { headingText, pageContainer, pageTitle, pageTitleLeading } from '../../lib/styles'
 import type { BlogPost } from '../../types/blog-post'
 
@@ -24,6 +25,13 @@ function formatDate(value: string) {
 type Props = {
   post: BlogPost
 }
+
+// A run of consecutive photos (see imageGroups.ts): stacked on phones, two
+// columns from sm up. An odd one out ends the run centered at column width.
+const imageGroup = cn(
+  'mt-[16px] grid gap-4 sm:grid-cols-2 [&>img]:mt-0',
+  'sm:[&>img:last-child:nth-child(odd)]:col-span-2 sm:[&>img:last-child:nth-child(odd)]:w-[calc(50%-0.5rem)] sm:[&>img:last-child:nth-child(odd)]:justify-self-center',
+)
 
 export function BlogPostView({ post }: Props) {
   return (
@@ -73,6 +81,7 @@ export function BlogPostView({ post }: Props) {
         <div className="pt-8">
           <div className="max-w-[60ch] [&>:first-child]:mt-0">
             <ReactMarkdown
+              rehypePlugins={[rehypeImageGroups]}
               components={{
                 h2: ({ children }) => <h2 className={cn(headingText, 'mt-[48px] mb-[24px] font-bold text-[var(--neon-pink)]')}>{children}</h2>,
                 h3: ({ children }) => <h3 className="mt-[40px] mb-[16px] text-xl font-bold text-[var(--laser-cyan)]">{children}</h3>,
@@ -91,6 +100,12 @@ export function BlogPostView({ post }: Props) {
                     {children}
                   </blockquote>
                 ),
+                div: ({ className, children }) =>
+                  className?.split(' ').includes(IMAGE_GROUP_CLASS) ? (
+                    <div className={imageGroup}>{children}</div>
+                  ) : (
+                    <div className={className}>{children}</div>
+                  ),
                 img: ({ src, alt }) => (
                   <img
                     src={src}

@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
   buildPostsFromRaw,
@@ -166,31 +167,50 @@ Body.
   })
 })
 
-describe('getAllPosts (real seed content)', () => {
-  it('returns both seed posts, newest first', () => {
-    const posts = getAllPosts()
-    expect(posts.map((post) => post.slug)).toEqual([
-      'introducing-ai-agents-into-my-design-system',
-      'what-board-games-taught-me-about-leading-a-team',
-    ])
-  })
-})
+// The real posts in content/blog. These check how the loader treats
+// whatever posts exist, so adding a post never means editing this file.
+describe('real content', () => {
+  const posts = getAllPosts()
 
-describe('getPostBySlug (real seed content)', () => {
-  it('finds a seeded post by slug', () => {
+  it('loads at least one post', () => {
+    expect(posts.length).toBeGreaterThan(0)
+  })
+
+  it('sorts posts newest first', () => {
+    for (let i = 1; i < posts.length; i++) {
+      expect(posts[i - 1].date >= posts[i].date, `${posts[i - 1].slug} before ${posts[i].slug}`).toBe(true)
+    }
+  })
+
+  it('gives every post a unique slug', () => {
+    const slugs = posts.map((post) => post.slug)
+    expect(new Set(slugs).size).toBe(slugs.length)
+  })
+
+  it('finds every post by its slug, and nothing for an unknown slug', () => {
+    for (const post of posts) expect(getPostBySlug(post.slug), post.slug).toBe(post)
+    expect(getPostBySlug('does-not-exist')).toBeUndefined()
+  })
+
+  it('finds a known post by slug', () => {
     expect(getPostBySlug('what-board-games-taught-me-about-leading-a-team')?.title).toBe(
       'What Board Games Taught Me About Leading a Team',
     )
   })
 
-  it('returns undefined for an unknown slug', () => {
-    expect(getPostBySlug('does-not-exist')).toBeUndefined()
+  it("collects every post's tags, deduped and sorted", () => {
+    const tags = getAllTags()
+    expect(tags).toEqual([...new Set(posts.flatMap((post) => post.tags))].sort())
+    expect(new Set(tags).size).toBe(tags.length)
+    expect(tags).toEqual([...tags].sort())
   })
-})
 
-describe('getAllTags (real seed content)', () => {
-  it('includes the tags from both seed posts, deduped and sorted', () => {
-    expect(getAllTags()).toEqual(['ai', 'boardgames', 'coding', 'leadership', 'teams'])
+  it('points every post at images that exist in public/', () => {
+    for (const post of posts) {
+      for (const image of [post.image, post.ogImage]) {
+        if (image) expect(existsSync(`public${image}`), `${post.slug}: ${image}`).toBe(true)
+      }
+    }
   })
 })
 
@@ -259,7 +279,7 @@ Body.
     expect(post.ogImage).toBe('/blog/og.png')
   })
 
-  it('every seed post has its own raster preview image', () => {
+  it('every post has its own raster preview image', () => {
     for (const post of getAllPosts()) {
       expect(postOgImagePath(post), post.slug).toMatch(/\.(png|jpe?g)$/)
     }
