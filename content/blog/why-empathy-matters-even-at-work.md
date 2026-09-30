@@ -4,7 +4,7 @@ slug: why-empathy-belongs-at-work
 image: /blog/empathy-at-work.svg
 ogImage: /blog/empathy-at-work.png
 blurb: "An executive once told me my top strength was something to pity. Here's why I think empathy is one of the most important things we bring to work."
-date: "2026-09-29"
+date: "2026-09-30"
 author: "Aaron Tilley"
 tags: ["leadership", "teams", "career"]
 ---
