@@ -1,27 +1,29 @@
-import { createContext, createElement, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, createElement, useCallback, useContext, useSyncExternalStore, type ReactNode } from 'react'
 import { updateThemeColor } from '../lib/season'
 
 export type Theme = 'dark' | 'light'
 
 const STORAGE_KEY = 'theme'
 
-function getInitialTheme(): Theme {
-  // renderToString() (scripts/prerender-meta.mjs) runs with no DOM at all --
-  // reading document here would throw before React even gets to render a
-  // single node. Default to dark, matching index.html's own inline-script
-  // fallback for when localStorage has no saved preference; the actual
-  // theme-conditional MARKUP (HeroSkyline, the navbar's sun/moon icon) is
-  // CSS-driven off the `data-theme` attribute, not this value, so a
-  // prerendered page still paints correctly for either theme regardless of
-  // what this returns on the server.
-  if (typeof document === 'undefined') {
-    return 'dark'
-  }
-  // index.html's inline script already sets this attribute before React
-  // even loads, so reading it back keeps this hook in sync with that single
-  // source of truth instead of re-deriving the choice a second way.
-  return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
+// The theme lives on <html data-theme>: index.html's inline script sets it
+// before first paint, and all theme-dependent styling is CSS keyed off it.
+// This hook just follows that attribute (like useSeason follows
+// data-season), so every component re-renders together when it changes.
+function subscribe(onChange: () => void) {
+  const observer = new MutationObserver(onChange)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+  return () => observer.disconnect()
 }
+
+const getSnapshot = (): Theme => (document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark')
+
+// The prerendered HTML (scripts/prerender-meta.mjs, which has no DOM) is
+// always rendered dark. During hydration React uses this same value, so the
+// first client render matches that markup; right after, it re-renders with
+// the real attribute, fixing theme-dependent attributes like the toggle's
+// aria-label. (Reading the attribute during that first render instead is
+// a hydration mismatch React never patches.)
+const getServerSnapshot = (): Theme => 'dark'
 
 type ThemeContextValue = {
   theme: Theme
@@ -36,21 +38,18 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme)
+  const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
+  const toggleTheme = useCallback(() => {
+    const next: Theme = getSnapshot() === 'dark' ? 'light' : 'dark'
+    document.documentElement.setAttribute('data-theme', next)
     updateThemeColor()
     try {
-      localStorage.setItem(STORAGE_KEY, theme)
+      localStorage.setItem(STORAGE_KEY, next)
     } catch {
       // Private browsing / storage disabled -- theme still applies for this
       // page view, it just won't persist across visits.
     }
-  }, [theme])
-
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
   }, [])
 
   return createElement(ThemeContext.Provider, { value: { theme, toggleTheme } }, children)

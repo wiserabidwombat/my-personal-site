@@ -25,12 +25,13 @@
 // the exact same module instances src/router.ts's own imports do underneath
 // ssrLoadModule, with no duplicate-React/duplicate-router-package hazard.
 import { createServer } from 'vite'
-import { readFile, writeFile, mkdir } from 'node:fs/promises'
+import { readFile, writeFile, mkdir, rm } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import React from 'react'
 import { renderToString } from 'react-dom/server'
 import { createMemoryHistory, RouterProvider } from '@tanstack/react-router'
+import { splitHoistedTags, withBuiltAssetUrls } from './prerender-html.mjs'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distDir = path.join(root, 'dist')
@@ -164,6 +165,9 @@ try {
   pageCount = pages.length
 
   const template = await readFile(path.join(distDir, 'index.html'), 'utf8')
+  // Written by `vite build` (build.manifest in vite.config.ts): source
+  // asset paths to the hashed files the browser bundle uses.
+  const manifest = JSON.parse(await readFile(path.join(distDir, '.vite', 'manifest.json'), 'utf8'))
 
   // The loop below overwrites dist/index.html itself for the '/' page (so
   // the apex URL keeps getting Home's prerendered head+body -- Vercel serves
@@ -194,18 +198,26 @@ try {
   const appShellHtml = template.replace('</head>', '    <meta name="robots" content="noindex" />\n  </head>')
   await writeFile(path.join(distDir, 'app-shell.html'), appShellHtml)
 
+  // Each page's body must match the browser's first render exactly, or
+  // hydration fails (React error #418) and React re-renders the whole page
+  // in the browser: resource hints React hoisted to the front of the body
+  // move to <head>, and dev-loader asset paths become the built files (see
+  // prerender-html.mjs).
   for (const page of pages) {
     const { title, tags } = renderHead(page)
-    const bodyHtml = await renderBody(page)
+    const { hoisted, body } = splitHoistedTags(withBuiltAssetUrls(await renderBody(page), manifest))
+    const headTags = hoisted ? `${tags}\n    ${hoisted}` : tags
     const html = template
       .replace(/<title>.*?<\/title>/, `<title>${escapeHtml(title)}</title>`)
-      .replace('</head>', `${tags}\n  </head>`)
-      .replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`)
+      .replace('</head>', `${headTags}\n  </head>`)
+      .replace('<div id="root"></div>', `<div id="root">${body}</div>`)
 
     const outDir = page.path === '/' ? distDir : path.join(distDir, page.path)
     await mkdir(outDir, { recursive: true })
     await writeFile(path.join(outDir, 'index.html'), html)
   }
+  // Only needed for the mapping above; not part of the deployed site.
+  await rm(path.join(distDir, '.vite'), { recursive: true, force: true })
 } finally {
   await server.close()
 }
