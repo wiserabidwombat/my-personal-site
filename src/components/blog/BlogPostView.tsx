@@ -106,12 +106,17 @@ export function BlogPostView({ post }: Props) {
                   ) : (
                     <div className={className}>{children}</div>
                   ),
+                // Markdown images have no width/height, so before loading they'd
+                // collapse to their alt text and all sit near the top of the
+                // page -- close enough that loading="lazy" fetches every one at
+                // once. `aspect-ratio: auto 4/3` reserves a 4:3 box until the
+                // image loads, then switches to its real proportions.
                 img: ({ src, alt }) => (
                   <img
                     src={src}
                     alt={alt ?? ''}
                     loading="lazy"
-                    className="mt-[16px] w-full rounded-2xl border border-[var(--laser-cyan)]/30"
+                    className="mt-[16px] w-full rounded-2xl border border-[var(--laser-cyan)]/30 [aspect-ratio:auto_4/3]"
                   />
                 ),
               }}

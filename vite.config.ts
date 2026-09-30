@@ -21,6 +21,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    // dist/.vite/manifest.json maps each source asset to its hashed file.
+    // scripts/prerender-meta.mjs reads it to give prerendered pages the same
+    // image URLs the browser bundle uses, then deletes it (it isn't served).
+    manifest: true,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
