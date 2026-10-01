@@ -18,7 +18,7 @@ import pomodoroWidget600 from '../../assets/projects/pomodoro-widget-600.webp'
 // deliberately NOT listed here -- it's a hidden Easter egg and stays
 // unlisted.
 
-export const TESTFLIGHT_URL = 'https://testflight.apple.com/join/PASTE_CODE_HERE'
+export const TESTFLIGHT_URL = 'https://testflight.apple.com/join/GYzhgfF5'
 
 export type ProjectStatus = 'Beta on TestFlight' | 'Live'
 
