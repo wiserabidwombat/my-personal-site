@@ -46,8 +46,6 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: GameState, view
   drawBonusTargets(ctx, state, view.palette, view.still)
   drawBlasts(ctx, state, view.palette, view.still)
   if (view.palette.season === 'halloween') drawBossSparks(ctx, state, view.palette, view.still)
-  // TODO(halloween-pass-2): witch and bat bonus targets in place of the UFO
-  // and scouts (render/bonus.ts), drawn only during the season.
   ctx.restore()
   drawImpactFlash(ctx, state, view.palette)
   if (state.phase !== 'ready') {

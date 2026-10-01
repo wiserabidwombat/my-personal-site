@@ -88,3 +88,30 @@ export function HeadingSkeleton() {
 export function FooterPumpkin() {
   return <PixelSprite art={jackOLantern} className="pointer-events-none inline-block h-4 w-auto align-[-3px]" />
 }
+
+// Skyline Defense's start screen, positioned against the start panel's box
+// (Panel's `decor`). Two rim-lit bats bob and flap beside its top corners,
+// from sm up only: below that the panel spans the play area and there's no
+// room beside it without covering text. The jack-o'-lantern sits on the
+// panel's bottom border at the right corner, clear of the centered Start
+// button. The game is always a night scene, so the bats are the dark-theme
+// ones in either theme.
+export function GameStartDecor() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none">
+      <div className="absolute top-4 right-full mr-6 hidden sm:block">
+        <div className="halloween-bat-bob relative w-10">
+          <PixelSprite art={batUpNight} className="halloween-flap-a w-full" />
+          <PixelSprite art={batDownNight} className="halloween-flap-b absolute inset-0 w-full" />
+        </div>
+      </div>
+      <div className="absolute top-14 left-full ml-8 hidden sm:block">
+        <div className="halloween-bat-bob relative w-8 [animation-delay:-1.3s]">
+          <PixelSprite art={batDownNight} className="halloween-flap-a w-full" />
+          <PixelSprite art={batUpNight} className="halloween-flap-b absolute inset-0 w-full" />
+        </div>
+      </div>
+      <PixelSprite art={jackOLantern} className="absolute right-5 -bottom-3.5 h-7 w-auto" />
+    </div>
+  )
+}

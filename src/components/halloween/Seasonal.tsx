@@ -9,6 +9,7 @@ const decor = {
   peekingGhost: lazy(() => loadDecor().then((module) => ({ default: module.PeekingGhost }))),
   headingSkeleton: lazy(() => loadDecor().then((module) => ({ default: module.HeadingSkeleton }))),
   footerPumpkin: lazy(() => loadDecor().then((module) => ({ default: module.FooterPumpkin }))),
+  gameStartDecor: lazy(() => loadDecor().then((module) => ({ default: module.GameStartDecor }))),
 }
 
 // Renders one Halloween sprite placement while the season is active, and
