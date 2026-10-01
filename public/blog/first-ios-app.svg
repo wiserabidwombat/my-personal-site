@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" preserveAspectRatio="xMidYMid slice">
+  <!-- Colors are the site's theme tokens (with the default palette as the
+       fallback), so the art follows light/dark mode and the Halloween theme
+       when the site renders it inline. -->
+  <defs>
+    <linearGradient id="ios-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" style="stop-color: var(--deep-space-purple, #150a24)"/>
+      <stop offset="100%" style="stop-color: var(--deep-space-black, #0a0612)"/>
+    </linearGradient>
+    <linearGradient id="ios-ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" style="stop-color: var(--neon-pink, #ff2bd6)"/>
+      <stop offset="100%" style="stop-color: var(--laser-cyan, #00f0ff)"/>
+    </linearGradient>
+    <linearGradient id="ios-trail" gradientUnits="userSpaceOnUse" x1="110" y1="320" x2="430" y2="100">
+      <stop offset="0%" style="stop-color: var(--neon-pink, #ff2bd6)" stop-opacity="0"/>
+      <stop offset="45%" style="stop-color: var(--neon-pink, #ff2bd6)" stop-opacity="0.6"/>
+      <stop offset="100%" style="stop-color: var(--laser-cyan, #00f0ff)"/>
+    </linearGradient>
+    <filter id="ios-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+  <rect width="640" height="360" fill="url(#ios-bg)"/>
+
+  <!-- Faint horizon lines for depth. -->
+  <g style="stroke: var(--laser-cyan, #00f0ff)" stroke-width="1">
+    <line x1="0" y1="292" x2="640" y2="292" stroke-opacity="0.12"/>
+    <line x1="0" y1="312" x2="640" y2="312" stroke-opacity="0.18"/>
+    <line x1="0" y1="336" x2="640" y2="336" stroke-opacity="0.24"/>
+  </g>
+
+  <!-- Launch trail: rises from the lower left, behind the phone, to the rocket. -->
+  <path d="M110 320 C 230 300, 380 200, 428 104" fill="none" stroke="url(#ios-trail)" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 10"/>
+  <path d="M150 334 C 260 316, 392 222, 440 116" fill="none" stroke="url(#ios-trail)" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.5"/>
+  <g style="fill: var(--laser-cyan, #00f0ff)">
+    <circle cx="404" cy="150" r="2" fill-opacity="0.8"/>
+    <circle cx="452" cy="148" r="1.5" fill-opacity="0.6"/>
+    <circle cx="396" cy="118" r="1.5" fill-opacity="0.5"/>
+  </g>
+
+  <!-- Rocket (Hugeicons Rocket01, the site's icon set), heading up and right. -->
+  <g transform="translate(418 44) scale(2.6)" fill="none" style="stroke: var(--laser-cyan, #00f0ff)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11.8013 6.48949L13.2869 5.00392C14.9596 3.3312 17.1495 2.63737 19.4671 2.52399C20.3686 2.47989 20.8193 2.45784 21.1807 2.81928C21.5422 3.18071 21.5201 3.63143 21.476 4.53289C21.3626 6.8505 20.6688 9.04042 18.9961 10.7131L17.5105 12.1987C16.2871 13.4221 15.9393 13.77 16.1961 15.097C16.4496 16.1107 16.6949 17.0923 15.9578 17.8294C15.0637 18.7235 14.2481 18.7235 13.354 17.8294L6.17058 10.646C5.27649 9.75188 5.27646 8.9363 6.17058 8.04219C6.90767 7.30509 7.88929 7.55044 8.90297 7.80389C10.23 8.06073 10.5779 7.71289 11.8013 6.48949Z"/>
+    <path d="M2.5 21.5L7.5 16.5" style="stroke: var(--neon-pink, #ff2bd6)"/>
+    <path d="M8.5 21.5L10.5 19.5" style="stroke: var(--neon-pink, #ff2bd6)"/>
+    <path d="M2.5 15.5L4.5 13.5" style="stroke: var(--neon-pink, #ff2bd6)"/>
+    <path d="M17.125 7H17M17.25 7C17.25 7.13807 17.1381 7.25 17 7.25C16.8619 7.25 16.75 7.13807 16.75 7C16.75 6.86193 16.8619 6.75 17 6.75C17.1381 6.75 17.25 6.86193 17.25 7Z"/>
+  </g>
+
+  <!-- Phone: a soft glow behind a cyan outline, near-black screen. -->
+  <rect x="262" y="54" width="120" height="252" rx="26" fill="none" style="stroke: var(--laser-cyan, #00f0ff)" stroke-width="6" stroke-opacity="0.45" filter="url(#ios-glow)"/>
+  <rect x="262" y="54" width="120" height="252" rx="26" style="fill: var(--deep-space-black, #0a0612); stroke: var(--laser-cyan, #00f0ff)" stroke-width="3"/>
+  <rect x="302" y="66" width="40" height="11" rx="5.5" style="fill: var(--laser-cyan, #00f0ff)" fill-opacity="0.25"/>
+
+  <!-- Countdown ring: a faint track with a glowing arc about 70% of the way round. -->
+  <circle cx="322" cy="168" r="38" fill="none" style="stroke: var(--cyber-purple, #8b2fe0)" stroke-opacity="0.35" stroke-width="6"/>
+  <circle cx="322" cy="168" r="38" fill="none" stroke="url(#ios-ring)" stroke-width="8" stroke-linecap="round" stroke-dasharray="167 239" transform="rotate(-90 322 168)" stroke-opacity="0.7" filter="url(#ios-glow)"/>
+  <circle cx="322" cy="168" r="38" fill="none" stroke="url(#ios-ring)" stroke-width="6" stroke-linecap="round" stroke-dasharray="167 239" transform="rotate(-90 322 168)"/>
+  <circle cx="322" cy="130" r="4" style="fill: var(--neon-pink, #ff2bd6)"/>
+
+  <!-- Session dots and two control pills. -->
+  <g style="stroke: var(--laser-cyan, #00f0ff)" stroke-width="1.5">
+    <circle cx="304" cy="232" r="3.5" style="fill: var(--laser-cyan, #00f0ff)"/>
+    <circle cx="316" cy="232" r="3.5" style="fill: var(--laser-cyan, #00f0ff)"/>
+    <circle cx="328" cy="232" r="3.5" fill="none"/>
+    <circle cx="340" cy="232" r="3.5" fill="none"/>
+  </g>
+  <g fill="none" style="stroke: var(--laser-cyan, #00f0ff)" stroke-opacity="0.6" stroke-width="1.5">
+    <rect x="290" y="252" width="28" height="13" rx="6.5"/>
+    <rect x="326" y="252" width="28" height="13" rx="6.5"/>
+  </g>
+  <rect x="302" y="290" width="40" height="3" rx="1.5" style="fill: var(--laser-cyan, #00f0ff)" fill-opacity="0.4"/>
+</svg>

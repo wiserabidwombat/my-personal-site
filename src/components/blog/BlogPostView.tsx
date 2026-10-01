@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { cn } from 'cn'
 import { PostImage } from './PostImage'
+import { PostBodyImage } from './PostBodyImage'
 import ReactMarkdown from 'react-markdown'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
@@ -28,9 +29,17 @@ type Props = {
 
 // A run of consecutive photos (see imageGroups.ts): stacked on phones, two
 // columns from sm up. An odd one out ends the run centered at column width.
+// A run that mixes portrait and landscape images (e.g. a phone screenshot
+// next to a StandBy one) stays one per row: side by side, the landscape one
+// would sit small beside a much taller portrait one. PostBodyImage sets the
+// data-orientation this reads once each image loads.
 const imageGroup = cn(
   'mt-[16px] grid gap-4 sm:grid-cols-2 [&>img]:mt-0',
-  'sm:[&>img:last-child:nth-child(odd)]:col-span-2 sm:[&>img:last-child:nth-child(odd)]:w-[calc(50%-0.5rem)] sm:[&>img:last-child:nth-child(odd)]:justify-self-center',
+  // Odd last image (not in a mixed run): spans both columns, centered at one column's width.
+  'sm:[&:not(:has(>[data-orientation=portrait]):has(>[data-orientation=landscape]))>img:last-child:nth-child(odd)]:col-span-2',
+  'sm:[&:not(:has(>[data-orientation=portrait]):has(>[data-orientation=landscape]))>img:last-child:nth-child(odd)]:w-[calc(50%-0.5rem)]',
+  'sm:[&:not(:has(>[data-orientation=portrait]):has(>[data-orientation=landscape]))>img:last-child:nth-child(odd)]:justify-self-center',
+  'sm:has-[>[data-orientation=portrait]]:has-[>[data-orientation=landscape]]:grid-cols-1',
 )
 
 export function BlogPostView({ post }: Props) {
@@ -106,19 +115,7 @@ export function BlogPostView({ post }: Props) {
                   ) : (
                     <div className={className}>{children}</div>
                   ),
-                // Markdown images have no width/height, so before loading they'd
-                // collapse to their alt text and all sit near the top of the
-                // page -- close enough that loading="lazy" fetches every one at
-                // once. `aspect-ratio: auto 4/3` reserves a 4:3 box until the
-                // image loads, then switches to its real proportions.
-                img: ({ src, alt }) => (
-                  <img
-                    src={src}
-                    alt={alt ?? ''}
-                    loading="lazy"
-                    className="mt-[16px] w-full rounded-2xl border border-[var(--laser-cyan)]/30 [aspect-ratio:auto_4/3]"
-                  />
-                ),
+                img: ({ src, alt }) => <PostBodyImage src={src} alt={alt} />,
               }}
             >
               {post.body}
