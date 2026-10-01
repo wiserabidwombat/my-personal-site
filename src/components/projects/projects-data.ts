@@ -42,6 +42,8 @@ export interface ProjectLinks {
 export interface Project {
   slug: string
   name: string
+  // The name under the app's icon on a phone, when it differs from `name`.
+  displayName?: string
   summary: string
   status: ProjectStatus
   // Platform/tech pills.
@@ -59,6 +61,7 @@ export interface Screenshot {
 export const pomodoroSimple: Project = {
   slug: 'pomodoro-simple',
   name: 'pomodoro-simple',
+  displayName: 'Simple: StandBy Timer',
   summary: 'A focused Pomodoro timer for iPhone, with Lock Screen and StandBy controls.',
   status: 'Beta on TestFlight',
   tags: ['iOS'],
