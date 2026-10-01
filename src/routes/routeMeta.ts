@@ -81,11 +81,10 @@ export const booksMeta: RouteMetaEntry = {
   description: "Browse Aaron's reading library, synced live from Hardcover.",
 }
 
-// TODO: confirm the /projects description.
 export const projectsMeta: RouteMetaEntry = {
   path: '/projects',
   title: 'Projects',
-  description: 'Things Aaron Tilley has built outside of work, from an iOS app in beta to this site.',
+  description: 'Side projects by Aaron Tilley: pomodoro-simple, an iOS focus timer, and the story behind this site.',
 }
 
 export const pomodoroSimpleMeta: RouteMetaEntry = {

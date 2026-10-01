@@ -5,7 +5,7 @@ import { ArrowLeft01Icon, Github01Icon } from '@hugeicons/core-free-icons'
 import { buttonVariants } from '@/components/ui/button'
 import { compactHero, neonOutlineButton, pageTitle, pageTitleLeading } from '../../lib/styles'
 import { ProjectPills } from './ProjectPills'
-import { pomodoroSimple, TODO_TESTFLIGHT_URL } from './projects-data'
+import { pomodoroSimple, TESTFLIGHT_URL } from './projects-data'
 
 // Filled cyan: the page's one primary action. Same color pair as the active
 // filter chip (outlinePillActive), which holds its contrast in every theme.
@@ -35,16 +35,10 @@ export function PomodoroHero() {
 
         <div className="mt-6 mb-8 flex flex-col items-center gap-3 sm:mb-4 sm:flex-row sm:items-start">
           <div className="flex flex-col items-center">
-            {TODO_TESTFLIGHT_URL ? (
-              <a href={TODO_TESTFLIGHT_URL} target="_blank" rel="noopener noreferrer" className={primaryButton}>
-                Join the beta on TestFlight
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
-            ) : (
-              <span aria-disabled="true" className={cn(primaryButton, 'cursor-not-allowed opacity-50')}>
-                Join the beta on TestFlight
-              </span>
-            )}
+            <a href={TESTFLIGHT_URL} target="_blank" rel="noopener noreferrer" className={primaryButton}>
+              Join the beta on TestFlight
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
             <p className="mt-2 max-w-64 text-xs leading-snug text-slate-400">
               You'll need Apple's free TestFlight app; the link walks you through it.
             </p>

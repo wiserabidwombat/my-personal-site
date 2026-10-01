@@ -1,22 +1,34 @@
 import type { LinkProps } from '@tanstack/react-router'
+import pomodoroApp400 from '../../assets/projects/pomodoro-app-400.webp'
+import pomodoroApp600 from '../../assets/projects/pomodoro-app-600.webp'
+import pomodoroCard800 from '../../assets/projects/pomodoro-card-800.webp'
+import pomodoroCard1600 from '../../assets/projects/pomodoro-card-1600.webp'
+import pomodoroLock400 from '../../assets/projects/pomodoro-lock-screen-400.webp'
+import pomodoroLock600 from '../../assets/projects/pomodoro-lock-screen-600.webp'
+import pomodoroStandby900 from '../../assets/projects/pomodoro-standby-900.webp'
+import pomodoroStandby1800 from '../../assets/projects/pomodoro-standby-1800.webp'
+import pomodoroWidget400 from '../../assets/projects/pomodoro-widget-400.webp'
+import pomodoroWidget600 from '../../assets/projects/pomodoro-widget-600.webp'
 
 // Everything the Projects pages show. Adding a project is one new entry in
 // `projects` below (plus its own detail route, if it gets one).
 //
-// Images live in src/assets/projects/ and are looked up by file name, so a
-// file that hasn't been added yet just renders a placeholder slot instead of
-// breaking the build. Skyline Defense is deliberately NOT listed here -- it's
-// a hidden Easter egg and stays unlisted.
+// Images are the resized .webp files in src/assets/projects/, made from
+// full-size masters kept out of git (see .gitignore). Skyline Defense is
+// deliberately NOT listed here -- it's a hidden Easter egg and stays
+// unlisted.
 
-// TODO: paste your public TestFlight invite link (https://testflight.apple.com/join/...).
-// While it's empty the "Join the beta" button renders disabled.
-export const TODO_TESTFLIGHT_URL = ''
+export const TESTFLIGHT_URL = 'https://testflight.apple.com/join/PASTE_CODE_HERE'
 
 export type ProjectStatus = 'Beta on TestFlight' | 'Live'
 
 export interface ProjectImage {
-  // Resolved URL, or null until the file exists in src/assets/projects/.
-  src: string | null
+  src: string
+  // Width-described candidates ("url 400w, url 600w") for retina screens.
+  srcSet?: string
+  // Intrinsic size of the largest candidate; sets the aspect ratio.
+  width: number
+  height: number
   alt: string
 }
 
@@ -34,26 +46,14 @@ export interface Project {
   status: ProjectStatus
   // Platform/tech pills.
   tags: string[]
-  image: ProjectImage
+  // 16:9 card image; the card shows a placeholder without one.
+  image?: ProjectImage
   links: ProjectLinks
 }
 
 export interface Screenshot {
-  // Expected file in src/assets/projects/.
-  file: string
   image: ProjectImage
-  // Shown under the placeholder until the file is added.
   caption: string
-}
-
-const assetFiles = import.meta.glob<string>('../../assets/projects/*.{png,jpg,jpeg,webp}', {
-  eager: true,
-  import: 'default',
-})
-
-// The built URL for src/assets/projects/<file>, or null if it isn't there yet.
-export function projectAsset(file: string): string | null {
-  return assetFiles[`../../assets/projects/${file}`] ?? null
 }
 
 export const pomodoroSimple: Project = {
@@ -63,10 +63,11 @@ export const pomodoroSimple: Project = {
   status: 'Beta on TestFlight',
   tags: ['iOS'],
   image: {
-    // TODO: add src/assets/projects/pomodoro-card.png (a 16:9 image for the card).
-    src: projectAsset('pomodoro-card.png'),
-    // TODO: alt text for the card image.
-    alt: '',
+    src: pomodoroCard800,
+    srcSet: `${pomodoroCard800} 800w, ${pomodoroCard1600} 1600w`,
+    width: 1600,
+    height: 900,
+    alt: 'Two iPhone screens from pomodoro-simple: the in-app timer and the Lock Screen Live Activity.',
   },
   links: {
     detail: { to: '/projects/pomodoro-simple', label: 'View project' },
@@ -83,6 +84,8 @@ export const personalSite: Project = {
   image: {
     // The site's own social preview banner (public/og-image.png).
     src: '/og-image.png',
+    width: 1200,
+    height: 630,
     alt: '',
   },
   links: {
@@ -93,23 +96,49 @@ export const personalSite: Project = {
 
 export const projects: readonly Project[] = [pomodoroSimple, personalSite]
 
-// TODO: drop the screenshots into src/assets/projects/ under these names and
-// fill in each alt text; they appear automatically once the files exist.
+// iPhone screenshots are 1320x2868 (portrait) or 2868x1320 (StandBy).
+const portrait = (small: string, large: string, alt: string): ProjectImage => ({
+  src: small,
+  srcSet: `${small} 400w, ${large} 600w`,
+  width: 600,
+  height: 1304,
+  alt,
+})
+
 export const pomodoroScreenshots: readonly Screenshot[] = [
   {
-    file: 'pomodoro-1.png',
-    image: { src: projectAsset('pomodoro-1.png'), alt: '' /* TODO: alt text */ },
-    caption: 'Screenshot 1',
+    image: portrait(
+      pomodoroApp400,
+      pomodoroApp600,
+      'pomodoro-simple timer screen showing a Focus session with 8:27 remaining, session dots, and Pause and Skip buttons.',
+    ),
+    caption: 'The timer',
   },
   {
-    file: 'pomodoro-2.png',
-    image: { src: projectAsset('pomodoro-2.png'), alt: '' /* TODO: alt text */ },
-    caption: 'Screenshot 2',
+    image: portrait(
+      pomodoroLock400,
+      pomodoroLock600,
+      'iPhone Lock Screen with a pomodoro-simple Live Activity showing a Focus session with 9:51 left and Pause and Skip buttons.',
+    ),
+    caption: 'Lock Screen',
   },
   {
-    file: 'pomodoro-lock-screen.png',
-    image: { src: projectAsset('pomodoro-lock-screen.png'), alt: '' /* TODO: alt text */ },
-    caption: 'Lock Screen / StandBy controls',
+    image: {
+      src: pomodoroStandby900,
+      srcSet: `${pomodoroStandby900} 900w, ${pomodoroStandby1800} 1800w`,
+      width: 1800,
+      height: 828,
+      alt: 'iPhone in StandBy mode on its side, showing the pomodoro-simple timer at 9:34 with pause and skip buttons next to a calendar.',
+    },
+    caption: 'StandBy',
+  },
+  {
+    image: portrait(
+      pomodoroWidget400,
+      pomodoroWidget600,
+      "pomodoro-simple home screen widget showing a Focus session at 9:02, controls, and today's goal progress.",
+    ),
+    caption: 'Home Screen widget',
   },
 ]
 

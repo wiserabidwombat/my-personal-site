@@ -12,7 +12,6 @@ export function Projects() {
           <h1 className={cn(pageTitle, pageTitleLeading, 'mx-auto max-w-3xl font-bold text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]')}>
             Projects
           </h1>
-          {/* TODO: confirm this line's wording. */}
           <p className="mx-auto max-w-2xl text-lg leading-snug text-slate-300">Things I've built outside of work.</p>
         </div>
       </section>

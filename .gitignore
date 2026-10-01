@@ -38,3 +38,7 @@ public/rss.xml
 
 # Local review screenshots (Playwright captures for visual checks)
 review-screenshots/
+
+# Full-size project screenshots: local masters only. The site ships the
+# resized .webp files generated from them, which are committed.
+src/assets/projects/*.png

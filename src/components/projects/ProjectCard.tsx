@@ -29,11 +29,18 @@ export function ProjectCard({ project }: Props) {
         'has-[.card-target:focus-visible]:-translate-y-1 has-[.card-target:focus-visible]:border-[var(--laser-cyan)]/70',
       )}
     >
-      {image.src ? (
+      {image ? (
         <img
           src={image.src}
+          srcSet={image.srcSet}
+          // One column below md, two (in a max-w-4xl container) from md up;
+          // ~470px is the column width at the 18px lg root font.
+          sizes="(min-width: 1024px) 470px, (min-width: 768px) 50vw, calc(100vw - 48px)"
+          width={image.width}
+          height={image.height}
           alt={image.alt}
           loading="lazy"
+          decoding="async"
           className="aspect-video w-full object-cover transition-[filter] duration-300 group-hover:brightness-110"
         />
       ) : (
