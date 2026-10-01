@@ -15,7 +15,7 @@ const primaryButton = cn(
 )
 
 export function PomodoroHero() {
-  const { name, summary, links } = pomodoroSimple
+  const { name, displayName, summary, links } = pomodoroSimple
 
   return (
     <section className={compactHero}>
@@ -42,6 +42,12 @@ export function PomodoroHero() {
             <p className="mt-2 max-w-64 text-xs leading-snug text-slate-400">
               You'll need Apple's free TestFlight app; the link walks you through it.
             </p>
+            {displayName && (
+              <p className="mt-1 max-w-64 text-xs leading-snug text-slate-400">
+                Shows up on your phone as{' '}
+                <strong className="font-semibold whitespace-nowrap text-slate-200">{displayName}</strong>.
+              </p>
+            )}
           </div>
           {links.github && (
             <a
