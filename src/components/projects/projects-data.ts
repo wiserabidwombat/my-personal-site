@@ -59,10 +59,8 @@ export function projectAsset(file: string): string | null {
 export const pomodoroSimple: Project = {
   slug: 'pomodoro-simple',
   name: 'pomodoro-simple',
-  // TODO: confirm this one-line description.
-  summary: 'A simple Pomodoro timer for iOS.',
+  summary: 'A focused Pomodoro timer for iPhone, with Lock Screen and StandBy controls.',
   status: 'Beta on TestFlight',
-  // TODO: add tech pills you want to show (e.g. the UI framework), if any.
   tags: ['iOS'],
   image: {
     // TODO: add src/assets/projects/pomodoro-card.png (a 16:9 image for the card).
@@ -115,16 +113,33 @@ export const pomodoroScreenshots: readonly Screenshot[] = [
   },
 ]
 
-// Each item is a suggested phrasing, not a confirmed fact. Confirm or rewrite
-// it, then set `confirmed: true` to drop its on-page TODO marker.
 export interface FeatureItem {
+  title: string
   text: string
-  confirmed: boolean
 }
 
 export const pomodoroFeatures: readonly FeatureItem[] = [
-  { text: 'Start, pause, and reset focus and break sessions with one tap.', confirmed: false },
-  { text: 'Control the timer from the Lock Screen and StandBy.', confirmed: false },
-  { text: 'Adjustable focus and break lengths.', confirmed: false },
-  { text: 'No account and no sign-up.', confirmed: false },
+  {
+    title: 'Lock Screen and StandBy',
+    text: 'pause, resume and skip without unlocking your phone, plus a live countdown when your phone is on its side while charging.',
+  },
+  {
+    title: 'Custom timer profiles',
+    text: 'set focus and break lengths and how many sessions make a cycle.',
+  },
+  {
+    title: 'Make it yours',
+    text: 'accent colors, chime sounds, and an option to silence chimes during Focus.',
+  },
+  {
+    title: 'Stats and daily goals',
+    text: 'track completed focus sessions, set a daily target, and export your history as CSV.',
+  },
+]
+
+// "How I Built It", one string per paragraph.
+export const pomodoroBuildStory: readonly string[] = [
+  'pomodoro-simple is my first iOS app. I wanted a timer for my own focus sessions that did exactly what I needed and nothing else, so I built one.',
+  'I built it with Claude. We started small: a basic app that met a short list of requirements. Once that worked, I added Lock Screen controls and StandBy support, which are the features I use most.',
+  "That second step was the hard part. The app, its widgets and the Live Activity all show the same timer, but each one runs separately and follows its own rules. Keeping them in sync, and learning each one's quirks, taught me more about how iOS works than the rest of the app combined.",
 ]
