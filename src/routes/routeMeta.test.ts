@@ -56,6 +56,9 @@ import {
   mineralsFossilsMeta,
   booksMeta,
   musicMeta,
+  projectsMeta,
+  pomodoroSimpleMeta,
+  pomodoroSimplePrivacyMeta,
   routeMetaList,
   type RouteMetaEntry,
 } from './routeMeta'
@@ -78,6 +81,9 @@ const routeFiles: { file: string; metaName: string; meta: RouteMetaEntry }[] = [
   { file: 'minerals_fossils.tsx', metaName: 'mineralsFossilsMeta', meta: mineralsFossilsMeta },
   { file: 'books.tsx', metaName: 'booksMeta', meta: booksMeta },
   { file: 'music.tsx', metaName: 'musicMeta', meta: musicMeta },
+  { file: 'projects.index.tsx', metaName: 'projectsMeta', meta: projectsMeta },
+  { file: 'projects.pomodoro-simple.index.tsx', metaName: 'pomodoroSimpleMeta', meta: pomodoroSimpleMeta },
+  { file: 'projects.pomodoro-simple.privacy.tsx', metaName: 'pomodoroSimplePrivacyMeta', meta: pomodoroSimplePrivacyMeta },
 ]
 
 describe('routeMeta wiring (guards against static-page metadata drift)', () => {

@@ -81,6 +81,24 @@ export const booksMeta: RouteMetaEntry = {
   description: "Browse Aaron's reading library, synced live from Hardcover.",
 }
 
+export const projectsMeta: RouteMetaEntry = {
+  path: '/projects',
+  title: 'Projects',
+  description: 'Side projects by Aaron Tilley: pomodoro-simple, an iOS focus timer, and the story behind this site.',
+}
+
+export const pomodoroSimpleMeta: RouteMetaEntry = {
+  path: '/projects/pomodoro-simple',
+  title: 'pomodoro-simple',
+  description: 'A focused Pomodoro timer for iPhone, with Lock Screen and StandBy controls.',
+}
+
+export const pomodoroSimplePrivacyMeta: RouteMetaEntry = {
+  path: '/projects/pomodoro-simple/privacy',
+  title: 'pomodoro-simple Privacy Policy',
+  description: 'Privacy policy for the pomodoro-simple iOS app.',
+}
+
 // Consumed directly by scripts/prerender-meta.mjs for its static-page
 // prerender pass (see that script's comments). Order here has no effect on
 // the prerendered output -- each page is written to its own
@@ -96,4 +114,7 @@ export const routeMetaList: readonly RouteMetaEntry[] = [
   mineralsFossilsMeta,
   booksMeta,
   musicMeta,
+  projectsMeta,
+  pomodoroSimpleMeta,
+  pomodoroSimplePrivacyMeta,
 ]

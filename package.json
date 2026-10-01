@@ -14,6 +14,7 @@
     "spotify:auth": "node --env-file=.env.local scripts/spotify-auth.mjs",
     "test": "vitest run",
     "og:image": "node scripts/og-image/render.mjs",
+    "images:projects": "node scripts/project-images.mjs",
     "sim": "tsx scripts/skyline-sim.ts"
   },
   "dependencies": {
@@ -56,6 +57,7 @@
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
     "playwright": "^1.63.0",
+    "sharp": "^0.35.5",
     "tsx": "^4.21.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.65.0",

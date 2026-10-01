@@ -21,6 +21,9 @@ import { Route as ResumeRouteImport } from './routes/resume'
 import { Route as SkylineDefenseRouteImport } from './routes/skyline-defense'
 import { Route as StackRouteImport } from './routes/stack'
 import { Route as BlogSlugRouteImport } from './routes/blog_.$slug'
+import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
+import { Route as ProjectsPomodoroSimpleIndexRouteImport } from './routes/projects.pomodoro-simple.index'
+import { Route as ProjectsPomodoroSimplePrivacyRouteImport } from './routes/projects.pomodoro-simple.privacy'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +85,23 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsPomodoroSimpleIndexRoute =
+  ProjectsPomodoroSimpleIndexRouteImport.update({
+    id: '/projects/pomodoro-simple/',
+    path: '/projects/pomodoro-simple/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProjectsPomodoroSimplePrivacyRoute =
+  ProjectsPomodoroSimplePrivacyRouteImport.update({
+    id: '/projects/pomodoro-simple/privacy',
+    path: '/projects/pomodoro-simple/privacy',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +116,9 @@ export interface FileRoutesByFullPath {
   '/skyline-defense': typeof SkylineDefenseRoute
   '/stack': typeof StackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/projects/': typeof ProjectsIndexRoute
+  '/projects/pomodoro-simple/privacy': typeof ProjectsPomodoroSimplePrivacyRoute
+  '/projects/pomodoro-simple/': typeof ProjectsPomodoroSimpleIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +133,9 @@ export interface FileRoutesByTo {
   '/skyline-defense': typeof SkylineDefenseRoute
   '/stack': typeof StackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/projects': typeof ProjectsIndexRoute
+  '/projects/pomodoro-simple/privacy': typeof ProjectsPomodoroSimplePrivacyRoute
+  '/projects/pomodoro-simple': typeof ProjectsPomodoroSimpleIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +151,9 @@ export interface FileRoutesById {
   '/skyline-defense': typeof SkylineDefenseRoute
   '/stack': typeof StackRoute
   '/blog_/$slug': typeof BlogSlugRoute
+  '/projects/': typeof ProjectsIndexRoute
+  '/projects/pomodoro-simple/privacy': typeof ProjectsPomodoroSimplePrivacyRoute
+  '/projects/pomodoro-simple/': typeof ProjectsPomodoroSimpleIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +170,9 @@ export interface FileRouteTypes {
     | '/skyline-defense'
     | '/stack'
     | '/blog/$slug'
+    | '/projects/'
+    | '/projects/pomodoro-simple/privacy'
+    | '/projects/pomodoro-simple/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +187,9 @@ export interface FileRouteTypes {
     | '/skyline-defense'
     | '/stack'
     | '/blog/$slug'
+    | '/projects'
+    | '/projects/pomodoro-simple/privacy'
+    | '/projects/pomodoro-simple'
   id:
     | '__root__'
     | '/'
@@ -169,6 +204,9 @@ export interface FileRouteTypes {
     | '/skyline-defense'
     | '/stack'
     | '/blog_/$slug'
+    | '/projects/'
+    | '/projects/pomodoro-simple/privacy'
+    | '/projects/pomodoro-simple/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +222,9 @@ export interface RootRouteChildren {
   SkylineDefenseRoute: typeof SkylineDefenseRoute
   StackRoute: typeof StackRoute
   BlogSlugRoute: typeof BlogSlugRoute
+  ProjectsIndexRoute: typeof ProjectsIndexRoute
+  ProjectsPomodoroSimplePrivacyRoute: typeof ProjectsPomodoroSimplePrivacyRoute
+  ProjectsPomodoroSimpleIndexRoute: typeof ProjectsPomodoroSimpleIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +313,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/': {
+      id: '/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/pomodoro-simple/': {
+      id: '/projects/pomodoro-simple/'
+      path: '/projects/pomodoro-simple'
+      fullPath: '/projects/pomodoro-simple/'
+      preLoaderRoute: typeof ProjectsPomodoroSimpleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/pomodoro-simple/privacy': {
+      id: '/projects/pomodoro-simple/privacy'
+      path: '/projects/pomodoro-simple/privacy'
+      fullPath: '/projects/pomodoro-simple/privacy'
+      preLoaderRoute: typeof ProjectsPomodoroSimplePrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +350,9 @@ const rootRouteChildren: RootRouteChildren = {
   SkylineDefenseRoute: SkylineDefenseRoute,
   StackRoute: StackRoute,
   BlogSlugRoute: BlogSlugRoute,
+  ProjectsIndexRoute: ProjectsIndexRoute,
+  ProjectsPomodoroSimplePrivacyRoute: ProjectsPomodoroSimplePrivacyRoute,
+  ProjectsPomodoroSimpleIndexRoute: ProjectsPomodoroSimpleIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
