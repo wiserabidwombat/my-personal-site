@@ -1,6 +1,7 @@
 import { popupShownY } from '../game/chains'
 import { TUNING } from '../game/tuning'
 import type { GameState, Scout, Ufo } from '../game/types'
+import { drawBat, drawWitch } from './halloweenBonus'
 import { alpha, type Palette } from './palette'
 
 // Bonus targets are magenta and lime -- never the cyan of the defended
@@ -98,9 +99,13 @@ function drawScout(ctx: CanvasRenderingContext2D, scout: Scout, palette: Palette
   ctx.restore()
 }
 
+// During Halloween the UFO is drawn as a witch and the scouts as bats (see
+// halloweenBonus.ts). Chosen per frame from the palette, so switching the
+// season mid-run swaps them on the next frame.
 export function drawBonusTargets(ctx: CanvasRenderingContext2D, state: GameState, palette: Palette, still: boolean) {
-  for (const scout of state.scouts) drawScout(ctx, scout, palette, still)
-  for (const ufo of state.ufos) drawUfo(ctx, ufo, palette, still)
+  const halloween = palette.season === 'halloween'
+  for (const scout of state.scouts) (halloween ? drawBat : drawScout)(ctx, scout, palette, still)
+  for (const ufo of state.ufos) (halloween ? drawWitch : drawUfo)(ctx, ufo, palette, still)
 }
 
 // "+points" (white for meteors, lime for bonus targets) rising and fading,

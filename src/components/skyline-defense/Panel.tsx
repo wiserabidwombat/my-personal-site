@@ -11,6 +11,9 @@ type Props = {
   // key handler, for panels whose keys overlap the game's.
   ownsKeys?: boolean
   onKeyDown?: KeyboardEventHandler<HTMLDivElement>
+  // Decorative extras positioned against the panel's box (e.g. seasonal
+  // sprites just outside its edges), not clipped by its rounded border.
+  decor?: ReactNode
 }
 
 // Leeway for "scrolled to the bottom" (fractional scroll positions).
@@ -54,47 +57,52 @@ function useOverflow() {
 // plus a fade (until scrolled to the bottom) so the list reads as
 // continuing beneath it. The divider's space is always reserved, so
 // nothing shifts when it appears.
-export function Panel({ title, children, actions, ownsKeys = false, onKeyDown }: Props) {
+export function Panel({ title, children, actions, ownsKeys = false, onKeyDown, decor }: Props) {
   const { scrollRef, contentRef, overflows, atBottom, onScroll } = useOverflow()
   const showFade = overflows && !atBottom
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-[var(--deep-space-black)]/70 p-4">
-      <div
-        role="dialog"
-        aria-label={title}
-        data-owns-keys={ownsKeys ? '' : undefined}
-        onKeyDown={onKeyDown}
-        className="flex max-h-full w-full max-w-sm flex-col overflow-hidden rounded-2xl border border-[var(--neon-pink)]/50 bg-[var(--deep-space-purple)]/90 text-center shadow-glow-pink"
-      >
+      {/* The panel's box: the dialog fills it (and shrinks to its max
+          height), and `decor` is positioned against it. */}
+      <div className="relative flex max-h-full w-full max-w-sm flex-col">
         <div
-          ref={scrollRef}
-          onScroll={onScroll}
-          className={`min-h-0 overflow-y-auto overscroll-contain p-6 ${actions ? 'pb-5' : ''}`}
+          role="dialog"
+          aria-label={title}
+          data-owns-keys={ownsKeys ? '' : undefined}
+          onKeyDown={onKeyDown}
+          className="flex min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-[var(--neon-pink)]/50 bg-[var(--deep-space-purple)]/90 text-center shadow-glow-pink"
         >
-          <div ref={contentRef}>
-            <h2 className="text-2xl font-extrabold tracking-wide text-[var(--neon-pink)] uppercase [text-shadow:var(--glow-pink)]">
-              {title}
-            </h2>
-            {children}
-          </div>
-        </div>
-        {actions && (
           <div
-            data-overflow={overflows ? '' : undefined}
-            className={`relative shrink-0 border-t px-6 py-4 transition-colors ${
-              overflows ? 'border-[var(--neon-pink)]/30' : 'border-transparent'
-            }`}
+            ref={scrollRef}
+            onScroll={onScroll}
+            className={`min-h-0 overflow-y-auto overscroll-contain p-6 ${actions ? 'pb-5' : ''}`}
           >
-            <div
-              aria-hidden="true"
-              data-fade={showFade ? '' : undefined}
-              className={`pointer-events-none absolute inset-x-0 bottom-[calc(100%+1px)] h-6 bg-gradient-to-t from-[var(--deep-space-purple)] to-transparent transition-opacity motion-reduce:transition-none ${
-                showFade ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-            <div className="flex flex-wrap items-center justify-center gap-3">{actions}</div>
+            <div ref={contentRef}>
+              <h2 className="text-2xl font-extrabold tracking-wide text-[var(--neon-pink)] uppercase [text-shadow:var(--glow-pink)]">
+                {title}
+              </h2>
+              {children}
+            </div>
           </div>
-        )}
+          {actions && (
+            <div
+              data-overflow={overflows ? '' : undefined}
+              className={`relative shrink-0 border-t px-6 py-4 transition-colors ${
+                overflows ? 'border-[var(--neon-pink)]/30' : 'border-transparent'
+              }`}
+            >
+              <div
+                aria-hidden="true"
+                data-fade={showFade ? '' : undefined}
+                className={`pointer-events-none absolute inset-x-0 bottom-[calc(100%+1px)] h-6 bg-gradient-to-t from-[var(--deep-space-purple)] to-transparent transition-opacity motion-reduce:transition-none ${
+                  showFade ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+              <div className="flex flex-wrap items-center justify-center gap-3">{actions}</div>
+            </div>
+          )}
+        </div>
+        {decor}
       </div>
     </div>
   )
