@@ -18,6 +18,7 @@ const primaryNavItems = [
   { to: '/', label: 'Home' },
   { to: '/about', label: 'About' },
   { to: '/blog', label: 'Blog' },
+  { to: '/projects', label: 'Projects' },
   { to: '/resume', label: 'Resume' },
   { to: '/contact', label: 'Contact' },
 ]
@@ -41,7 +42,7 @@ export function Navbar() {
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         <Link
           to="/"
-          className="text-lg font-bold tracking-widest text-[var(--laser-cyan)] [text-shadow:var(--glow-cyan)]"
+          className="text-lg font-bold tracking-widest whitespace-nowrap text-[var(--laser-cyan)] [text-shadow:var(--glow-cyan)]"
         >
           AARON TILLEY
         </Link>
@@ -50,7 +51,7 @@ export function Navbar() {
           <NavigationMenuList className="gap-1">
             {primaryNavItems.map((item) => (
               <NavigationMenuItem key={item.to}>
-                <Link to={item.to} className={`${navLinkClass} block rounded-2xl px-4.5 py-2.5`}>
+                <Link to={item.to} className={`${navLinkClass} block rounded-2xl px-3 py-2.5 lg:px-4.5`}>
                   {item.label}
                 </Link>
               </NavigationMenuItem>
