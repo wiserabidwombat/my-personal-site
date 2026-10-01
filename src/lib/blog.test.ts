@@ -218,6 +218,7 @@ describe('tagLabel', () => {
   it('uses the override for acronyms and joined words', () => {
     expect(tagLabel('ai')).toBe('AI')
     expect(tagLabel('boardgames')).toBe('Board Games')
+    expect(tagLabel('ios')).toBe('iOS')
   })
 
   it('title-cases other tags word by word', () => {

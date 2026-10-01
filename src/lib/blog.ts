@@ -105,6 +105,7 @@ export function getAllTags(): string[] {
 const TAG_LABELS: Record<string, string> = {
   ai: 'AI',
   boardgames: 'Board Games',
+  ios: 'iOS',
 }
 
 export function tagLabel(tag: string): string {
