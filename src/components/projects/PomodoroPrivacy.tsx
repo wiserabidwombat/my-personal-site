@@ -30,7 +30,7 @@ export function PomodoroPrivacy() {
             className="inline-flex items-center gap-1 text-sm font-semibold tracking-[0.3em] text-[var(--laser-cyan)] uppercase transition-colors hover:text-[var(--neon-pink)]"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} className="size-4" aria-hidden="true" />
-            pomodoro-simple
+            Steady
           </Link>
           <h1 className={cn(pageTitle, pageTitleLeading, 'max-w-3xl font-bold text-balance text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]')}>
             Privacy Policy for Steady: Focus Timer

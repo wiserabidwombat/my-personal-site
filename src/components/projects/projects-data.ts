@@ -75,7 +75,7 @@ export const pomodoroSimple: Project = {
     srcSet: `${pomodoroCard800} 800w, ${pomodoroCard1600} 1600w`,
     width: 1600,
     height: 900,
-    alt: 'Two iPhone screens from pomodoro-simple: the in-app timer and the Lock Screen Live Activity.',
+    alt: 'Two iPhone screens from Steady: the in-app timer and the Lock Screen Live Activity.',
   },
   links: {
     detail: { to: '/projects/pomodoro-simple', label: 'View project' },
@@ -121,7 +121,7 @@ export const pomodoroScreenshots: readonly Screenshot[] = [
     image: portrait(
       pomodoroApp400,
       pomodoroApp600,
-      'pomodoro-simple timer screen showing a Focus session with 8:27 remaining, session dots, and Pause and Skip buttons.',
+      'Steady timer screen showing a Focus session with 8:27 remaining, session dots, and Pause and Skip buttons.',
     ),
     caption: 'The timer',
   },
@@ -129,7 +129,7 @@ export const pomodoroScreenshots: readonly Screenshot[] = [
     image: portrait(
       pomodoroLock400,
       pomodoroLock600,
-      'iPhone Lock Screen with a pomodoro-simple Live Activity showing a Focus session with 9:51 left and Pause and Skip buttons.',
+      'iPhone Lock Screen with a Steady Live Activity showing a Focus session with 9:51 left and Pause and Skip buttons.',
     ),
     caption: 'Lock Screen',
   },
@@ -139,7 +139,7 @@ export const pomodoroScreenshots: readonly Screenshot[] = [
       srcSet: `${pomodoroStandby900} 900w, ${pomodoroStandby1800} 1800w`,
       width: 1800,
       height: 828,
-      alt: 'iPhone in StandBy mode on its side, showing the pomodoro-simple timer at 9:34 with pause and skip buttons next to a calendar.',
+      alt: 'iPhone in StandBy mode on its side, showing the Steady timer at 9:34 with pause and skip buttons next to a calendar.',
     },
     caption: 'StandBy',
   },
@@ -147,7 +147,7 @@ export const pomodoroScreenshots: readonly Screenshot[] = [
     image: portrait(
       pomodoroWidget400,
       pomodoroWidget600,
-      "pomodoro-simple home screen widget showing a Focus session at 9:02, controls, and today's goal progress.",
+      "Steady home screen widget showing a Focus session at 9:02, controls, and today's goal progress.",
     ),
     caption: 'Home Screen widget',
   },
@@ -179,7 +179,7 @@ export const pomodoroFeatures: readonly FeatureItem[] = [
 
 // "How I Built It", one string per paragraph.
 export const pomodoroBuildStory: readonly string[] = [
-  'pomodoro-simple is my first iOS app. I wanted a timer for my own focus sessions that did exactly what I needed and nothing else, so I built one.',
+  'Steady is my first iOS app. I wanted a timer for my own focus sessions that did exactly what I needed and nothing else, so I built one.',
   'I built it with Claude. We started small: a basic app that met a short list of requirements. Once that worked, I added Lock Screen controls and StandBy support, which are the features I use most.',
   "That second step was the hard part. The app, its widgets and the Live Activity all show the same timer, but each one runs separately and follows its own rules. Keeping them in sync, and learning each one's quirks, taught me more about how iOS works than the rest of the app combined.",
 ]

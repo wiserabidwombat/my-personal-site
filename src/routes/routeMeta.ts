@@ -89,14 +89,14 @@ export const projectsMeta: RouteMetaEntry = {
 
 export const pomodoroSimpleMeta: RouteMetaEntry = {
   path: '/projects/pomodoro-simple',
-  title: 'pomodoro-simple',
+  title: 'Steady: Focus Timer',
   description: 'A focused Pomodoro timer for iPhone, iPad, and Apple Watch, with Lock Screen and StandBy controls.',
 }
 
 export const pomodoroSimplePrivacyMeta: RouteMetaEntry = {
   path: '/projects/pomodoro-simple/privacy',
   title: 'Steady Privacy Policy',
-  description: 'Privacy policy for the pomodoro-simple app on iPhone, iPad, and Apple Watch.',
+  description: 'Privacy policy for the Steady app on iPhone, iPad, and Apple Watch.',
 }
 
 // Consumed directly by scripts/prerender-meta.mjs for its static-page
