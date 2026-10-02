@@ -43,7 +43,7 @@ export interface Project {
   slug: string
   name: string
   // The name under the app's icon on iPhone and iPad, when it differs from
-  // `name`, and on Apple Watch if that's different again.
+  // `name`, and on Apple Watch (omit, or set the same, when it matches).
   displayName?: string
   watchDisplayName?: string
   summary: string
@@ -61,10 +61,12 @@ export interface Screenshot {
 }
 
 export const pomodoroSimple: Project = {
+  // The slug, routes and repo keep the original "pomodoro-simple"; the
+  // app itself is now called Steady.
   slug: 'pomodoro-simple',
-  name: 'pomodoro-simple',
-  displayName: 'Simple: StandBy Timer',
-  watchDisplayName: 'Simple Timer',
+  name: 'Steady: Focus Timer',
+  displayName: 'Steady',
+  watchDisplayName: 'Steady',
   summary: 'A focused Pomodoro timer for iPhone, iPad, and Apple Watch, with Lock Screen and StandBy controls.',
   status: 'Beta on TestFlight',
   tags: ['iOS', 'iPadOS', 'watchOS'],
@@ -111,6 +113,9 @@ const portrait = (small: string, large: string, alt: string): ProjectImage => ({
   alt,
 })
 
+// TODO: the Home Screen widget screenshot (pomodoro-widget) still shows the
+// old name, "Simple: StandBy Timer", under the widget, in the image itself.
+// Recapture it after the rename and re-run `npm run images:projects`.
 export const pomodoroScreenshots: readonly Screenshot[] = [
   {
     image: portrait(

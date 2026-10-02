@@ -47,11 +47,13 @@ export function PomodoroHero() {
             </p>
             {displayName && (
               <p className="mt-1 max-w-64 text-xs leading-snug text-slate-400">
-                Shows up as <strong className={appName}>{displayName}</strong> on iPhone and iPad
-                {watchDisplayName && (
+                Shows up as <strong className={appName}>{displayName}</strong> on{' '}
+                {watchDisplayName && watchDisplayName !== displayName ? (
                   <>
-                    , and <strong className={appName}>{watchDisplayName}</strong> on Apple Watch
+                    iPhone and iPad, and <strong className={appName}>{watchDisplayName}</strong> on Apple Watch
                   </>
+                ) : (
+                  'iPhone, iPad, and Apple Watch'
                 )}
                 .
               </p>

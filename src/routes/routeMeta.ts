@@ -95,7 +95,7 @@ export const pomodoroSimpleMeta: RouteMetaEntry = {
 
 export const pomodoroSimplePrivacyMeta: RouteMetaEntry = {
   path: '/projects/pomodoro-simple/privacy',
-  title: 'pomodoro-simple Privacy Policy',
+  title: 'Steady Privacy Policy',
   description: 'Privacy policy for the pomodoro-simple app on iPhone, iPad, and Apple Watch.',
 }
 

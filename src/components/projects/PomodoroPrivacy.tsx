@@ -33,7 +33,7 @@ export function PomodoroPrivacy() {
             pomodoro-simple
           </Link>
           <h1 className={cn(pageTitle, pageTitleLeading, 'max-w-3xl font-bold text-balance text-[var(--neon-pink)] [text-shadow:var(--glow-pink)]')}>
-            Privacy Policy for Simple: StandBy Timer
+            Privacy Policy for Steady: Focus Timer
           </h1>
           <p className="text-slate-300">
             <strong className={policyStrong}>Last updated:</strong> <time dateTime={LAST_UPDATED}>{lastUpdatedLabel}</time>
@@ -45,7 +45,7 @@ export function PomodoroPrivacy() {
         className={cn(pageContainer, 'flex flex-col gap-10 py-8 leading-relaxed text-slate-300 sm:py-10 [&>*]:max-w-[70ch]')}
       >
         <p>
-          Simple: StandBy Timer does not collect, store, transmit, or share any personal data. Everything the app keeps
+          Steady: Focus Timer does not collect, store, transmit, or share any personal data. Everything the app keeps
           stays on your own devices: your iPhone, your iPad, and your Apple Watch. I never receive any of it.
         </p>
         <PrivacyStorageSections />
