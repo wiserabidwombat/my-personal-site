@@ -14,8 +14,11 @@ const primaryButton = cn(
   'border-[var(--laser-cyan)] bg-[var(--laser-cyan)] font-semibold text-[var(--deep-space-black)] hover:bg-[var(--laser-cyan)] hover:shadow-glow-cyan',
 )
 
+// An app name in the "Shows up as" line.
+const appName = 'font-semibold whitespace-nowrap text-slate-200'
+
 export function PomodoroHero() {
-  const { name, displayName, summary, links } = pomodoroSimple
+  const { name, displayName, watchDisplayName, summary, links } = pomodoroSimple
 
   return (
     <section className={compactHero}>
@@ -44,8 +47,13 @@ export function PomodoroHero() {
             </p>
             {displayName && (
               <p className="mt-1 max-w-64 text-xs leading-snug text-slate-400">
-                Shows up on your phone as{' '}
-                <strong className="font-semibold whitespace-nowrap text-slate-200">{displayName}</strong>.
+                Shows up as <strong className={appName}>{displayName}</strong> on iPhone and iPad
+                {watchDisplayName && (
+                  <>
+                    , and <strong className={appName}>{watchDisplayName}</strong> on Apple Watch
+                  </>
+                )}
+                .
               </p>
             )}
           </div>

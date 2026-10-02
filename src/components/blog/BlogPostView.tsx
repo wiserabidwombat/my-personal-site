@@ -89,6 +89,9 @@ export function BlogPostView({ post }: Props) {
             above and 24px below (adjacent margins collapse to the larger). */}
         <div className="pt-8">
           <div className="max-w-[60ch] [&>:first-child]:mt-0">
+            {/* A later note on the post (frontmatter `update`), kept apart
+                from its original text: muted and italic. */}
+            {post.update && <p className="mb-[24px] text-slate-400 italic">{post.update}</p>}
             <ReactMarkdown
               rehypePlugins={[rehypeImageGroups]}
               components={{
