@@ -84,7 +84,7 @@ export const booksMeta: RouteMetaEntry = {
 export const projectsMeta: RouteMetaEntry = {
   path: '/projects',
   title: 'Projects',
-  description: 'Side projects by Aaron Tilley: pomodoro-simple, a focus timer for iPhone, iPad, and Apple Watch, and the story behind this site.',
+  description: 'Side projects by Aaron Tilley: Steady, a focus timer for iPhone, iPad, and Apple Watch, and the story behind this site.',
 }
 
 export const pomodoroSimpleMeta: RouteMetaEntry = {

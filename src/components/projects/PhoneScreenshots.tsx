@@ -82,7 +82,7 @@ export function PhoneScreenshots({ screenshots }: Props) {
         data-fade-start={canScrollBack}
         data-fade-end={canScrollForward}
         role="region"
-        aria-label="pomodoro-simple screenshots"
+        aria-label="Steady screenshots"
         tabIndex={0}
         onKeyDown={onKeyDown}
         className={cn(
