@@ -84,19 +84,19 @@ export const booksMeta: RouteMetaEntry = {
 export const projectsMeta: RouteMetaEntry = {
   path: '/projects',
   title: 'Projects',
-  description: 'Side projects by Aaron Tilley: pomodoro-simple, an iOS focus timer, and the story behind this site.',
+  description: 'Side projects by Aaron Tilley: pomodoro-simple, a focus timer for iPhone, iPad, and Apple Watch, and the story behind this site.',
 }
 
 export const pomodoroSimpleMeta: RouteMetaEntry = {
   path: '/projects/pomodoro-simple',
   title: 'pomodoro-simple',
-  description: 'A focused Pomodoro timer for iPhone, with Lock Screen and StandBy controls.',
+  description: 'A focused Pomodoro timer for iPhone, iPad, and Apple Watch, with Lock Screen and StandBy controls.',
 }
 
 export const pomodoroSimplePrivacyMeta: RouteMetaEntry = {
   path: '/projects/pomodoro-simple/privacy',
   title: 'pomodoro-simple Privacy Policy',
-  description: 'Privacy policy for the pomodoro-simple iOS app.',
+  description: 'Privacy policy for the pomodoro-simple app on iPhone, iPad, and Apple Watch.',
 }
 
 // Consumed directly by scripts/prerender-meta.mjs for its static-page

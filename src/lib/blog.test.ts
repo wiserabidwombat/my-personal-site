@@ -70,6 +70,25 @@ Body.
     expect(() => buildPostsFromRaw(rawModules)).toThrow(/date/i)
   })
 
+  it('reads an optional update note, and rejects one that is not a string', () => {
+    const post = (update: string) => ({
+      '/content/blog/updated.md': `---
+title: Updated Post
+slug: updated-post
+image: /blog/updated.svg
+blurb: A post with an update note.
+date: "2026-01-01"
+${update}
+---
+Body.
+`,
+    })
+
+    expect(buildPostsFromRaw(post('update: "Update, March 2026: fixed."'))[0].update).toBe('Update, March 2026: fixed.')
+    expect(buildPostsFromRaw(post(''))[0].update).toBeUndefined()
+    expect(() => buildPostsFromRaw(post('update: 2026'))).toThrow(/update/)
+  })
+
   it('throws when tags is a scalar instead of a list', () => {
     const rawModules = {
       '/content/blog/scalar-tags.md': `---

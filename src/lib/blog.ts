@@ -26,6 +26,10 @@ function parsePost(raw: string, filePath: string): BlogPost {
     throw new Error(`Blog post "${filePath}" has an "ogImage" field that isn't a string`)
   }
 
+  if (data.update !== undefined && (typeof data.update !== 'string' || data.update.trim() === '')) {
+    throw new Error(`Blog post "${filePath}" has an "update" field that isn't a non-empty string`)
+  }
+
   if (
     data.tags !== undefined &&
     (!Array.isArray(data.tags) || data.tags.some((tag: unknown) => typeof tag !== 'string'))
@@ -41,6 +45,7 @@ function parsePost(raw: string, filePath: string): BlogPost {
     blurb: data.blurb,
     date: data.date,
     author: data.author,
+    update: data.update,
     tags: data.tags ?? [],
     body: content.trim(),
   }

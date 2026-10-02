@@ -7,6 +7,7 @@ blurb: "pomodoro-simple started as a basic timer for my own focus sessions. Keep
 date: "2026-10-01"
 author: "Aaron Tilley"
 tags: ["coding", "ai", "ios"]
+update: "Update, October 2026: it now runs on iPad and Apple Watch too; data stays on your devices."
 ---
 
 I shipped my first iOS app. Well, shipped to TestFlight, which counts. It's called [pomodoro-simple](/projects/pomodoro-simple), and it's a Pomodoro timer I built for my own focus sessions.

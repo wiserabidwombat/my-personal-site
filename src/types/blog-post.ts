@@ -7,6 +7,9 @@ export type BlogPost = {
   blurb: string
   date: string
   author?: string
+  // A short dated note shown above the body, e.g. "Update, October 2026:
+  // ...", so a post can be corrected without editing its text.
+  update?: string
   tags: string[]
   body: string
 }
