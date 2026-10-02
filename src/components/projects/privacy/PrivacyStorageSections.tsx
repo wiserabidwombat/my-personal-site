@@ -53,7 +53,7 @@ export function PrivacyStorageSections() {
           </li>
           <li>
             <strong className={policyStrong}>Siri and Shortcuts.</strong> So you can say things like "Start Deep Work
-            with Simple Timer," your timer profile names are made available to Siri and the Shortcuts app on your
+            with Steady," your timer profile names are made available to Siri and the Shortcuts app on your
             device. Requests you make to Siri are handled by Apple under{' '}
             <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer" className={policyLink}>
               Apple's Privacy Policy
