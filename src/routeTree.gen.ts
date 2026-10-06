@@ -22,6 +22,7 @@ import { Route as SkylineDefenseRouteImport } from './routes/skyline-defense'
 import { Route as StackRouteImport } from './routes/stack'
 import { Route as BlogSlugRouteImport } from './routes/blog_.$slug'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
+import { Route as ProjectsNannyPrivacyRouteImport } from './routes/projects.nanny.privacy'
 import { Route as ProjectsPomodoroSimpleIndexRouteImport } from './routes/projects.pomodoro-simple.index'
 import { Route as ProjectsPomodoroSimplePrivacyRouteImport } from './routes/projects.pomodoro-simple.privacy'
 
@@ -90,6 +91,11 @@ const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
   path: '/projects/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsNannyPrivacyRoute = ProjectsNannyPrivacyRouteImport.update({
+  id: '/projects/nanny/privacy',
+  path: '/projects/nanny/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsPomodoroSimpleIndexRoute =
   ProjectsPomodoroSimpleIndexRouteImport.update({
     id: '/projects/pomodoro-simple/',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/stack': typeof StackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/projects/nanny/privacy': typeof ProjectsNannyPrivacyRoute
   '/projects/pomodoro-simple/privacy': typeof ProjectsPomodoroSimplePrivacyRoute
   '/projects/pomodoro-simple/': typeof ProjectsPomodoroSimpleIndexRoute
 }
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/stack': typeof StackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/projects': typeof ProjectsIndexRoute
+  '/projects/nanny/privacy': typeof ProjectsNannyPrivacyRoute
   '/projects/pomodoro-simple/privacy': typeof ProjectsPomodoroSimplePrivacyRoute
   '/projects/pomodoro-simple': typeof ProjectsPomodoroSimpleIndexRoute
 }
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/stack': typeof StackRoute
   '/blog_/$slug': typeof BlogSlugRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/projects/nanny/privacy': typeof ProjectsNannyPrivacyRoute
   '/projects/pomodoro-simple/privacy': typeof ProjectsPomodoroSimplePrivacyRoute
   '/projects/pomodoro-simple/': typeof ProjectsPomodoroSimpleIndexRoute
 }
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/stack'
     | '/blog/$slug'
     | '/projects/'
+    | '/projects/nanny/privacy'
     | '/projects/pomodoro-simple/privacy'
     | '/projects/pomodoro-simple/'
   fileRoutesByTo: FileRoutesByTo
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/stack'
     | '/blog/$slug'
     | '/projects'
+    | '/projects/nanny/privacy'
     | '/projects/pomodoro-simple/privacy'
     | '/projects/pomodoro-simple'
   id:
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/stack'
     | '/blog_/$slug'
     | '/projects/'
+    | '/projects/nanny/privacy'
     | '/projects/pomodoro-simple/privacy'
     | '/projects/pomodoro-simple/'
   fileRoutesById: FileRoutesById
@@ -223,6 +235,7 @@ export interface RootRouteChildren {
   StackRoute: typeof StackRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
+  ProjectsNannyPrivacyRoute: typeof ProjectsNannyPrivacyRoute
   ProjectsPomodoroSimplePrivacyRoute: typeof ProjectsPomodoroSimplePrivacyRoute
   ProjectsPomodoroSimpleIndexRoute: typeof ProjectsPomodoroSimpleIndexRoute
 }
@@ -320,6 +333,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/nanny/privacy': {
+      id: '/projects/nanny/privacy'
+      path: '/projects/nanny/privacy'
+      fullPath: '/projects/nanny/privacy'
+      preLoaderRoute: typeof ProjectsNannyPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects/pomodoro-simple/': {
       id: '/projects/pomodoro-simple/'
       path: '/projects/pomodoro-simple'
@@ -351,6 +371,7 @@ const rootRouteChildren: RootRouteChildren = {
   StackRoute: StackRoute,
   BlogSlugRoute: BlogSlugRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
+  ProjectsNannyPrivacyRoute: ProjectsNannyPrivacyRoute,
   ProjectsPomodoroSimplePrivacyRoute: ProjectsPomodoroSimplePrivacyRoute,
   ProjectsPomodoroSimpleIndexRoute: ProjectsPomodoroSimpleIndexRoute,
 }

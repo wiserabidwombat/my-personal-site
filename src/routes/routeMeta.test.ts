@@ -59,6 +59,7 @@ import {
   projectsMeta,
   pomodoroSimpleMeta,
   pomodoroSimplePrivacyMeta,
+  nannyPrivacyMeta,
   routeMetaList,
   type RouteMetaEntry,
 } from './routeMeta'
@@ -84,6 +85,7 @@ const routeFiles: { file: string; metaName: string; meta: RouteMetaEntry }[] = [
   { file: 'projects.index.tsx', metaName: 'projectsMeta', meta: projectsMeta },
   { file: 'projects.pomodoro-simple.index.tsx', metaName: 'pomodoroSimpleMeta', meta: pomodoroSimpleMeta },
   { file: 'projects.pomodoro-simple.privacy.tsx', metaName: 'pomodoroSimplePrivacyMeta', meta: pomodoroSimplePrivacyMeta },
+  { file: 'projects.nanny.privacy.tsx', metaName: 'nannyPrivacyMeta', meta: nannyPrivacyMeta },
 ]
 
 describe('routeMeta wiring (guards against static-page metadata drift)', () => {

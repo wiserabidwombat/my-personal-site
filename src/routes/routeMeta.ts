@@ -99,6 +99,12 @@ export const pomodoroSimplePrivacyMeta: RouteMetaEntry = {
   description: 'Privacy policy for the Steady app on iPhone, iPad, and Apple Watch.',
 }
 
+export const nannyPrivacyMeta: RouteMetaEntry = {
+  path: '/projects/nanny/privacy',
+  title: 'Nanny: Screen Time Limits — Privacy Policy',
+  description: 'Privacy policy for Nanny: Screen Time Limits, an iOS app.',
+}
+
 // Consumed directly by scripts/prerender-meta.mjs for its static-page
 // prerender pass (see that script's comments). Order here has no effect on
 // the prerendered output -- each page is written to its own
@@ -117,4 +123,5 @@ export const routeMetaList: readonly RouteMetaEntry[] = [
   projectsMeta,
   pomodoroSimpleMeta,
   pomodoroSimplePrivacyMeta,
+  nannyPrivacyMeta,
 ]
