@@ -59,6 +59,8 @@ import {
   projectsMeta,
   pomodoroSimpleMeta,
   pomodoroSimplePrivacyMeta,
+  pinballLabMeta,
+  pinballLabPrivacyMeta,
   nannyPrivacyMeta,
   routeMetaList,
   type RouteMetaEntry,
@@ -85,6 +87,8 @@ const routeFiles: { file: string; metaName: string; meta: RouteMetaEntry }[] = [
   { file: 'projects.index.tsx', metaName: 'projectsMeta', meta: projectsMeta },
   { file: 'projects.pomodoro-simple.index.tsx', metaName: 'pomodoroSimpleMeta', meta: pomodoroSimpleMeta },
   { file: 'projects.pomodoro-simple.privacy.tsx', metaName: 'pomodoroSimplePrivacyMeta', meta: pomodoroSimplePrivacyMeta },
+  { file: 'projects.pinball-lab.index.tsx', metaName: 'pinballLabMeta', meta: pinballLabMeta },
+  { file: 'projects.pinball-lab.privacy.tsx', metaName: 'pinballLabPrivacyMeta', meta: pinballLabPrivacyMeta },
   { file: 'projects.nanny.privacy.tsx', metaName: 'nannyPrivacyMeta', meta: nannyPrivacyMeta },
 ]
 

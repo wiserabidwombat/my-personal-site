@@ -9,7 +9,8 @@ import {
 } from '@hugeicons/core-free-icons'
 import { PolicySection, policyLink, policyList, policyStrong } from './PolicySection'
 
-const CONTACT_EMAIL = 'aaronltilley1+pomodoro@gmail.com'
+// Also the contact address on Pinball Lab's policy.
+export const CONTACT_EMAIL = 'aaronltilley1+pomodoro@gmail.com'
 
 // The privacy policy's second half: what the app doesn't do, exporting,
 // crash reports and beta feedback, deleting, changes, the App Store

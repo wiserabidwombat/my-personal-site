@@ -2,17 +2,9 @@ import { Link } from '@tanstack/react-router'
 import { cn } from 'cn'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft01Icon, Github01Icon } from '@hugeicons/core-free-icons'
-import { buttonVariants } from '@/components/ui/button'
-import { compactHero, neonOutlineButton, pageTitle, pageTitleLeading } from '../../lib/styles'
+import { compactHero, neonOutlineButton, pageTitle, pageTitleLeading, primaryCyanButton as primaryButton } from '../../lib/styles'
 import { ProjectPills } from './ProjectPills'
 import { pomodoroSimple, TESTFLIGHT_URL } from './projects-data'
-
-// Filled cyan: the page's one primary action. Same color pair as the active
-// filter chip (outlinePillActive), which holds its contrast in every theme.
-const primaryButton = cn(
-  buttonVariants({ size: 'lg' }),
-  'border-[var(--laser-cyan)] bg-[var(--laser-cyan)] font-semibold text-[var(--deep-space-black)] hover:bg-[var(--laser-cyan)] hover:shadow-glow-cyan',
-)
 
 // An app name in the "Shows up as" line.
 const appName = 'font-semibold whitespace-nowrap text-slate-200'

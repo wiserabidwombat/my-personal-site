@@ -37,6 +37,14 @@ export const neonOutlineButton = cn(
   'border-[var(--laser-cyan)] bg-transparent text-[var(--laser-cyan)] hover:bg-[var(--laser-cyan)]/10 hover:text-[var(--laser-cyan)] hover:shadow-glow-cyan',
 )
 
+// Filled cyan: a page's one primary action (project heroes). Same color
+// pair as the active filter chip (outlinePillActive), which holds its
+// contrast in every theme.
+export const primaryCyanButton = cn(
+  buttonVariants({ size: 'lg' }),
+  'border-[var(--laser-cyan)] bg-[var(--laser-cyan)] font-semibold text-[var(--deep-space-black)] hover:bg-[var(--laser-cyan)] hover:shadow-glow-cyan',
+)
+
 // Compact hero (Blog, Contact): shorter than the site default
 // (bg-synth-grid's 26rem min-height and 11rem horizon) so the first cards
 // land above the fold on a ~800px laptop viewport. Horizon and glow move up with it to stay behind the text.
