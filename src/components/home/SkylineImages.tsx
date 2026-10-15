@@ -50,7 +50,7 @@ const skylines: Record<Theme, { src: string; alt: string; halloweenSrc?: string;
 // <html data-season>) -- so prerendered HTML paints the right art before
 // any JS runs, with no flash. The normal images stay eager (they're the
 // hero's LCP), with fetchPriority favoring the active theme. The Halloween
-// images start lazy: hidden (display: none) outside October, the browser
+// images start lazy: hidden (display: none) outside Oct 29-31, the browser
 // never downloads them. Once the season is confirmed active they switch to
 // eager, so the other theme's Halloween art is ready before a toggle (a
 // lazy, hidden image may not load until it's shown).

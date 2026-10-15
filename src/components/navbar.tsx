@@ -98,7 +98,7 @@ export function Navbar() {
                 server has no real `theme` to read; see useTheme.ts's SSR
                 guard), while a runtime toggle still swaps instantly since
                 it's the same data-theme attribute driving both. */}
-            {/* In October (or a preview) the same CSS approach swaps in pixel
+            {/* On Oct 29-31 (or a preview) the same CSS approach swaps in pixel
                 pumpkins, off <html data-season>: a lit jack-o'-lantern in
                 dark mode, an unlit pumpkin in light mode. */}
             <span className="block season-hidden">

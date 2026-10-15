@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react'
 import { useSeason } from '../../hooks/useSeason'
 
 // The sprite module is split into its own chunk and imported only when the
-// season is active, so outside October it's never downloaded.
+// season is active, so outside Oct 29-31 it's never downloaded.
 const loadDecor = () => import('./HalloweenDecor')
 const decor = {
   heroBats: lazy(() => loadDecor().then((module) => ({ default: module.HeroBats }))),

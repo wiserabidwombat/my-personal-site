@@ -10,7 +10,7 @@ import {
 export type SeasonState = {
   // The Halloween theme is on (<html data-season="halloween">).
   active: boolean
-  // It's October, or a preview is on: the footer can offer on/off.
+  // It's Oct 29-31, or a preview is on: the footer can offer on/off.
   available: boolean
   setEnabled: (enabled: boolean) => void
 }

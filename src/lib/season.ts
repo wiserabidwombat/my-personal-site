@@ -1,7 +1,8 @@
-// The October-only Halloween theme. index.html carries a hand-copied version
-// of resolveSeason() as an inline <head> script (it must run before any
-// bundle loads, so there's no flash of the normal theme); season.test.ts
-// runs that script against the same cases to keep the two in step.
+// The Halloween theme, on for the last three days of October (Oct 29-31).
+// index.html carries a hand-copied version of resolveSeason() as an inline
+// <head> script (it must run before any bundle loads, so there's no flash of
+// the normal theme); season.test.ts runs that script against the same cases
+// to keep the two in step.
 
 export type Season = 'halloween' | 'none'
 
@@ -23,9 +24,9 @@ export type SeasonInputs = {
 const asSeason = (value: string | null): Season | null =>
   value === 'halloween' || value === 'none' ? value : null
 
-// October, in the visitor's local time zone.
+// The last three days of October (29-31), in the visitor's local time zone.
 export function isHalloweenDate(now: Date): boolean {
-  return now.getMonth() === 9
+  return now.getMonth() === 9 && now.getDate() >= 29
 }
 
 // Checked in order: a ?season= URL parameter (saved as the session's
@@ -45,7 +46,7 @@ export function resolveSeason({ now, search, preview, optOut }: SeasonInputs): {
 }
 
 // Whether the Halloween theme can be turned on or off right now: it's
-// October, or this session is previewing (?season=halloween or =none).
+// Oct 29-31, or this session is previewing (?season=halloween or =none).
 // Otherwise the date rule has nothing to turn on, so the footer toggle
 // stays hidden.
 export function isSeasonAvailable({ now, preview }: Pick<SeasonInputs, 'now' | 'preview'>): boolean {
@@ -55,8 +56,8 @@ export function isSeasonAvailable({ now, preview }: Pick<SeasonInputs, 'now' | '
 type StorageLike = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>
 
 // The visitor's footer toggle. Turning the theme off records the opt-out;
-// turning it on clears it. In October that's all it takes. Outside October
-// the only way the theme is on is a preview, so the choice is kept as the
+// turning it on clears it. On Oct 29-31 that's all it takes. Outside those
+// days the only way the theme is on is a preview, so the choice is kept as the
 // session's preview instead ('halloween' or 'none'), which also keeps the
 // toggle available to switch back.
 export function applySeasonChoice(enabled: boolean, now: Date, local: StorageLike, session: StorageLike) {
