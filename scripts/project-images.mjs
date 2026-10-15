@@ -21,7 +21,9 @@
 //   2. Resize. Portrait masters -> 400w + 600w WebP; landscape -> 900w + 1800w.
 //   3. Cards. Composes each project's 1600x900 card image (phones on a
 //      synthwave gradient, see CARDS) from the redacted masters, writes its
-//      <name>.png master, then 800w + 1600w WebP.
+//      <name>.png master, then 800w + 1600w WebP. Each card is made twice:
+//      on the dark theme's background (<name>-*) and on the light theme's
+//      (<name>-light-*); ProjectCard shows the one for the active theme.
 import sharp from 'sharp'
 import { readFile, writeFile, stat } from 'node:fs/promises'
 import path from 'node:path'
@@ -173,23 +175,31 @@ async function resizeMasters() {
 
 const SCALE = 2 // render at 2x, downscale at the end for clean edges
 
-// Gradient plus a heavily blurred magenta glow (blurred with sharp, not an SVG
+// Card backgrounds per theme: a vertical gradient plus one soft glow behind
+// the phones. Light uses the light theme's page and panel colors
+// (--deep-space-black / --deep-space-purple) with a pale violet glow.
+const BACKGROUNDS = {
+  dark: { top: 'rgb(21,10,36)', bottom: 'rgb(10,6,18)', glow: 'rgb(120,20,110)' },
+  light: { top: 'rgb(247,245,251)', bottom: 'rgb(233,227,245)', glow: 'rgb(214,190,240)' },
+}
+
+// Gradient plus a heavily blurred glow (blurred with sharp, not an SVG
 // filter, which renders at an unpredictable size).
-async function buildBackground() {
+async function buildBackground({ top, bottom, glow: glowColor }) {
   const w = CARD.width * SCALE
   const h = CARD.height * SCALE
   const gradient = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
     <defs>
       <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="rgb(21,10,36)"/>
-        <stop offset="1" stop-color="rgb(10,6,18)"/>
+        <stop offset="0" stop-color="${top}"/>
+        <stop offset="1" stop-color="${bottom}"/>
       </linearGradient>
     </defs>
     <rect width="${w}" height="${h}" fill="url(#bg)"/>
   </svg>`
   const glow = await sharp(
     Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-      <ellipse cx="${w * 0.5}" cy="${h * 0.76}" rx="${w * 0.32}" ry="${h * 0.34}" fill="rgb(120,20,110)"/>
+      <ellipse cx="${w * 0.5}" cy="${h * 0.76}" rx="${w * 0.32}" ry="${h * 0.34}" fill="${glowColor}"/>
     </svg>`),
   )
     .blur(130 * SCALE)
@@ -279,20 +289,23 @@ async function buildCard({ name, phones }) {
   for (const phone of phones) {
     layers.push(await clipToCanvas(await buildPhone(phone), w, h))
   }
-  // composite() runs after resize() inside one sharp pipeline, so flatten first.
-  const big = await sharp(await buildBackground()).composite(layers).png().toBuffer()
-  const png = await sharp(big)
-    .resize(CARD.width, CARD.height, { kernel: 'lanczos3' })
-    .png()
-    .toBuffer()
+  for (const [theme, background] of Object.entries(BACKGROUNDS)) {
+    const file = theme === 'dark' ? name : `${name}-${theme}`
+    // composite() runs after resize() inside one sharp pipeline, so flatten first.
+    const big = await sharp(await buildBackground(background)).composite(layers).png().toBuffer()
+    const png = await sharp(big)
+      .resize(CARD.width, CARD.height, { kernel: 'lanczos3' })
+      .png()
+      .toBuffer()
 
-  const master = path.join(dir, `${name}.png`)
-  await writeFile(master, png)
-  await report(master)
-  for (const cw of [800, 1600]) {
-    const out = path.join(dir, `${name}-${cw}.webp`)
-    await sharp(png).resize({ width: cw, kernel: 'lanczos3' }).webp(WEBP).toFile(out)
-    await report(out)
+    const master = path.join(dir, `${file}.png`)
+    await writeFile(master, png)
+    await report(master)
+    for (const cw of [800, 1600]) {
+      const out = path.join(dir, `${file}-${cw}.webp`)
+      await sharp(png).resize({ width: cw, kernel: 'lanczos3' }).webp(WEBP).toFile(out)
+      await report(out)
+    }
   }
 }
 

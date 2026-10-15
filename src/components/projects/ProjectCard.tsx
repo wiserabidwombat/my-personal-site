@@ -4,10 +4,31 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowUpRight01Icon, Github01Icon, Image01Icon } from '@hugeicons/core-free-icons'
 import { headingText } from '../../lib/styles'
 import { ProjectPills } from './ProjectPills'
-import type { Project } from './projects-data'
+import type { Project, ProjectImage } from './projects-data'
 
 type Props = {
   project: Project
+}
+
+function CardImage({ image, className }: { image: ProjectImage; className?: string }) {
+  return (
+    <img
+      src={image.src}
+      srcSet={image.srcSet}
+      // One column below md, two (in a max-w-4xl container) from md up;
+      // ~470px is the column width at the 18px lg root font.
+      sizes="(min-width: 1024px) 470px, (min-width: 768px) 50vw, calc(100vw - 48px)"
+      width={image.width}
+      height={image.height}
+      alt={image.alt}
+      loading="lazy"
+      decoding="async"
+      className={cn(
+        'aspect-video w-full object-cover transition-[filter] duration-300 group-hover:brightness-110',
+        className,
+      )}
+    />
+  )
 }
 
 const secondaryLinkClass =
@@ -30,19 +51,18 @@ export function ProjectCard({ project }: Props) {
       )}
     >
       {image ? (
-        <img
-          src={image.src}
-          srcSet={image.srcSet}
-          // One column below md, two (in a max-w-4xl container) from md up;
-          // ~470px is the column width at the 18px lg root font.
-          sizes="(min-width: 1024px) 470px, (min-width: 768px) 50vw, calc(100vw - 48px)"
-          width={image.width}
-          height={image.height}
-          alt={image.alt}
-          loading="lazy"
-          decoding="async"
-          className="aspect-video w-full object-cover transition-[filter] duration-300 group-hover:brightness-110"
-        />
+        image.light ? (
+          // Both themes' images are mounted and swapped by the
+          // theme-dark-only/theme-light-only classes (keyed off <html
+          // data-theme>), so prerendered HTML shows the right one with no
+          // flash. Both are lazy, so the hidden one isn't downloaded.
+          <>
+            <CardImage image={image} className="theme-dark-only" />
+            <CardImage image={{ ...image, src: image.light.src, srcSet: image.light.srcSet }} className="theme-light-only" />
+          </>
+        ) : (
+          <CardImage image={image} />
+        )
       ) : (
         <div className="flex aspect-video w-full items-center justify-center bg-[var(--deep-space-black)]/60 text-slate-500">
           <HugeiconsIcon icon={Image01Icon} strokeWidth={1.5} className="size-10" aria-hidden="true" />
