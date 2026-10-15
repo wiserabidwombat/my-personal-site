@@ -17,10 +17,13 @@ const local = (month: number, day: number, hour = 0, minute = 0, second = 0) =>
   new Date(2026, month, day, hour, minute, second)
 
 const OCT_1_MIDNIGHT = local(9, 1, 0, 0, 0)
-const OCT_31_2359 = local(9, 31, 23, 59, 59)
-const SEP_30_LAST_SECOND = local(8, 30, 23, 59, 59)
-const NOV_1_MIDNIGHT = local(10, 1, 0, 0, 0)
 const MID_OCTOBER = local(9, 15, 12)
+const OCT_28_LAST_SECOND = local(9, 28, 23, 59, 59)
+const OCT_29_MIDNIGHT = local(9, 29, 0, 0, 0)
+const OCT_31_2359 = local(9, 31, 23, 59, 59)
+const NOV_1_MIDNIGHT = local(10, 1, 0, 0, 0)
+// A day the date rule has the theme on.
+const HALLOWEEN_DAY = local(9, 30, 12)
 const MID_JULY = local(6, 4, 12)
 
 const inputs = (overrides: Partial<SeasonInputs> = {}): SeasonInputs => ({
@@ -32,10 +35,13 @@ const inputs = (overrides: Partial<SeasonInputs> = {}): SeasonInputs => ({
 })
 
 describe('isHalloweenDate', () => {
-  it('is true for all of October, local time, and nothing else', () => {
-    expect(isHalloweenDate(OCT_1_MIDNIGHT)).toBe(true)
+  it('is true for Oct 29-31, local time, and nothing else', () => {
+    expect(isHalloweenDate(OCT_29_MIDNIGHT)).toBe(true)
+    expect(isHalloweenDate(HALLOWEEN_DAY)).toBe(true)
     expect(isHalloweenDate(OCT_31_2359)).toBe(true)
-    expect(isHalloweenDate(SEP_30_LAST_SECOND)).toBe(false)
+    expect(isHalloweenDate(OCT_1_MIDNIGHT)).toBe(false)
+    expect(isHalloweenDate(MID_OCTOBER)).toBe(false)
+    expect(isHalloweenDate(OCT_28_LAST_SECOND)).toBe(false)
     expect(isHalloweenDate(NOV_1_MIDNIGHT)).toBe(false)
   })
 })
@@ -44,25 +50,27 @@ describe('isHalloweenDate', () => {
 type Case = { name: string; input: SeasonInputs; season: 'halloween' | 'none'; savePreview: 'halloween' | 'none' | null }
 
 const cases: Case[] = [
-  { name: 'Oct 1 00:00 turns it on', input: inputs({ now: OCT_1_MIDNIGHT }), season: 'halloween', savePreview: null },
+  { name: 'Oct 29 00:00 turns it on', input: inputs({ now: OCT_29_MIDNIGHT }), season: 'halloween', savePreview: null },
   { name: 'Oct 31 23:59 keeps it on', input: inputs({ now: OCT_31_2359 }), season: 'halloween', savePreview: null },
-  { name: 'Sep 30 23:59:59 is off', input: inputs({ now: SEP_30_LAST_SECOND }), season: 'none', savePreview: null },
+  { name: 'Oct 28 23:59:59 is off', input: inputs({ now: OCT_28_LAST_SECOND }), season: 'none', savePreview: null },
+  { name: 'Oct 1 00:00 is off', input: inputs({ now: OCT_1_MIDNIGHT }), season: 'none', savePreview: null },
+  { name: 'mid-October is off', input: inputs({ now: MID_OCTOBER }), season: 'none', savePreview: null },
   { name: 'Nov 1 00:00 is off', input: inputs({ now: NOV_1_MIDNIGHT }), season: 'none', savePreview: null },
   {
-    name: '?season=halloween forces it on outside October and saves the preview',
+    name: '?season=halloween forces it on outside Oct 29-31 and saves the preview',
     input: inputs({ search: '?season=halloween' }),
     season: 'halloween',
     savePreview: 'halloween',
   },
   {
-    name: '?season=none forces it off in October and saves the preview',
-    input: inputs({ now: MID_OCTOBER, search: '?season=none' }),
+    name: '?season=none forces it off during Oct 29-31 and saves the preview',
+    input: inputs({ now: HALLOWEEN_DAY, search: '?season=none' }),
     season: 'none',
     savePreview: 'none',
   },
   {
     name: 'the URL parameter beats a saved preview and the opt-out',
-    input: inputs({ now: MID_OCTOBER, search: '?season=halloween', preview: 'none', optOut: 'true' }),
+    input: inputs({ now: HALLOWEEN_DAY, search: '?season=halloween', preview: 'none', optOut: 'true' }),
     season: 'halloween',
     savePreview: 'halloween',
   },
@@ -74,14 +82,14 @@ const cases: Case[] = [
   },
   {
     name: 'a saved preview beats the opt-out',
-    input: inputs({ now: MID_OCTOBER, preview: 'halloween', optOut: 'true' }),
+    input: inputs({ now: HALLOWEEN_DAY, preview: 'halloween', optOut: 'true' }),
     season: 'halloween',
     savePreview: null,
   },
-  { name: 'the opt-out turns October off', input: inputs({ now: MID_OCTOBER, optOut: 'true' }), season: 'none', savePreview: null },
+  { name: 'the opt-out turns Oct 29-31 off', input: inputs({ now: HALLOWEEN_DAY, optOut: 'true' }), season: 'none', savePreview: null },
   {
     name: 'unknown values are ignored',
-    input: inputs({ now: MID_OCTOBER, search: '?season=xmas', preview: 'spooky', optOut: 'yes' }),
+    input: inputs({ now: HALLOWEEN_DAY, search: '?season=xmas', preview: 'spooky', optOut: 'yes' }),
     season: 'halloween',
     savePreview: null,
   },
@@ -103,8 +111,8 @@ describe('themeColorFor', () => {
 })
 
 describe('isSeasonAvailable', () => {
-  it('is true in October or while previewing', () => {
-    expect(isSeasonAvailable({ now: MID_OCTOBER, preview: null })).toBe(true)
+  it('is true on Oct 29-31 or while previewing', () => {
+    expect(isSeasonAvailable({ now: HALLOWEEN_DAY, preview: null })).toBe(true)
     expect(isSeasonAvailable({ now: MID_JULY, preview: 'halloween' })).toBe(true)
     expect(isSeasonAvailable({ now: MID_JULY, preview: 'none' })).toBe(true)
     expect(isSeasonAvailable({ now: MID_JULY, preview: null })).toBe(false)
@@ -123,16 +131,16 @@ function memoryStorage(initial: Record<string, string> = {}) {
 }
 
 describe('applySeasonChoice', () => {
-  it('turning off in October records the opt-out and ends a preview', () => {
+  it('turning off during Oct 29-31 records the opt-out and ends a preview', () => {
     const localStore = memoryStorage()
     const sessionStore = memoryStorage({ [PREVIEW_KEY]: 'halloween' })
-    applySeasonChoice(false, MID_OCTOBER, localStore, sessionStore)
+    applySeasonChoice(false, HALLOWEEN_DAY, localStore, sessionStore)
     expect(localStore.data.get(OPT_OUT_KEY)).toBe('true')
     expect(sessionStore.data.has(PREVIEW_KEY)).toBe(false)
-    expect(resolveSeason(inputs({ now: MID_OCTOBER, optOut: 'true' })).season).toBe('none')
+    expect(resolveSeason(inputs({ now: HALLOWEEN_DAY, optOut: 'true' })).season).toBe('none')
   })
 
-  it('turning off during a preview outside October keeps previewing, switched off', () => {
+  it('turning off during a preview outside Oct 29-31 keeps previewing, switched off', () => {
     const localStore = memoryStorage()
     const sessionStore = memoryStorage({ [PREVIEW_KEY]: 'halloween' })
     applySeasonChoice(false, MID_JULY, localStore, sessionStore)
@@ -141,15 +149,15 @@ describe('applySeasonChoice', () => {
     expect(isSeasonAvailable({ now: MID_JULY, preview: 'none' })).toBe(true)
   })
 
-  it('turning on in October clears the opt-out', () => {
+  it('turning on during Oct 29-31 clears the opt-out', () => {
     const localStore = memoryStorage({ [OPT_OUT_KEY]: 'true' })
     const sessionStore = memoryStorage()
-    applySeasonChoice(true, MID_OCTOBER, localStore, sessionStore)
+    applySeasonChoice(true, HALLOWEEN_DAY, localStore, sessionStore)
     expect(localStore.data.has(OPT_OUT_KEY)).toBe(false)
     expect(sessionStore.data.has(PREVIEW_KEY)).toBe(false)
   })
 
-  it('turning on outside October keeps it on for the session as a preview', () => {
+  it('turning on outside Oct 29-31 keeps it on for the session as a preview', () => {
     const localStore = memoryStorage({ [OPT_OUT_KEY]: 'true' })
     const sessionStore = memoryStorage()
     applySeasonChoice(true, MID_JULY, localStore, sessionStore)
@@ -216,13 +224,13 @@ describe('index.html season script', () => {
 
   it('sets the same theme-color as themeColorFor', () => {
     for (const theme of ['dark', 'light'] as const) {
-      expect(runScript(inputs({ now: MID_OCTOBER }), { theme }).themeColor).toBe(themeColorFor('halloween', theme))
+      expect(runScript(inputs({ now: HALLOWEEN_DAY }), { theme }).themeColor).toBe(themeColorFor('halloween', theme))
       expect(runScript(inputs({ now: MID_JULY }), { theme }).themeColor).toBe(themeColorFor('none', theme))
     }
   })
 
   it('falls back to the date rule when storage is blocked', () => {
-    expect(runScript(inputs({ now: MID_OCTOBER }), { storageThrows: true }).season).toBe('halloween')
+    expect(runScript(inputs({ now: HALLOWEEN_DAY }), { storageThrows: true }).season).toBe('halloween')
     expect(runScript(inputs({ now: MID_JULY }), { storageThrows: true }).season).toBe('none')
   })
 })

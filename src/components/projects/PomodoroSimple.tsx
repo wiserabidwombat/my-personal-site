@@ -27,7 +27,7 @@ export function PomodoroSimple() {
       <PomodoroHero />
 
       <Section icon={Image01Icon} title="Screenshots">
-        <PhoneScreenshots screenshots={pomodoroScreenshots} />
+        <PhoneScreenshots screenshots={pomodoroScreenshots} label="Steady screenshots" />
       </Section>
 
       <Section icon={CheckmarkCircle02Icon} title="Features">

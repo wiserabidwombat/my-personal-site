@@ -6,6 +6,8 @@ import { useScrollEdges } from './useScrollEdges'
 
 type Props = {
   screenshots: readonly Screenshot[]
+  // Accessible name for the strip, e.g. "Steady screenshots".
+  label: string
 }
 
 // iPhone screens are 1320x2868. A portrait screen is 11rem wide, so 23.9rem
@@ -38,7 +40,7 @@ const fadeMask = cn(
 // the screen's orientation. Scrolls sideways; edge fades and (on desktop)
 // prev/next buttons show which way there's more. Focusable, so Left/Right
 // arrow keys step through it. Only the first image loads eagerly.
-export function PhoneScreenshots({ screenshots }: Props) {
+export function PhoneScreenshots({ screenshots, label }: Props) {
   const scrollerRef = useRef<HTMLDivElement>(null)
   const { canScrollBack, canScrollForward } = useScrollEdges(scrollerRef)
 
@@ -82,7 +84,7 @@ export function PhoneScreenshots({ screenshots }: Props) {
         data-fade-start={canScrollBack}
         data-fade-end={canScrollForward}
         role="region"
-        aria-label="Steady screenshots"
+        aria-label={label}
         tabIndex={0}
         onKeyDown={onKeyDown}
         className={cn(

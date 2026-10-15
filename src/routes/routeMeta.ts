@@ -84,7 +84,8 @@ export const booksMeta: RouteMetaEntry = {
 export const projectsMeta: RouteMetaEntry = {
   path: '/projects',
   title: 'Projects',
-  description: 'Side projects by Aaron Tilley: Steady, a focus timer for iPhone, iPad, and Apple Watch, and the story behind this site.',
+  description:
+    'Side projects by Aaron Tilley: Steady, a focus timer for iPhone, iPad, and Apple Watch; Pinball Lab, three pinball tables for iPhone; and the story behind this site.',
 }
 
 export const pomodoroSimpleMeta: RouteMetaEntry = {
@@ -97,6 +98,18 @@ export const pomodoroSimplePrivacyMeta: RouteMetaEntry = {
   path: '/projects/pomodoro-simple/privacy',
   title: 'Steady Privacy Policy',
   description: 'Privacy policy for the Steady app on iPhone, iPad, and Apple Watch.',
+}
+
+export const pinballLabMeta: RouteMetaEntry = {
+  path: '/projects/pinball-lab',
+  title: 'Pinball Lab',
+  description: 'Three original pinball tables for iPhone, each one pushing further than the last.',
+}
+
+export const pinballLabPrivacyMeta: RouteMetaEntry = {
+  path: '/projects/pinball-lab/privacy',
+  title: 'Pinball Lab Privacy Policy',
+  description: 'Privacy policy for Pinball Lab, an iPhone pinball game.',
 }
 
 export const nannyPrivacyMeta: RouteMetaEntry = {
@@ -123,5 +136,7 @@ export const routeMetaList: readonly RouteMetaEntry[] = [
   projectsMeta,
   pomodoroSimpleMeta,
   pomodoroSimplePrivacyMeta,
+  pinballLabMeta,
+  pinballLabPrivacyMeta,
   nannyPrivacyMeta,
 ]

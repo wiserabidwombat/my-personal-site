@@ -23,6 +23,8 @@ import { Route as StackRouteImport } from './routes/stack'
 import { Route as BlogSlugRouteImport } from './routes/blog_.$slug'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsNannyPrivacyRouteImport } from './routes/projects.nanny.privacy'
+import { Route as ProjectsPinballLabIndexRouteImport } from './routes/projects.pinball-lab.index'
+import { Route as ProjectsPinballLabPrivacyRouteImport } from './routes/projects.pinball-lab.privacy'
 import { Route as ProjectsPomodoroSimpleIndexRouteImport } from './routes/projects.pomodoro-simple.index'
 import { Route as ProjectsPomodoroSimplePrivacyRouteImport } from './routes/projects.pomodoro-simple.privacy'
 
@@ -96,6 +98,17 @@ const ProjectsNannyPrivacyRoute = ProjectsNannyPrivacyRouteImport.update({
   path: '/projects/nanny/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsPinballLabIndexRoute = ProjectsPinballLabIndexRouteImport.update({
+  id: '/projects/pinball-lab/',
+  path: '/projects/pinball-lab/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsPinballLabPrivacyRoute =
+  ProjectsPinballLabPrivacyRouteImport.update({
+    id: '/projects/pinball-lab/privacy',
+    path: '/projects/pinball-lab/privacy',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ProjectsPomodoroSimpleIndexRoute =
   ProjectsPomodoroSimpleIndexRouteImport.update({
     id: '/projects/pomodoro-simple/',
@@ -124,7 +137,9 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/projects/nanny/privacy': typeof ProjectsNannyPrivacyRoute
+  '/projects/pinball-lab/privacy': typeof ProjectsPinballLabPrivacyRoute
   '/projects/pomodoro-simple/privacy': typeof ProjectsPomodoroSimplePrivacyRoute
+  '/projects/pinball-lab/': typeof ProjectsPinballLabIndexRoute
   '/projects/pomodoro-simple/': typeof ProjectsPomodoroSimpleIndexRoute
 }
 export interface FileRoutesByTo {
@@ -142,7 +157,9 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/projects': typeof ProjectsIndexRoute
   '/projects/nanny/privacy': typeof ProjectsNannyPrivacyRoute
+  '/projects/pinball-lab/privacy': typeof ProjectsPinballLabPrivacyRoute
   '/projects/pomodoro-simple/privacy': typeof ProjectsPomodoroSimplePrivacyRoute
+  '/projects/pinball-lab': typeof ProjectsPinballLabIndexRoute
   '/projects/pomodoro-simple': typeof ProjectsPomodoroSimpleIndexRoute
 }
 export interface FileRoutesById {
@@ -161,7 +178,9 @@ export interface FileRoutesById {
   '/blog_/$slug': typeof BlogSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/projects/nanny/privacy': typeof ProjectsNannyPrivacyRoute
+  '/projects/pinball-lab/privacy': typeof ProjectsPinballLabPrivacyRoute
   '/projects/pomodoro-simple/privacy': typeof ProjectsPomodoroSimplePrivacyRoute
+  '/projects/pinball-lab/': typeof ProjectsPinballLabIndexRoute
   '/projects/pomodoro-simple/': typeof ProjectsPomodoroSimpleIndexRoute
 }
 export interface FileRouteTypes {
@@ -181,7 +200,9 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/projects/'
     | '/projects/nanny/privacy'
+    | '/projects/pinball-lab/privacy'
     | '/projects/pomodoro-simple/privacy'
+    | '/projects/pinball-lab/'
     | '/projects/pomodoro-simple/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -199,7 +220,9 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/projects'
     | '/projects/nanny/privacy'
+    | '/projects/pinball-lab/privacy'
     | '/projects/pomodoro-simple/privacy'
+    | '/projects/pinball-lab'
     | '/projects/pomodoro-simple'
   id:
     | '__root__'
@@ -217,7 +240,9 @@ export interface FileRouteTypes {
     | '/blog_/$slug'
     | '/projects/'
     | '/projects/nanny/privacy'
+    | '/projects/pinball-lab/privacy'
     | '/projects/pomodoro-simple/privacy'
+    | '/projects/pinball-lab/'
     | '/projects/pomodoro-simple/'
   fileRoutesById: FileRoutesById
 }
@@ -236,7 +261,9 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
   ProjectsNannyPrivacyRoute: typeof ProjectsNannyPrivacyRoute
+  ProjectsPinballLabPrivacyRoute: typeof ProjectsPinballLabPrivacyRoute
   ProjectsPomodoroSimplePrivacyRoute: typeof ProjectsPomodoroSimplePrivacyRoute
+  ProjectsPinballLabIndexRoute: typeof ProjectsPinballLabIndexRoute
   ProjectsPomodoroSimpleIndexRoute: typeof ProjectsPomodoroSimpleIndexRoute
 }
 
@@ -340,6 +367,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsNannyPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/pinball-lab/': {
+      id: '/projects/pinball-lab/'
+      path: '/projects/pinball-lab'
+      fullPath: '/projects/pinball-lab/'
+      preLoaderRoute: typeof ProjectsPinballLabIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/pinball-lab/privacy': {
+      id: '/projects/pinball-lab/privacy'
+      path: '/projects/pinball-lab/privacy'
+      fullPath: '/projects/pinball-lab/privacy'
+      preLoaderRoute: typeof ProjectsPinballLabPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects/pomodoro-simple/': {
       id: '/projects/pomodoro-simple/'
       path: '/projects/pomodoro-simple'
@@ -372,7 +413,9 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
   ProjectsNannyPrivacyRoute: ProjectsNannyPrivacyRoute,
+  ProjectsPinballLabPrivacyRoute: ProjectsPinballLabPrivacyRoute,
   ProjectsPomodoroSimplePrivacyRoute: ProjectsPomodoroSimplePrivacyRoute,
+  ProjectsPinballLabIndexRoute: ProjectsPinballLabIndexRoute,
   ProjectsPomodoroSimpleIndexRoute: ProjectsPomodoroSimpleIndexRoute,
 }
 export const routeTree = rootRouteImport

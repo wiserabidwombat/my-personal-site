@@ -1,7 +1,7 @@
 // Regenerates the Projects page images (src/assets/projects/) from full-size
 // PNG masters, in one command: `npm run images:projects`.
 //
-// The masters (pomodoro-*.png) are raw app screenshots and are gitignored
+// The masters (pomodoro-*.png, pinball-*.png) are raw app screenshots and are gitignored
 // (`src/assets/projects/*.png`), so they only exist on this machine. Drop new
 // screenshots over them whenever the app's UI changes, then re-run this. Only
 // the derived .webp files are committed and imported by
@@ -19,9 +19,9 @@
 //      new capture can lay things out differently, and a stale rectangle
 //      would leave private text readable. Inspect the output before commit.
 //   2. Resize. Portrait masters -> 400w + 600w WebP; landscape -> 900w + 1800w.
-//   3. Card. Composes the 1600x900 social/card image (two phones on a
-//      synthwave gradient) from the redacted masters, writes the
-//      pomodoro-card.png master, then 800w + 1600w WebP.
+//   3. Cards. Composes each project's 1600x900 card image (phones on a
+//      synthwave gradient, see CARDS) from the redacted masters, writes its
+//      <name>.png master, then 800w + 1600w WebP.
 import sharp from 'sharp'
 import { readFile, writeFile, stat } from 'node:fs/promises'
 import path from 'node:path'
@@ -38,6 +38,10 @@ const MASTERS = [
   'pomodoro-lock-screen',
   'pomodoro-widget',
   'pomodoro-standby',
+  'pinball-tables',
+  'pinball-orbit',
+  'pinball-grey-invasion',
+  'pinball-cthulhu-rising',
 ]
 const PORTRAIT_WIDTHS = [400, 600]
 const LANDSCAPE_WIDTHS = [900, 1800]
@@ -50,10 +54,27 @@ const REDACTIONS = {
 }
 
 const CARD = { width: 1600, height: 900 }
-const PHONES = [
-  // Back phone first; later entries draw on top.
-  { master: 'pomodoro-lock-screen', edge: [0, 240, 255], angle: -4, x: 790, y: 60 },
-  { master: 'pomodoro-app', edge: [255, 43, 214], angle: 4, x: 470, y: 70 },
+// One entry per card. Phones are listed back first; later entries draw on
+// top. A phone is ~359px wide at SCREEN_HEIGHT; (x, y) is its unrotated
+// top-left on the 1600x900 card.
+const CARDS = [
+  {
+    name: 'pomodoro-card',
+    phones: [
+      { master: 'pomodoro-lock-screen', edge: [0, 240, 255], angle: -4, x: 790, y: 60 },
+      { master: 'pomodoro-app', edge: [255, 43, 214], angle: 4, x: 470, y: 70 },
+    ],
+  },
+  {
+    // The three tables, each edged in its accent color from the app's table
+    // list; Grey Invasion in front.
+    name: 'pinball-card',
+    phones: [
+      { master: 'pinball-orbit', edge: [150, 120, 255], angle: 7, x: 330, y: 95 },
+      { master: 'pinball-cthulhu-rising', edge: [70, 220, 190], angle: -7, x: 910, y: 95 },
+      { master: 'pinball-grey-invasion', edge: [90, 240, 120], angle: 0, x: 620, y: 60 },
+    ],
+  },
 ]
 const SCREEN_HEIGHT = 720
 const BEZEL = 14
@@ -251,11 +272,11 @@ async function clipToCanvas(layer, canvasW, canvasH) {
   return { input, left: Math.max(0, layer.left), top: Math.max(0, layer.top) }
 }
 
-async function buildCard() {
+async function buildCard({ name, phones }) {
   const w = CARD.width * SCALE
   const h = CARD.height * SCALE
   const layers = []
-  for (const phone of PHONES) {
+  for (const phone of phones) {
     layers.push(await clipToCanvas(await buildPhone(phone), w, h))
   }
   // composite() runs after resize() inside one sharp pipeline, so flatten first.
@@ -265,11 +286,11 @@ async function buildCard() {
     .png()
     .toBuffer()
 
-  const master = path.join(dir, 'pomodoro-card.png')
+  const master = path.join(dir, `${name}.png`)
   await writeFile(master, png)
   await report(master)
   for (const cw of [800, 1600]) {
-    const out = path.join(dir, `pomodoro-card-${cw}.webp`)
+    const out = path.join(dir, `${name}-${cw}.webp`)
     await sharp(png).resize({ width: cw, kernel: 'lanczos3' }).webp(WEBP).toFile(out)
     await report(out)
   }
@@ -280,7 +301,7 @@ async function buildCard() {
 try {
   await redactMasters()
   await resizeMasters()
-  await buildCard()
+  for (const card of CARDS) await buildCard(card)
   console.log('\nWrote:\n' + written.map((l) => `  ${l}`).join('\n'))
 } catch (err) {
   console.error(err instanceof Error ? err.message : err)

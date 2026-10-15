@@ -1,4 +1,6 @@
 import type { LinkProps } from '@tanstack/react-router'
+import pinballCard800 from '../../assets/projects/pinball-card-800.webp'
+import pinballCard1600 from '../../assets/projects/pinball-card-1600.webp'
 import pomodoroApp400 from '../../assets/projects/pomodoro-app-400.webp'
 import pomodoroApp600 from '../../assets/projects/pomodoro-app-600.webp'
 import pomodoroCard800 from '../../assets/projects/pomodoro-card-800.webp'
@@ -83,6 +85,25 @@ export const pomodoroSimple: Project = {
   },
 }
 
+export const pinballLab: Project = {
+  slug: 'pinball-lab',
+  name: 'Pinball Lab',
+  summary: 'Three original pinball tables for iPhone, each one pushing further than the last.',
+  status: 'Beta on TestFlight',
+  tags: ['iOS', 'SwiftUI', 'SpriteKit', 'Blender', 'Python'],
+  image: {
+    src: pinballCard800,
+    srcSet: `${pinballCard800} 800w, ${pinballCard1600} 1600w`,
+    width: 1600,
+    height: 900,
+    alt: 'Three iPhone screens from Pinball Lab: the Orbit Pinball, Grey Invasion, and Cthulhu Rising tables.',
+  },
+  links: {
+    detail: { to: '/projects/pinball-lab', label: 'View project' },
+    github: 'https://github.com/wiserabidwombat/pinball-lab',
+  },
+}
+
 export const personalSite: Project = {
   slug: 'my-personal-site',
   name: 'aarontilley.me',
@@ -102,10 +123,10 @@ export const personalSite: Project = {
   },
 }
 
-export const projects: readonly Project[] = [pomodoroSimple, personalSite]
+export const projects: readonly Project[] = [pomodoroSimple, pinballLab, personalSite]
 
 // iPhone screenshots are 1320x2868 (portrait) or 2868x1320 (StandBy).
-const portrait = (small: string, large: string, alt: string): ProjectImage => ({
+export const portrait = (small: string, large: string, alt: string): ProjectImage => ({
   src: small,
   srcSet: `${small} 400w, ${large} 600w`,
   width: 600,

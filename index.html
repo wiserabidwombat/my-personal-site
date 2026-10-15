@@ -23,7 +23,7 @@
       })();
     </script>
     <script id="season-script">
-      // October-only Halloween theme, applied before first paint so there's
+      // Halloween theme (Oct 29-31, local time), applied before first paint so there's
       // no flash of the normal theme. A hand-copied mirror of resolveSeason()
       // in src/lib/season.ts (season.test.ts runs this script against the
       // same cases). Order: ?season= URL parameter (saved for the session),
@@ -49,7 +49,10 @@
               if (localStorage.getItem('halloween-opt-out') === 'true') season = 'none';
             } catch (e) {}
           }
-          if (!season) season = new Date().getMonth() === 9 ? 'halloween' : 'none';
+          if (!season) {
+            var now = new Date();
+            season = now.getMonth() === 9 && now.getDate() >= 29 ? 'halloween' : 'none';
+          }
         } catch (e) {
           season = 'none';
         }
