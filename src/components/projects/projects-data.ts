@@ -1,16 +1,21 @@
 import type { LinkProps } from '@tanstack/react-router'
 import pinballCard800 from '../../assets/projects/pinball-card-800.webp'
 import pinballCard1600 from '../../assets/projects/pinball-card-1600.webp'
+import pinballCardLight800 from '../../assets/projects/pinball-card-light-800.webp'
+import pinballCardLight1600 from '../../assets/projects/pinball-card-light-1600.webp'
 import pomodoroApp400 from '../../assets/projects/pomodoro-app-400.webp'
 import pomodoroApp600 from '../../assets/projects/pomodoro-app-600.webp'
 import pomodoroCard800 from '../../assets/projects/pomodoro-card-800.webp'
 import pomodoroCard1600 from '../../assets/projects/pomodoro-card-1600.webp'
+import pomodoroCardLight800 from '../../assets/projects/pomodoro-card-light-800.webp'
+import pomodoroCardLight1600 from '../../assets/projects/pomodoro-card-light-1600.webp'
 import pomodoroLock400 from '../../assets/projects/pomodoro-lock-screen-400.webp'
 import pomodoroLock600 from '../../assets/projects/pomodoro-lock-screen-600.webp'
 import pomodoroStandby900 from '../../assets/projects/pomodoro-standby-900.webp'
 import pomodoroStandby1800 from '../../assets/projects/pomodoro-standby-1800.webp'
 import pomodoroWidget400 from '../../assets/projects/pomodoro-widget-400.webp'
 import pomodoroWidget600 from '../../assets/projects/pomodoro-widget-600.webp'
+import siteCardLight from '../../assets/projects/site-card-light.webp'
 
 // Everything the Projects pages show. Adding a project is one new entry in
 // `projects` below (plus its own detail route, if it gets one).
@@ -32,6 +37,9 @@ export interface ProjectImage {
   width: number
   height: number
   alt: string
+  // The light theme's version (same size and framing), when the image has
+  // a dark background baked in. The card shows whichever matches the theme.
+  light?: { src: string; srcSet?: string }
 }
 
 export interface ProjectLinks {
@@ -78,6 +86,10 @@ export const pomodoroSimple: Project = {
     width: 1600,
     height: 900,
     alt: 'Two iPhone screens from Steady: the in-app timer and the Lock Screen Live Activity.',
+    light: {
+      src: pomodoroCardLight800,
+      srcSet: `${pomodoroCardLight800} 800w, ${pomodoroCardLight1600} 1600w`,
+    },
   },
   links: {
     detail: { to: '/projects/pomodoro-simple', label: 'View project' },
@@ -97,6 +109,10 @@ export const pinballLab: Project = {
     width: 1600,
     height: 900,
     alt: 'Three iPhone screens from Pinball Lab: the Orbit Pinball, Grey Invasion, and Cthulhu Rising tables.',
+    light: {
+      src: pinballCardLight800,
+      srcSet: `${pinballCardLight800} 800w, ${pinballCardLight1600} 1600w`,
+    },
   },
   links: {
     detail: { to: '/projects/pinball-lab', label: 'View project' },
@@ -111,11 +127,13 @@ export const personalSite: Project = {
   status: 'Live',
   tags: ['React', 'TypeScript', 'Tailwind CSS', 'Vite', 'Vercel'],
   image: {
-    // The site's own social preview banner (public/og-image.png).
+    // The site's own social preview banner (public/og-image.png), and its
+    // light version (`npm run og:image -- --light`).
     src: '/og-image.png',
     width: 1200,
     height: 630,
     alt: '',
+    light: { src: siteCardLight },
   },
   links: {
     detail: { to: '/stack', label: 'About this site' },
