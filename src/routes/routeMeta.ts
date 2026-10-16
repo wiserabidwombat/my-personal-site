@@ -122,7 +122,10 @@ export const nannyPrivacyMeta: RouteMetaEntry = {
 // prerender pass (see that script's comments). Order here has no effect on
 // the prerendered output -- each page is written to its own
 // dist/<path>/index.html -- it just controls prerender log/loop order.
+export const gardenMeta: RouteMetaEntry = { path: '/garden', title: 'The Patient Garden', description: 'Give your purchases time. Grow something instead.' }
+
 export const routeMetaList: readonly RouteMetaEntry[] = [
+  gardenMeta,
   homeMeta,
   aboutMeta,
   resumeMeta,
