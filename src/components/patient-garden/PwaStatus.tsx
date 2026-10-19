@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 interface InstallPrompt extends Event { prompt: () => Promise<void>; userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }> }
-export function PwaStatus() {
+export function PwaStatus({ showHelp = false }: { showHelp?: boolean }) {
   const [online, setOnline] = useState(true)
   const [offlineReady, setOfflineReady] = useState(false)
   const [install, setInstall] = useState<InstallPrompt | null>(null)
@@ -40,7 +40,7 @@ export function PwaStatus() {
     }
     return () => { canceled = true; cleanups.forEach(fn => fn()); window.removeEventListener('online', connection); window.removeEventListener('offline', connection); window.removeEventListener('beforeinstallprompt', prompt); window.removeEventListener('appinstalled', isInstalled) }
   }, [])
-  return <aside className="pg-pwa"><div className="pg-pwa-row"><span role="status">{!online ? 'Offline · changes still save on this device' : offlineReady ? 'Offline ready · saved on this device' : import.meta.env.PROD ? 'Preparing offline files…' : 'Local preview · offline installation is available in the production build'}</span>{install && !standalone && <button onClick={async () => { try { await install.prompt(); await install.userChoice; setInstall(null) } catch { setNotice('Use your browser’s Install or Add to Home Screen menu.') } }}>Install app</button>}{update && <button onClick={() => { reloading.current = true; update.postMessage({ type: 'SKIP_WAITING' }) }}>Update app</button>}</div>{notice && <p role="status">{notice}</p>}
-    <details><summary>{standalone ? 'Installed · backup & update help' : 'How to put this on your phone'}</summary><p>On iPhone or iPad, open this link in Safari, use Share, then Add to Home Screen. On Android, use Install app when offered, or the browser menu. Sharing products directly into the app is available only in supported browsers after installation; pasting a link always works.</p><p>First open the app online and wait for “Offline ready.” Export a backup in Settings before changing devices or site addresses. A Vercel preview and the live website have separate local gardens; move yours with export/import. App updates preserve your saved data.</p></details>
+  return <aside className="pg-pwa"><div className="pg-pwa-row"><span role="status">{!online ? 'Offline · changes still save on this device' : offlineReady ? 'Offline ready · saved on this device' : import.meta.env.PROD ? 'Preparing offline files…' : 'Preview · device storage'}</span>{install && !standalone && <button onClick={async () => { try { await install.prompt(); await install.userChoice; setInstall(null) } catch { setNotice('Use your browser’s Install or Add to Home Screen menu.') } }}>Install app</button>}{update && <button onClick={() => { reloading.current = true; update.postMessage({ type: 'SKIP_WAITING' }) }}>Update app</button>}</div>{notice && <p role="status">{notice}</p>}
+    {showHelp && <details><summary>{standalone ? 'Installed · backup & update help' : 'How to put this on your phone'}</summary><p>On iPhone or iPad, open this link in Safari, use Share, then Add to Home Screen. On Android, use Install app when offered, or the browser menu. Sharing products directly into the app is available only in supported browsers after installation; pasting a link always works.</p><p>First open the app online and wait for “Offline ready.” Export a backup in Settings before changing devices or site addresses. A Vercel preview and the live website have separate local gardens; move yours with export/import. App updates preserve your saved data.</p></details>}
   </aside>
 }

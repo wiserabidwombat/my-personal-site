@@ -83,3 +83,11 @@ Preview URLs and the production site are separate origins and therefore separate
 - Production-browser checks: offline-ready status, offline reload retaining habitats and records, explicit update offer with saved item preserved across update, and protection from stale-tab overwrites. Chrome's installability check returned no blocking errors.
 - Earlier visual checks covered all three catch previews without reward changes, actual catch growth exactly once, no catch replay on reload, pause, and reduced-motion behavior.
 - Physical iPhone/Android installation, OS share-sheet exposure, and real device background/update behavior need the phone checklist alongside the Vercel preview.
+
+## Mobile navigation update
+
+Today is a compact dashboard with budget status, add/review wishes, watering, patience collection, and a garden shortcut. The complete garden and spending records live in their own tabs. Adding/editing a wish opens a dedicated screen; drafts survive switching tabs until saved or canceled. Shared product links open that capture screen directly.
+
+On phones the five tabs stay fixed at the bottom with safe-area padding, and changing screens returns to the top. Garden and Shop & upgrades are separate views. Installation instructions and reward explanations are tucked into Settings. Desktop navigation stays at the top.
+
+Verified at 320 × 640, 390 × 844, and 430 × 932: no horizontal overflow and reachable navigation. Today fits one viewport at 390 × 844 and 430 × 932; the 320 × 640 layout requires a short scroll. Browser checks covered capture, draft preservation, editing, garden/shop separation, Settings-only help, watering, shared drafts, and offline persistence. All 384 tests and the production build passed. These changes still need to be pushed to update the hosted preview.
