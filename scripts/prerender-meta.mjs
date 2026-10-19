@@ -210,7 +210,9 @@ try {
     const html = template
       .replace(/<title>.*?<\/title>/, `<title>${escapeHtml(title)}</title>`)
       .replace('</head>', `${headTags}\n  </head>`)
-      .replace('<div id="root"></div>', `<div id="root">${body}</div>`)
+      // The garden renders private device-local state; keep its document head,
+      // but mount its UI on the client rather than hydrating a placeholder.
+      .replace('<div id="root"></div>', `<div id="root">${page.path === '/garden' ? '' : body}</div>`)
 
     const outDir = page.path === '/' ? distDir : path.join(distDir, page.path)
     await mkdir(outDir, { recursive: true })

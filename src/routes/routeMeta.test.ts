@@ -47,6 +47,7 @@ import { fileURLToPath } from 'node:url'
 import { seoMeta, canonicalLink, SITE_URL } from '../lib/meta'
 import {
   homeMeta,
+  gardenMeta,
   aboutMeta,
   resumeMeta,
   blogMeta,
@@ -74,6 +75,7 @@ const routesDir = path.dirname(fileURLToPath(import.meta.url))
 // getAllPosts()/getPostBySlug(), computed fresh every build, so there is no
 // hand-typed copy of that data for this guard to protect.)
 const routeFiles: { file: string; metaName: string; meta: RouteMetaEntry }[] = [
+  { file: 'garden.tsx', metaName: 'gardenMeta', meta: gardenMeta },
   { file: 'index.tsx', metaName: 'homeMeta', meta: homeMeta },
   { file: 'about.tsx', metaName: 'aboutMeta', meta: aboutMeta },
   { file: 'resume.tsx', metaName: 'resumeMeta', meta: resumeMeta },

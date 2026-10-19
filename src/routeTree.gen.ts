@@ -15,6 +15,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as BooksRouteImport } from './routes/books'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as GamesRouteImport } from './routes/games'
+import { Route as GardenRouteImport } from './routes/garden'
 import { Route as Minerals_fossilsRouteImport } from './routes/minerals_fossils'
 import { Route as MusicRouteImport } from './routes/music'
 import { Route as ResumeRouteImport } from './routes/resume'
@@ -56,6 +57,11 @@ const ContactRoute = ContactRouteImport.update({
 const GamesRoute = GamesRouteImport.update({
   id: '/games',
   path: '/games',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GardenRoute = GardenRouteImport.update({
+  id: '/garden',
+  path: '/garden',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Minerals_fossilsRoute = Minerals_fossilsRouteImport.update({
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/books': typeof BooksRoute
   '/contact': typeof ContactRoute
   '/games': typeof GamesRoute
+  '/garden': typeof GardenRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/music': typeof MusicRoute
   '/resume': typeof ResumeRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/books': typeof BooksRoute
   '/contact': typeof ContactRoute
   '/games': typeof GamesRoute
+  '/garden': typeof GardenRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/music': typeof MusicRoute
   '/resume': typeof ResumeRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/books': typeof BooksRoute
   '/contact': typeof ContactRoute
   '/games': typeof GamesRoute
+  '/garden': typeof GardenRoute
   '/minerals_fossils': typeof Minerals_fossilsRoute
   '/music': typeof MusicRoute
   '/resume': typeof ResumeRoute
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/books'
     | '/contact'
     | '/games'
+    | '/garden'
     | '/minerals_fossils'
     | '/music'
     | '/resume'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/books'
     | '/contact'
     | '/games'
+    | '/garden'
     | '/minerals_fossils'
     | '/music'
     | '/resume'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/books'
     | '/contact'
     | '/games'
+    | '/garden'
     | '/minerals_fossils'
     | '/music'
     | '/resume'
@@ -253,6 +265,7 @@ export interface RootRouteChildren {
   BooksRoute: typeof BooksRoute
   ContactRoute: typeof ContactRoute
   GamesRoute: typeof GamesRoute
+  GardenRoute: typeof GardenRoute
   Minerals_fossilsRoute: typeof Minerals_fossilsRoute
   MusicRoute: typeof MusicRoute
   ResumeRoute: typeof ResumeRoute
@@ -309,6 +322,13 @@ declare module '@tanstack/react-router' {
       path: '/games'
       fullPath: '/games'
       preLoaderRoute: typeof GamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/garden': {
+      id: '/garden'
+      path: '/garden'
+      fullPath: '/garden'
+      preLoaderRoute: typeof GardenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/minerals_fossils': {
@@ -405,6 +425,7 @@ const rootRouteChildren: RootRouteChildren = {
   BooksRoute: BooksRoute,
   ContactRoute: ContactRoute,
   GamesRoute: GamesRoute,
+  GardenRoute: GardenRoute,
   Minerals_fossilsRoute: Minerals_fossilsRoute,
   MusicRoute: MusicRoute,
   ResumeRoute: ResumeRoute,
